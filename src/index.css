@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import "tailwindcss";
+
+
+@theme {
+    --color-cloud-100: #F5F9FC;
+    --color-cloud-300: #D9E5F1;
+    --color-cloud-400: #95A6BD;
+    --color-cloud-500: #213547;
+
+
+    --color-lime-100: #F2F7C7;
+    --color-lime-500: #BACA57;
+
+
+    --color-sky-100: #E8F7FF;
+    --color-sky-500: #A7DAEB;
+
+    --color-campfire-100: #FEEDD8;
+    --color-campfire-500: #E6AB6E;
+
+    --color-sunflower-100: #FFF5D9;
+    --color-sunflower-500: #F2C94C;
+
+    --color-salmon-100: #FFEBEB;
+    --color-salmon-500: #EEA2A2;
+}
+
+* {
+    font-family: 'Nunito';
+}
+
+.font-baskerville {
+    font-family: 'Libre Baskerville';
+}
