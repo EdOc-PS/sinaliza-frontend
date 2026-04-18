@@ -4,11 +4,11 @@ import Label from "../../../ui/Label"
 import Button from "../../../ui/Button"
 import Select from "../../../ui/Select"
 
-import { ArrowLeft01Icon, Backpack01Icon, ConversationIcon, DiplomaIcon, HealtcareIcon, HierarchyCircle02Icon, LocationUser01Icon, MailOpenLoveIcon, PenTool03Icon, SchoolIcon, SmartPhone01Icon, StationeryIcon, TeacherIcon, UserIcon } from "@hugeicons/core-free-icons"
+import { ArrowLeft01Icon, Backpack01Icon, CheckmarkBadge01Icon, CirclePasswordIcon, ConversationIcon, DiplomaIcon, HealtcareIcon, HierarchyCircle02Icon, LocationUser01Icon, Mail01Icon, MailOpenLoveIcon, PenTool03Icon, SchoolIcon, SmartPhone01Icon, StationeryIcon, TeacherIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import InputText from "../../../ui/InputText"
 
-type PerfilId = "student" | "educator" | "instructor" | "guardian";
+type PerfilId = "student" | "educator" | "interpreter" | "guardian";
 
 type CampoFormulario = {
     id: string;
@@ -25,6 +25,7 @@ const perfilFormularios: Record<PerfilId, { titulo: string; descricao: string; c
         titulo: "Dados do estudante",
         descricao: "Complete as informações acadêmicas e de apoio.",
         campos: [
+            { id: "instituto", label: "Instituto:", placeholder: "Nome da instituição", icon: SchoolIcon },
             { id: "grauEscolar", label: "Grau escolar:", placeholder: "Ex: 8º ano, ensino médio, graduação", icon: Backpack01Icon },
             { id: "necessidadesEspeciais", label: "Necessidades especiais:", placeholder: "Descreva se houver alguma", icon: HealtcareIcon },
         ],
@@ -38,8 +39,8 @@ const perfilFormularios: Record<PerfilId, { titulo: string; descricao: string; c
             { id: "especialidade", label: "Especialidade:", placeholder: "Área de maior atuação", icon: StationeryIcon },
         ],
     },
-    instructor: {
-        titulo: "Dados do instrutor",
+    interpreter: {
+        titulo: "Dados do intérprete",
         descricao: "Detalhe a formação e a área de apoio.",
         campos: [
             { id: "instituto", label: "Instituto:", placeholder: "Nome da instituição", icon: SchoolIcon },
@@ -49,12 +50,10 @@ const perfilFormularios: Record<PerfilId, { titulo: string; descricao: string; c
                 icon: ConversationIcon,
                 kind: "select",
                 options: [
-                    { label: "Selecione uma opção", value: "", },
-                    { label: "Iniciante", value: "iniciante" },
-                    { label: "Básico", value: "basico" },
-                    { label: "Intermediário", value: "intermediario" },
-                    { label: "Avançado", value: "avancado" },
-                    { label: "Fluente", value: "fluente" },
+                    { label: "Básico", value: "BASICO" },
+                    { label: "Intermediário", value: "INTERMEDIARIO" },
+                    { label: "Avançado", value: "AVANCADO" },
+                    { label: "Fluente", value: "FLUENTE" },
                 ],
             },
             { id: "certificado", label: "Certificado:", placeholder: "Informação sobre certificação", icon: DiplomaIcon },
@@ -65,7 +64,7 @@ const perfilFormularios: Record<PerfilId, { titulo: string; descricao: string; c
         titulo: "Dados do responsável",
         descricao: "Preencha as informações de vínculo.",
         campos: [
-            { id: "alunoResponsavel", label: "Aluno que é responsável:", placeholder: "Nome do aluno", icon: UserIcon },
+            { id: "alunoResponsavel", label: "Aluno que é responsável:", placeholder: "Email do aluno", icon: Mail01Icon },
             { id: "parentesco", label: "Parentesco:", placeholder: "Ex: mãe, pai, avó", icon: HierarchyCircle02Icon },
         ],
     },
@@ -79,6 +78,8 @@ const Register = () => {
     const [numero, setNumero] = useState("");
     const [bio, setBio] = useState("");
     const [proficienciaLibras, setProficienciaLibras] = useState("");
+    const [senha, setSenha] = useState("");
+    const [confirmarSenha, setConfirmarSenha] = useState("");
 
     const perfis: Array<{ id: PerfilId; titulo: string; descricao: string; classes: string }> = [
         {
@@ -94,8 +95,8 @@ const Register = () => {
             classes: "bg-[#ffd6c9] border-[#f8a892] text-[#8a3a24]",
         },
         {
-            id: "instructor",
-            titulo: "Instrutor",
+            id: "interpreter",
+            titulo: "Interprete",
             descricao: "Praticas guiadas e acompanhamento",
             classes: "bg-yellow-100 border-yellow-300 text-yellow-900",
         },
@@ -113,10 +114,12 @@ const Register = () => {
         <>
             <div className="space-y-10">
                 <div className="flex justify-center gap-4 mb-12">
-                    <div className={`w-20 h-1.5 rounded-full transition-colors ${view >= 0 ? "bg-green-500" : "bg-neutral-200"}`}></div>
-                    <div className={`w-20 h-1.5 rounded-full transition-colors ${view >= 1 ? "bg-green-500" : "bg-neutral-200"}`}></div>
-                    <div className={`w-20 h-1.5 rounded-full transition-colors ${view >= 2 ? "bg-green-500" : "bg-neutral-200"}`}></div>
-                    <div className={`w-20 h-1.5 rounded-full transition-colors ${view >= 3 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 0 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 1 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 2 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 3 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 4 ? "bg-green-500" : "bg-neutral-200"}`}></div>
+                    <div className={`w-12 h-1.5 rounded-full transition-colors ${view >= 5 ? "bg-green-500" : "bg-neutral-200"}`}></div>
                 </div>
 
                 {view === 0 && (
@@ -191,7 +194,7 @@ const Register = () => {
                                         key={perfil.id}
                                         type="button"
                                         onClick={() => setPerfilSelecionado(perfil.id)}
-                                        className={`rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
+                                        className={`cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
                                             }`}
                                     >
                                         <p className="text-2xl font-bold">{perfil.titulo}</p>
@@ -293,12 +296,82 @@ const Register = () => {
                                 className="w-18 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80">
                                 <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
                             </button>
-                            <Button className="w-full" onClick={() => {
-                                console.log("Registro completo:", { nome, email, numero, perfilSelecionado, bio, proficienciaLibras });
-                            }}>
-                                Concluir
+                            <Button className="w-full" onClick={() => setView(4)}>
+                                Próximo
                             </Button>
                         </div>
+                    </>
+                )}
+
+                {view === 4 && (
+                    <>
+                        <div className="text-center space-y-2">
+                            <p className="text-4xl font-bold text-cloud-500 font-baskerville">Criar Senha</p>
+                            <p className="text-lg text-neutral-500 mt-2 font-baskerville">Crie uma senha segura para proteger sua conta.</p>
+                        </div>
+
+                        <div className="grid gap-4 md:col-span-1">
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="senha">
+                                    Senha:
+                                </Label>
+                                <Input
+                                    id="senha"
+                                    icon={CirclePasswordIcon}
+                                    type="password"
+                                    placeholder="Digite sua senha"
+                                    value={senha}
+                                    onChange={(value) => setSenha(value)}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="confirmarSenha">
+                                    Confirmar Senha:
+                                </Label>
+                                <Input
+                                    id="confirmarSenha"
+                                    icon={CirclePasswordIcon}
+                                    type="password"
+                                    placeholder="Repita sua senha"
+                                    value={confirmarSenha}
+                                    onChange={(value) => setConfirmarSenha(value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-6 justify-between">
+                            <button
+                                onClick={() => setView(3)}
+                                className="w-18 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80">
+                                <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+                            </button>
+                            <Button className="w-full" onClick={() => setView(5)}>
+                                Próximo
+                            </Button>
+                        </div>
+                    </>
+                )}
+
+                {view === 5 && (
+                    <>
+                        <div className="text-center space-y-6">
+                            <div className="flex justify-center">
+                                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
+                                    <HugeiconsIcon icon={CheckmarkBadge01Icon} size={42} className="text-green-800" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-4xl font-bold text-cloud-500 font-baskerville">Conta Criada com Sucesso!</p>
+                                <p className="text-lg text-neutral-500 font-baskerville">Bem-vindo à plataforma Sinaliza.</p>
+                            </div>
+                        </div>
+
+                        <Button className="w-full" onClick={() => {
+                            console.log("Registro completo:", { nome, email, numero, perfilSelecionado, bio, senha, proficienciaLibras });
+                        }}>
+                            Entrar na Plataforma
+                        </Button>
                     </>
                 )}
             </div>

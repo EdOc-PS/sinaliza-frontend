@@ -10,6 +10,7 @@ interface SelectOption {
 }
 
 interface SelectProps {
+    id?: string;
     onChange?: (value: string) => void;
     value?: string;
     icon?: IconSvgElement;
@@ -20,6 +21,7 @@ interface SelectProps {
 
 
 const Select = ({
+    id,
     onChange,
     value = "",
     icon,
@@ -62,6 +64,7 @@ const Select = ({
                 )}
 
                 <button
+                    id={id}
                     type="button"
                     disabled={disabled}
                     className="flex cursor-pointer w-full items-center justify-between gap-3 bg-transparent text-left text-neutral-900 outline-none disabled:cursor-not-allowed disabled:opacity-60"
