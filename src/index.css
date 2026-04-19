@@ -1,35 +1,105 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 @import "tailwindcss";
 
-
 @theme {
+    /* Cloud*/
     --color-cloud-100: #F5F9FC;
+    --color-cloud-200: #E6EEF5;
     --color-cloud-300: #D9E5F1;
     --color-cloud-400: #95A6BD;
     --color-cloud-500: #213547;
+    --color-cloud-600: #1A2B3D;
+    --color-cloud-700: #132433;
+    --color-cloud-800: #0D1822;
+    --color-cloud-900: #050B10;
 
-
-    --color-lime-100: #F2F7C7;
-    --color-lime-500: #BACA57;
-
-
-    --color-sky-100: #E8F7FF;
-    --color-sky-500: #A7DAEB;
-
-    --color-campfire-100: #FEEDD8;
-    --color-campfire-500: #E6AB6E;
-
+    /* Sunflower */
     --color-sunflower-100: #FFF5D9;
-    --color-sunflower-500: #F2C94C;
+    --color-sunflower-200: #FCE9B3;
+    --color-sunflower-300: #F9D66B;
+    --color-sunflower-400: #F5C44E;
+    --color-sunflower-500: #EFB832;
+    --color-sunflower-600: #D9A020;
+    --color-sunflower-700: #B88010;
+    --color-sunflower-800: #8C5E08;
+    --color-sunflower-900: #5C3A02;
 
+    /* Salmon */
     --color-salmon-100: #FFEBEB;
+    --color-salmon-200: #FECECE;
+    --color-salmon-300: #FDADAD;
+    --color-salmon-400: #F79090;
     --color-salmon-500: #EEA2A2;
+    --color-salmon-600: #D97878;
+    --color-salmon-700: #C05050;
+    --color-salmon-800: #923030;
+    --color-salmon-900: #5E1515;
+
+    /* Campfire */
+    --color-campfire-100: #FEEDD8;
+    --color-campfire-200: #FDDAB4;
+    --color-campfire-300: #F9C48A;
+    --color-campfire-400: #F2B076;
+    --color-campfire-500: #E6AB6E;
+    --color-campfire-600: #CC8A48;
+    --color-campfire-700: #A86830;
+    --color-campfire-800: #7D481C;
+    --color-campfire-900: #502B0A;
+
+    /* Lime */
+    --color-lime-100: #F2F7C7;
+    --color-lime-200: #E4EF96;
+    --color-lime-300: #D2E46A;
+    --color-lime-400: #C8D85E;
+    --color-lime-500: #BACA57;
+    --color-lime-600: #96AA30;
+    --color-lime-700: #72861C;
+    --color-lime-800: #4E600E;
+    --color-lime-900: #2E3C04;
+
+    /* Sky */
+    --color-sky-100: #E8F7FF;
+    --color-sky-200: #C8ECFA;
+    --color-sky-300: #A7DAEB;
+    --color-sky-400: #82C8E0;
+    --color-sky-500: #56B2D4;
+    --color-sky-600: #3490B5;
+    --color-sky-700: #1E6E94;
+    --color-sky-800: #0E4D70;
+    --color-sky-900: #062E48;
+
+    /* Status — essencial para acessibilidade */
+    --color-success-100: #E8F5E9;
+    --color-success-500: #4CAF50;
+    --color-success-700: #388E3C;
+    --color-success-900: #1B5E20;
+
+    --color-warning-100: #FFF3E0;
+    --color-warning-500: #FF9800;
+    --color-warning-700: #F57C00;
+    --color-warning-900: #E65100;
+
+    --color-error-100: #FFEBEE;
+    --color-error-500: #F44336;
+    --color-error-700: #D32F2F;
+    --color-error-900: #B71C1C;
+
+    --color-info-100: #E3F2FD;
+    --color-info-500: #2196F3;
+    --color-info-700: #1976D2;
+    --color-info-900: #0D47A1;
 }
 
 * {
-    font-family: 'Nunito';
+    font-family: 'Nunito', sans-serif;
 }
 
 .font-baskerville {
-    font-family: 'Libre Baskerville';
+    font-family: 'Libre Baskerville', serif;
+}
+
+/* Focus ring para acessibilidade — essencial para navegação por teclado */
+*:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
 }

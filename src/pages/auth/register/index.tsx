@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Input from '../../../components/ui/Input'
-import Label from '../../../components/ui/Label'
-import Button from '../../../components/ui/Button'
-import Select from '../../../components/ui/Select'
-import InputText from '../../../components/ui/InputText'
+import Input from '@components/ui/Input'
+import Label from '@components/ui/Label'
+import Button from '@components/ui/Button'
+import Select from '@components/ui/Select'
+import InputText from '@components/ui/InputText'
 import {
     ArrowLeft01Icon,
     Backpack01Icon,
@@ -24,8 +24,18 @@ import {
     TeacherIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { PostRequest } from '@api/requests'
+import { AUTH } from '@/config/api/apiRoutes/auth'
+import { maskPhone } from '@/lib/mask/mask'
 
 type PerfilId = 'student' | 'educator' | 'interpreter' | 'guardian'
+
+const perfilRoleMap: Record<PerfilId, string> = {
+    student: 'STUDENT',
+    educator: 'EDUCATOR',
+    interpreter: 'INTERPRETER',
+    guardian: 'GUARDIAN',
+}
 
 type CampoFormulario = {
     id: string
@@ -35,6 +45,7 @@ type CampoFormulario = {
     type?: string
     kind?: 'input' | 'select'
     options?: Array<{ label: string; value: string }>
+    noSpecialChars?: boolean
 }
 
 const perfilFormularios: Record<
@@ -50,6 +61,7 @@ const perfilFormularios: Record<
                 label: 'Instituto:',
                 placeholder: 'Nome da instituição',
                 icon: SchoolIcon,
+                noSpecialChars: true,
             },
             {
                 id: 'grauEscolar',
@@ -62,6 +74,7 @@ const perfilFormularios: Record<
                 label: 'Necessidades especiais:',
                 placeholder: 'Descreva se houver alguma',
                 icon: HealtcareIcon,
+                noSpecialChars: true,
             },
         ],
     },
@@ -74,18 +87,21 @@ const perfilFormularios: Record<
                 label: 'Instituto:',
                 placeholder: 'Nome da instituição',
                 icon: SchoolIcon,
+                noSpecialChars: true,
             },
             {
                 id: 'department',
                 label: 'Departamento:',
                 placeholder: 'Ex: Matemática, Pedagogia',
                 icon: TeacherIcon,
+                noSpecialChars: true,
             },
             {
                 id: 'specialty',
                 label: 'Especialidade:',
                 placeholder: 'Área de maior atuação',
                 icon: StationeryIcon,
+                noSpecialChars: true,
             },
         ],
     },
@@ -116,12 +132,14 @@ const perfilFormularios: Record<
                 label: 'Certificado:',
                 placeholder: 'Informação sobre certificação',
                 icon: DiplomaIcon,
+                noSpecialChars: true,
             },
             {
                 id: 'areaAtuacao',
                 label: 'Área de atuação:',
                 placeholder: 'Ex: reforço escolar, interpretação',
                 icon: TeacherIcon,
+                noSpecialChars: true,
             },
         ],
     },
@@ -140,29 +158,47 @@ const perfilFormularios: Record<
                 label: 'Parentesco:',
                 placeholder: 'Ex: mãe, pai, avó',
                 icon: HierarchyCircle02Icon,
+                noSpecialChars: true,
             },
         ],
     },
 }
 
+type UserProps = {
+    nome: string
+    email: string
+    phone: string
+    bio: string
+    senha: string
+    confirmarSenha: string
+    perfil: PerfilId | null
+    dadosPerfil: Record<string, string>
+}
+
+type ProfileArrayProps = {
+    id: PerfilId
+    titulo: string
+    descricao: string
+    classes: string
+}
+
 const RegisterPage = () => {
     const navigate = useNavigate()
+
+    const [loading, setIsLoading] = useState(false)
     const [view, setView] = useState<number>(0)
-    const [perfilSelecionado, setPerfilSelecionado] = useState<PerfilId | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
+    const [user, setUser] = useState<UserProps>({
+        nome: '',
+        email: '',
+        phone: '',
+        bio: '',
+        senha: '',
+        confirmarSenha: '',
+        perfil: null,
+        dadosPerfil: {},
+    })
 
-    // Dados base
-    const [nome, setNome] = useState('')
-    const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [bio, setBio] = useState('')
-    const [senha, setSenha] = useState('')
-    const [confirmarSenha, setConfirmarSenha] = useState('')
-
-    // Dados de perfil (dinâmicos)
-    const [dataProfile, setDataProfile] = useState<Record<string, string>>({})
-
-    const perfis: Array<{ id: PerfilId; titulo: string; descricao: string; classes: string }> = [
+    const perfis: Array<ProfileArrayProps> = [
         {
             id: 'student',
             titulo: 'Estudante',
@@ -189,17 +225,70 @@ const RegisterPage = () => {
         },
     ]
 
-    const formularioSelecionado = perfilSelecionado ? perfilFormularios[perfilSelecionado] : null
+    const formularioSelecionado = user.perfil ? perfilFormularios[user.perfil] : null
 
-    const handleDataProfileChange = (fieldId: string, value: string) => {
-        setDataProfile((prev) => ({ ...prev, [fieldId]: value }))
+    const handleUserChange = (field: keyof UserProps, value: string | PerfilId | null) => {
+        setUser((prev) => ({ ...prev, [field]: value }))
     }
 
+    const handleDataProfileChange = (fieldId: string, value: string) => {
+        setUser((prev) => ({
+            ...prev,
+            dadosPerfil: { ...prev.dadosPerfil, [fieldId]: value },
+        }))
+    }
 
+    // ──── Validações ────────────────────────────
+
+    // View 0: Dados pessoais (nome e email obrigatórios; nome mínimo 3 chars)
+    const nomeValido = user.nome.trim().length >= 3
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email.trim())
+    const isView0Valid = nomeValido && emailValido
+
+    // View 2: Dados do perfil (todos os campos obrigatórios)
+    const isView2Valid = () => {
+        if (!formularioSelecionado) return false
+        return formularioSelecionado.campos.every(
+            (campo) => user.dadosPerfil[campo.id]?.trim() !== ''
+        )
+    }
+
+    // View 4: Senha (ambas obrigatórias, mínimo 6 chars e devem coincidir)
+    const senhaValida = user.senha.length >= 6
+    const senhasIguais = user.senha === user.confirmarSenha
+    const senhasValidas = user.senha.trim() !== '' && user.confirmarSenha.trim() !== ''
+    const isView4Valid = senhasValidas && senhasIguais && senhaValida
+
+    // Função de registro
+    const handleRegister = async () => {
+        if (!user.perfil) return
+        setIsLoading(true)
+        try {
+            const payload = {
+                name: user.nome,
+                email: user.email,
+                password: user.senha,
+                role: perfilRoleMap[user.perfil],
+                phone: user.phone || undefined,
+                bio: user.bio || undefined,
+                dataProfile: user.dadosPerfil,
+            }
+            const response = await PostRequest(AUTH.REGISTER(), payload)
+            if (!response.success) {
+                console.log('Erro no cadastro:', response.message)
+                return
+            }
+            setView(5)
+        } catch (error) {
+            console.error('Erro ao criar conta:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-neutral-50 to-neutral-100 p-4">
-            <div className="w-full max-w-xl bg-white rounded-3xl p-8  border-2 border-neutral-300 ">
+        <div className="min-h-screen flex justify-center items-start bg-linear-to-br from-neutral-50 to-neutral-100 p-4 pt-26">
+            <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
                 <div className="space-y-10">
                     {/* Progress bar */}
                     <div className="flex justify-center gap-2 mb-8">
@@ -231,9 +320,15 @@ const RegisterPage = () => {
                                         id="nome"
                                         icon={LocationUser01Icon}
                                         placeholder="Digite seu nome"
-                                        value={nome}
-                                        onChange={(value) => setNome(value)}
+                                        value={user.nome}
+                                        noSpecialChars
+                                        onChange={(value) => handleUserChange('nome', value)}
                                     />
+                                    {user.nome.trim() !== '' && !nomeValido && (
+                                        <p className="text-xs text-neutral-400 pl-1">
+                                            O nome precisa ter pelo menos 3 caracteres.
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex flex-col gap-2">
@@ -242,24 +337,35 @@ const RegisterPage = () => {
                                         id="email"
                                         icon={MailOpenLoveIcon}
                                         placeholder="usuario@example.com"
-                                        value={email}
-                                        onChange={(value) => setEmail(value)}
+                                        value={user.email}
+                                        onChange={(value) => handleUserChange('email', value)}
                                     />
+                                    {user.email.trim() !== '' && !emailValido && (
+                                        <p className="text-xs text-neutral-400 pl-1">
+                                            Digite um e-mail válido.
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="phone">Telefone:</Label>
+                                    <Label htmlFor="phone" isOptional>
+                                        Telefone:
+                                    </Label>
                                     <Input
                                         id="phone"
                                         icon={SmartPhone01Icon}
                                         placeholder="(31) 99999-9999"
-                                        value={phone}
-                                        onChange={(value) => setPhone(value)}
+                                        value={user.phone}
+                                        onChange={(value) => handleUserChange('phone', maskPhone(value))}
                                     />
                                 </div>
                             </div>
 
-                            <Button className="w-full" onClick={() => setView(1)}>
+                            <Button
+                                className="w-full"
+                                onClick={() => setView(1)}
+                                disabled={!isView0Valid}
+                            >
                                 Próximo
                             </Button>
                         </>
@@ -279,13 +385,13 @@ const RegisterPage = () => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 {perfis.map((perfil) => {
-                                    const selecionado = perfilSelecionado === perfil.id
+                                    const selecionado = user.perfil === perfil.id
 
                                     return (
                                         <button
                                             key={perfil.id}
                                             type="button"
-                                            onClick={() => setPerfilSelecionado(perfil.id)}
+                                            onClick={() => handleUserChange('perfil', perfil.id)}
                                             className={`cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
                                                 }`}
                                         >
@@ -306,7 +412,7 @@ const RegisterPage = () => {
                                 <Button
                                     className="flex-1"
                                     onClick={() => setView(2)}
-                                    disabled={!perfilSelecionado}
+                                    disabled={!user.perfil}
                                 >
                                     Próximo
                                 </Button>
@@ -334,7 +440,7 @@ const RegisterPage = () => {
                                             <Select
                                                 id={campo.id}
                                                 icon={campo.icon}
-                                                value={dataProfile[campo.id] || ''}
+                                                value={user.dadosPerfil[campo.id] || ''}
                                                 onChange={(value) =>
                                                     handleDataProfileChange(campo.id, value)
                                                 }
@@ -346,7 +452,8 @@ const RegisterPage = () => {
                                                 icon={campo.icon}
                                                 type={campo.type}
                                                 placeholder={campo.placeholder}
-                                                value={dataProfile[campo.id] || ''}
+                                                value={user.dadosPerfil[campo.id] || ''}
+                                                noSpecialChars={campo.noSpecialChars}
                                                 onChange={(value) =>
                                                     handleDataProfileChange(campo.id, value)
                                                 }
@@ -363,7 +470,11 @@ const RegisterPage = () => {
                                 >
                                     <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
                                 </button>
-                                <Button className="flex-1" onClick={() => setView(3)}>
+                                <Button
+                                    className="flex-1"
+                                    onClick={() => setView(3)}
+                                    disabled={!isView2Valid()}
+                                >
                                     Próximo
                                 </Button>
                             </div>
@@ -383,13 +494,13 @@ const RegisterPage = () => {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="bio">Biografia:</Label>
+                                <Label htmlFor="bio" isOptional>Biografia:</Label>
                                 <InputText
                                     id="bio"
                                     icon={PenTool03Icon}
                                     placeholder="Escreva uma breve descrição sobre você, seus interesses e o que espera encontrar na plataforma."
-                                    value={bio}
-                                    onChange={(value) => setBio(value)}
+                                    value={user.bio}
+                                    onChange={(value) => handleUserChange('bio', value)}
                                 />
                             </div>
 
@@ -426,10 +537,15 @@ const RegisterPage = () => {
                                         id="senha"
                                         icon={CirclePasswordIcon}
                                         type="password"
-                                        placeholder="Mínimo 6 caracteres"
-                                        value={senha}
-                                        onChange={(value) => setSenha(value)}
+                                        placeholder="Escreva sua melhor senha"
+                                        value={user.senha}
+                                        onChange={(value) => handleUserChange('senha', value)}
                                     />
+                                    {user.senha.trim() !== '' && !senhaValida && (
+                                        <p className="text-xs text-neutral-400 pl-1">
+                                            A senha precisa ter pelo menos 6 caracteres.
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex flex-col gap-2">
@@ -439,10 +555,16 @@ const RegisterPage = () => {
                                         icon={CirclePasswordIcon}
                                         type="password"
                                         placeholder="Repita a senha"
-                                        value={confirmarSenha}
-                                        onChange={(value) => setConfirmarSenha(value)}
+                                        value={user.confirmarSenha}
+                                        onChange={(value) => handleUserChange('confirmarSenha', value)}
                                     />
                                 </div>
+
+                                {senhasValidas && !senhasIguais && (
+                                    <p className="text-xs text-neutral-400 pl-1">
+                                        As senhas não coincidem.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex gap-3 pt-4">
@@ -454,10 +576,10 @@ const RegisterPage = () => {
                                 </button>
                                 <Button
                                     className="flex-1"
-                                    onClick={() => { }}
-                                    disabled={isLoading}
+                                    onClick={handleRegister}
+                                    disabled={!isView4Valid || loading}
                                 >
-                                    {isLoading ? 'Criando conta...' : 'Criar Conta'}
+                                    {loading ? 'Criando conta...' : 'Criar Conta'}
                                 </Button>
                             </div>
                         </>

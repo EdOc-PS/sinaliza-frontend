@@ -1,22 +1,35 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Input from '../../../components/ui/Input'
-import Label from '../../../components/ui/Label'
-import Button from '../../../components/ui/Button'
+import Input from '@components/ui/Input'
+import Label from '@components/ui/Label'
+import Button from '@components/ui/Button'
 import { CirclePasswordIcon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
+import { PostRequest } from '@api/requests'
+import { AUTH } from '@routes/auth'
+
+interface AuthProps {
+    email: string
+    password: string
+}
 
 const LoginPage = () => {
     const navigate = useNavigate()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [auth, setAuth] = useState<AuthProps>({
+        email: '',
+        password: '',
+    })
+    
     const [isLoading, setIsLoading] = useState(false)
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(auth.email.trim())
 
     const handleLogin = async () => {
         setIsLoading(true)
         try {
-            // TODO: Chamar API de login
-            console.log('Login:', { email, password })
-            // navigate('/') // Navegar para home após login bem-sucedido
+            const response = await PostRequest<AuthProps>(AUTH.LOGIN(), auth)
+            if (!response.success) {
+                console.log("erro")
+            }
+            console.log(response.object)
         } catch (error) {
             console.error('Erro ao fazer login:', error)
         } finally {
@@ -44,9 +57,14 @@ const LoginPage = () => {
                                 id="email"
                                 icon={MailOpenLoveIcon}
                                 placeholder="usuario@example.com"
-                                value={email}
-                                onChange={(value) => setEmail(value)}
+                                value={auth.email}
+                                onChange={(value) => setAuth({ ...auth, email: value })}
                             />
+                            {auth.email.trim() !== '' && !emailValido && (
+                                <p className="text-xs text-neutral-400 pl-1">
+                                    Digite um e-mail válido.
+                                </p>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-2">
@@ -56,8 +74,8 @@ const LoginPage = () => {
                                 type="password"
                                 icon={CirclePasswordIcon}
                                 placeholder="Sua melhor senha"
-                                value={password}
-                                onChange={(value) => setPassword(value)}
+                                value={auth.password}
+                                onChange={(value) => setAuth({ ...auth, password: value })}
                             />
                             <p className="text-end text-cloud-500/80 text-sm cursor-pointer font-medium hover:text-cloud-500">
                                 Esqueci a minha senha
@@ -85,7 +103,7 @@ const LoginPage = () => {
                 </div>
             </div>
 
-            
+
         </div>
     )
 }

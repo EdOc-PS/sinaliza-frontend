@@ -1,0 +1,180 @@
+import { api } from './client';
+
+// ─────────────────────────────────────────────
+// Tipos alinhados com ApiResponse<T> do backend
+// ─────────────────────────────────────────────
+
+export type APIResponse<T = unknown> = {
+  success: boolean;
+  message: string;
+  object?: T;
+  errors?: Record<string, string[]>;
+};
+
+// ─────────────────────────────────────────────
+// Tipos de domínio (espelham o backend)
+// ─────────────────────────────────────────────
+
+export type Role = 'STUDENT' | 'EDUCATOR' | 'INTERPRETER' | 'GUARDIAN' | 'ADMIN';
+export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
+
+export type DataProfile = {
+  institute?: string;
+  // STUDENT
+  grauEscolar?: string;
+  necessidadesEspeciais?: string;
+  // EDUCATOR
+  department?: string;
+  specialty?: string;
+  // INTERPRETER
+  certificate?: string;
+  areaAtuacao?: string;
+  proficienciaLibras?: LibrasLevel;
+  // GUARDIAN
+  parentesco?: string;
+  studentEmail?: string;
+};
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  birthdate?: string;
+  avatar?: string;
+  bio?: string;
+  status: boolean;
+  role: Role;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ─────────────────────────────────────────────
+// Payloads de requisição
+// ─────────────────────────────────────────────
+
+export type LoginPayload = {
+  email: string;
+  password: string;
+};
+
+export type RegisterPayload = {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+  phone?: string;
+  birthdate?: string;
+  bio?: string;
+  dataProfile: DataProfile;
+};
+
+export type UpdateUserPayload = {
+  name?: string;
+  email?: string;
+  password?: string;
+  birthdate?: string;
+  phone?: string;
+  avatar?: string;
+  status?: boolean;
+};
+
+export type LoginResponse = {
+  access_token: string;
+  user: User;
+};
+
+// ─────────────────────────────────────────────
+// Helpers internos
+// ─────────────────────────────────────────────
+
+function handleError<T>(error: unknown): APIResponse<T> {
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const axiosError = error as { response: { status: number; data: { message?: string; errors?: Record<string, string[]> } } };
+    const { status, data } = axiosError.response;
+
+    switch (status) {
+      case 400:
+        return { success: false, message: data.message ?? 'Requisição inválida.', errors: data.errors };
+      case 401:
+        if (typeof window !== 'undefined') localStorage.clear();
+        return { success: false, message: 'Sessão expirada. Faça login novamente.' };
+      case 403:
+        return { success: false, message: 'Acesso negado.' };
+      case 404:
+        return { success: false, message: data.message ?? 'Recurso não encontrado.' };
+      case 409:
+        return { success: false, message: data.message ?? 'Conflito de dados.' };
+      case 500:
+        return { success: false, message: data.message ?? 'Erro interno no servidor.' };
+      default:
+        return { success: false, message: 'Erro inesperado.' };
+    }
+  }
+
+  return { success: false, message: 'Sem conexão com o servidor.' };
+}
+
+// ─────────────────────────────────────────────
+// GET
+// ─────────────────────────────────────────────
+
+export async function GetRequest<T>(
+  path: string,
+  params?: Record<string, unknown>
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.get<APIResponse<T>>(path, { params });
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+
+// ─────────────────────────────────────────────
+// POST
+// ─────────────────────────────────────────────
+
+export async function PostRequest<T>(
+  path: string,
+  data: unknown
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.post<APIResponse<T>>(path, data);
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+
+// ─────────────────────────────────────────────
+// PATCH
+// ─────────────────────────────────────────────
+
+export async function PatchRequest<T>(
+  path: string,
+  data: unknown
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.patch<APIResponse<T>>(path, data);
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+
+// ─────────────────────────────────────────────
+// DELETE
+// ─────────────────────────────────────────────
+
+export async function DeleteRequest<T>(
+  path: string
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.delete<APIResponse<T>>(path);
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+

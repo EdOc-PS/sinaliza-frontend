@@ -6,9 +6,10 @@ import type { ChangeEvent, InputHTMLAttributes } from "react";
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
     onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void;
     icon?: IconSvgElement;
+    noSpecialChars?: boolean;
 }
 
-const Input = ({ className = "", onChange, icon, type, ...props }: InputProps) => {
+const Input = ({ className = "", onChange, icon, type, noSpecialChars, ...props }: InputProps) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === "password";
     const inputType = isPassword ? (showPassword ? "text" : "password") : (type ?? "text");
@@ -28,7 +29,13 @@ const Input = ({ className = "", onChange, icon, type, ...props }: InputProps) =
             <input
                 type={inputType}
                 className={`w-full  bg-transparent text-neutral-900 outline-none placeholder:text-neutral-600 ${className}`}
-                onChange={(event) => onChange?.(event.target.value, event)}
+                onChange={(event) => {
+                    const raw = event.target.value;
+                    const sanitized = noSpecialChars
+                        ? raw.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '')
+                        : raw;
+                    onChange?.(sanitized, event);
+                }}
                 {...props}
             />
 
