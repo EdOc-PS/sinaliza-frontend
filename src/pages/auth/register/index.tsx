@@ -290,6 +290,7 @@ const RegisterPage = () => {
         <div className="min-h-screen flex justify-center items-start bg-linear-to-br from-neutral-50 to-neutral-100 p-4 pt-26">
             <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
                 <div className="space-y-10">
+
                     {/* Progress bar */}
                     <div className="flex justify-center gap-2 mb-8">
                         {[0, 1, 2, 3, 4, 5].map((step) => (
@@ -299,6 +300,10 @@ const RegisterPage = () => {
                                     }`}
                             />
                         ))}
+                    </div>
+
+                    <div className='flex w-ful justify-center '>
+                        <img src="/src/assets/sunny.png" alt="" className='w-20 h-20' />
                     </div>
 
                     {/* Step 0: Dados pessoais */}
@@ -395,8 +400,14 @@ const RegisterPage = () => {
                                             className={`cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
                                                 }`}
                                         >
-                                            <p className="text-lg font-bold">{perfil.titulo}</p>
-                                            <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
+                                            <div>
+                                                <p className="text-lg font-bold">{perfil.titulo}</p>
+                                                <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
+                                            </div>
+                                            <div className='flex justify-end'>
+                                                <img src="/src/assets/home.png" alt="" className='w-15 h-15' />
+                                            </div>
+
                                         </button>
                                     )
                                 })}

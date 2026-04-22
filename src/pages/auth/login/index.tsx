@@ -6,6 +6,7 @@ import Button from '@components/ui/Button'
 import { CirclePasswordIcon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
 import { PostRequest } from '@api/requests'
 import { AUTH } from '@routes/auth'
+import { toast } from 'sonner'
 
 interface AuthProps {
     email: string
@@ -18,7 +19,7 @@ const LoginPage = () => {
         email: '',
         password: '',
     })
-    
+
     const [isLoading, setIsLoading] = useState(false)
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(auth.email.trim())
 
@@ -41,6 +42,10 @@ const LoginPage = () => {
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-neutral-50 to-neutral-100 p-4">
             <div className="w-full max-w-xl bg-white rounded-3xl p-8  border-2 border-neutral-300 ">
                 <div className="space-y-6">
+                    <div className='flex w-ful justify-center '>
+                        <img src="/src/assets/sun(3).png" alt="" className='w-20 h-20' />
+                    </div>
+
                     <div className="text-center">
                         <p className="text-4xl font-bold text-cloud-500 font-baskerville">
                             Olá, <span className="text-campfire-500 font-baskerville">Bem vindo!</span>
@@ -84,7 +89,7 @@ const LoginPage = () => {
 
                         <Button
                             className="w-full"
-                            onClick={handleLogin}
+                            onClick={() => toast.success('Sucesso!')}
                             disabled={isLoading}
                         >
                             {isLoading ? 'Entrando...' : 'Entrar na minha conta'}
