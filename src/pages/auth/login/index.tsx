@@ -43,7 +43,7 @@ const LoginPage = () => {
             <div className="w-full max-w-xl bg-white rounded-3xl p-8  border-2 border-neutral-300 ">
                 <div className="space-y-6">
                     <div className='flex w-ful justify-center '>
-                        <img src="/src/assets/sun(3).png" alt="" className='w-20 h-20' />
+                        <img src="/src/assets/sun.png" alt="" className='w-20 h-20' />
                     </div>
 
                     <div className="text-center">
@@ -107,8 +107,6 @@ const LoginPage = () => {
                     </div>
                 </div>
             </div>
-
-
         </div>
     )
 }

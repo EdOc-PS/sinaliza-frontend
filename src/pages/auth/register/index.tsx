@@ -287,10 +287,9 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-start bg-linear-to-br from-neutral-50 to-neutral-100 p-4 pt-26">
+        <div className="min-h-screen flex justify-center items-start bg-linear-to-br from-neutral-50 to-neutral-100 p-4 pt-12">
             <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
-                <div className="space-y-10">
-
+                <div className="space-y-8">
                     {/* Progress bar */}
                     <div className="flex justify-center gap-2 mb-8">
                         {[0, 1, 2, 3, 4, 5].map((step) => (
@@ -302,13 +301,14 @@ const RegisterPage = () => {
                         ))}
                     </div>
 
-                    <div className='flex w-ful justify-center '>
-                        <img src="/src/assets/sunny.png" alt="" className='w-20 h-20' />
-                    </div>
+
 
                     {/* Step 0: Dados pessoais */}
-                    {view === 0 && (
+                    {view === 5 && (
                         <>
+                            <div className='flex w-ful justify-center '>
+                                <img src="/src/assets/hello.png" alt="" className='w-20 h-20' />
+                            </div>
                             <div className="text-center">
                                 <p className="text-3xl font-bold text-cloud-500 font-baskerville">
                                     Dados pessoais
@@ -379,6 +379,10 @@ const RegisterPage = () => {
                     {/* Step 1: Perfil */}
                     {view === 1 && (
                         <>
+                            <div className='flex w-ful justify-center '>
+                                <img src="/src/assets/profile.png" alt="" className='w-20 h-20' />
+                            </div>
+
                             <div className="text-center">
                                 <p className="text-3xl font-bold text-cloud-500 font-baskerville">
                                     Perfil de uso
@@ -397,16 +401,16 @@ const RegisterPage = () => {
                                             key={perfil.id}
                                             type="button"
                                             onClick={() => handleUserChange('perfil', perfil.id)}
-                                            className={`cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
+                                            className={`flex items-start cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
                                                 }`}
                                         >
                                             <div>
                                                 <p className="text-lg font-bold">{perfil.titulo}</p>
                                                 <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
                                             </div>
-                                            <div className='flex justify-end'>
-                                                <img src="/src/assets/home.png" alt="" className='w-15 h-15' />
-                                            </div>
+
+                                            <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-15 h-15 mt-8' />
+
 
                                         </button>
                                     )
@@ -434,6 +438,10 @@ const RegisterPage = () => {
                     {/* Step 2: Dados do perfil */}
                     {view === 2 && (
                         <>
+                            <div className='flex w-ful justify-center '>
+                                <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-20 h-20' />
+                            </div>
+
                             <div className="text-center">
                                 <p className="text-3xl font-bold text-cloud-500 font-baskerville">
                                     {formularioSelecionado?.titulo}
@@ -495,6 +503,10 @@ const RegisterPage = () => {
                     {/* Step 3: Bio */}
                     {view === 3 && (
                         <>
+                            <div className='flex w-ful justify-center '>
+                                <img src="/src/assets/pen.png" alt="" className='w-20 h-20' />
+                            </div>
+
                             <div className="text-center">
                                 <p className="text-3xl font-bold text-cloud-500 font-baskerville">
                                     Sua Bio
@@ -532,6 +544,9 @@ const RegisterPage = () => {
                     {/* Step 4: Senha */}
                     {view === 4 && (
                         <>
+                            <div className='flex w-ful justify-center '>
+                                <img src="/src/assets/security.png" alt="" className='w-20 h-20' />
+                            </div>
                             <div className="text-center">
                                 <p className="text-3xl font-bold text-cloud-500 font-baskerville">
                                     Criar Senha
@@ -597,27 +612,24 @@ const RegisterPage = () => {
                     )}
 
                     {/* Step 5: Sucesso */}
-                    {view === 5 && (
+                    {view === 0 && (
                         <>
-                            <div className="text-center space-y-6">
-                                <div className="flex justify-center">
-                                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                                        <HugeiconsIcon
-                                            icon={CheckmarkBadge01Icon}
-                                            size={40}
-                                            className="text-green-800"
-                                        />
+
+                        
+                                <div className="space-y-8 text-center flex flex-col items-center">
+                                    <p className="text-3xl text-cloud-500 font-baskerville">
+                                        Bem-vindo ao Sinaliza
+                                    </p>
+
+                                   
+                                    <div className="flex justify-center p-8 rounded-full bg-green-400/50">
+                                         <img src="/src/assets/approve.png" alt="" className='w-25 h-25' />
                                     </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                        Conta Criada com Sucesso!
-                                    </p>
-                                    <p className="text-lg text-neutral-500 font-baskerville">
-                                        Bem-vindo à plataforma Sinaliza
+                                    <p className='text-neutral-500 font-medium text-md '>
+                                        Sua conta foi criada com sucesso. Agora você faz parte de uma comunidade comprometida com a inclusão
                                     </p>
                                 </div>
-                            </div>
+
 
                             <Button
                                 className="w-full"
