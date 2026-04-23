@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthBackground from '@components/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
@@ -287,7 +288,8 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-start bg-linear-to-br from-neutral-50 to-neutral-100 p-4 pt-12">
+        <div className="min-h-screen flex justify-center items-start p-4 pt-12">
+            <AuthBackground />
             <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
                 <div className="space-y-8">
                     {/* Progress bar */}

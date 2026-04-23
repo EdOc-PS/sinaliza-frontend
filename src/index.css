@@ -98,6 +98,26 @@
     font-family: 'Libre Baskerville', serif;
 }
 
+.wave-auth-1 {
+    will-change: transform;
+    animation: authWaveDrift1 9s ease-in-out infinite alternate;
+}
+
+.wave-auth-2 {
+    will-change: transform;
+    animation: authWaveDrift2 11s ease-in-out infinite alternate;
+}
+
+@keyframes authWaveDrift1 {
+    from { transform: translateX(-24px) scaleY(1); }
+    to   { transform: translateX(24px) scaleY(1.08); }
+}
+
+@keyframes authWaveDrift2 {
+    from { transform: translateX(16px) scaleY(1); }
+    to   { transform: translateX(-22px) scaleY(0.94); }
+}
+
 /* Focus ring para acessibilidade — essencial para navegação por teclado */
 *:focus-visible {
     outline: 2px solid var(--color-focus-ring);

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthBackground from '@components/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
@@ -39,7 +40,8 @@ const LoginPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-neutral-50 to-neutral-100 p-4">
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <AuthBackground />
             <div className="w-full max-w-xl bg-white rounded-3xl p-8  border-2 border-neutral-300 ">
                 <div className="space-y-6">
                     <div className='flex w-ful justify-center '>
