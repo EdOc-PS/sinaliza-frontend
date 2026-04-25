@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AuthBackground from '@components/AuthBackground'
+import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'

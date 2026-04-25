@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AuthBackground from '@components/AuthBackground'
+import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
 import Select from '@components/ui/Select'
 import InputText from '@components/ui/InputText'
+import ProgressBar from '@/components/layout/ProgressBar'
 import {
     ArrowLeft01Icon,
     Backpack01Icon,
-    CheckmarkBadge01Icon,
     CirclePasswordIcon,
     ConversationIcon,
     DiplomaIcon,
@@ -204,25 +204,25 @@ const RegisterPage = () => {
             id: 'student',
             titulo: 'Estudante',
             descricao: 'Aprendizado continuo e diario de estudos',
-            classes: 'bg-sky-100 border-sky-300 text-sky-900',
+            classes: 'bg-sky-100 text-sky-900',
         },
         {
             id: 'educator',
             titulo: 'Professor',
             descricao: 'Gestao de turmas e compartilhamento',
-            classes: 'bg-[#ffd6c9] border-[#f8a892] text-[#8a3a24]',
+            classes: 'bg-[#ffd6c9] text-[#8a3a24]',
         },
         {
             id: 'interpreter',
             titulo: 'Interprete',
             descricao: 'Praticas guiadas e acompanhamento',
-            classes: 'bg-yellow-100 border-yellow-300 text-yellow-900',
+            classes: 'bg-yellow-100 text-yellow-900',
         },
         {
             id: 'guardian',
             titulo: 'Familiar',
             descricao: 'Apoio domestico e conexao familiar',
-            classes: 'bg-lime-100 border-lime-300 text-lime-900',
+            classes: 'bg-lime-100 text-lime-900',
         },
     ]
 
@@ -288,344 +288,333 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-start p-4 pt-12">
+        <div className="min-h-screen flex justify-center items-start p-4 pt-8">
             <AuthBackground />
-            <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
-                <div className="space-y-8">
-                    {/* Progress bar */}
-                    <div className="flex justify-center gap-2 mb-8">
-                        {[0, 1, 2, 3, 4, 5].map((step) => (
-                            <div
-                                key={step}
-                                className={`h-2 rounded-full transition-all ${view >= step ? 'bg-green-500 w-8' : 'bg-neutral-200 w-6'
-                                    }`}
-                            />
-                        ))}
-                    </div>
+            <div className='flex flex-col items-center gap-4 w-full'>
+                <h1 className='text-3xl font-bold text-cloud-500'>sinaliza</h1>
+                <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
+                    <div className="space-y-6">
+                        <ProgressBar currentStep={view} totalSteps={6} />
 
-
-
-                    {/* Step 0: Dados pessoais */}
-                    {view === 5 && (
-                        <>
-                            <div className='flex w-ful justify-center '>
-                                <img src="/src/assets/hello.png" alt="" className='w-20 h-20' />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                    Dados pessoais
-                                </p>
-                                <p className="text-lg text-neutral-500 mt-2 font-baskerville">
-                                    Vamos começar com o básico
-                                </p>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="nome">Seu nome:</Label>
-                                    <Input
-                                        id="nome"
-                                        icon={LocationUser01Icon}
-                                        placeholder="Digite seu nome"
-                                        value={user.nome}
-                                        noSpecialChars
-                                        onChange={(value) => handleUserChange('nome', value)}
-                                    />
-                                    {user.nome.trim() !== '' && !nomeValido && (
-                                        <p className="text-xs text-neutral-400 pl-1">
-                                            O nome precisa ter pelo menos 3 caracteres.
-                                        </p>
-                                    )}
+                        {/* Step 0: Dados pessoais */}
+                        {view === 0 && (
+                            <>
+                                <div className='flex w-ful justify-center '>
+                                    <img src="/src/assets/hello.png" alt="" className='w-20 h-20' />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                        Dados pessoais
+                                    </p>
+                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                        Vamos começar com o básico
+                                    </p>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="email">E-mail:</Label>
-                                    <Input
-                                        id="email"
-                                        icon={MailOpenLoveIcon}
-                                        placeholder="usuario@example.com"
-                                        value={user.email}
-                                        onChange={(value) => handleUserChange('email', value)}
-                                    />
-                                    {user.email.trim() !== '' && !emailValido && (
-                                        <p className="text-xs text-neutral-400 pl-1">
-                                            Digite um e-mail válido.
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="phone" isOptional>
-                                        Telefone:
-                                    </Label>
-                                    <Input
-                                        id="phone"
-                                        icon={SmartPhone01Icon}
-                                        placeholder="(31) 99999-9999"
-                                        value={user.phone}
-                                        onChange={(value) => handleUserChange('phone', maskPhone(value))}
-                                    />
-                                </div>
-                            </div>
-
-                            <Button
-                                className="w-full"
-                                onClick={() => setView(1)}
-                                disabled={!isView0Valid}
-                            >
-                                Próximo
-                            </Button>
-                        </>
-                    )}
-
-                    {/* Step 1: Perfil */}
-                    {view === 1 && (
-                        <>
-                            <div className='flex w-ful justify-center '>
-                                <img src="/src/assets/profile.png" alt="" className='w-20 h-20' />
-                            </div>
-
-                            <div className="text-center">
-                                <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                    Perfil de uso
-                                </p>
-                                <p className="text-lg text-neutral-500 mt-2 font-baskerville">
-                                    Selecione o perfil que melhor se encaixa
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                {perfis.map((perfil) => {
-                                    const selecionado = user.perfil === perfil.id
-
-                                    return (
-                                        <button
-                                            key={perfil.id}
-                                            type="button"
-                                            onClick={() => handleUserChange('perfil', perfil.id)}
-                                            className={`flex items-start cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-200 hover:-translate-y-0.5 ${perfil.classes} ${selecionado ? "ring-2 ring-cloud-500 shadow-md" : "opacity-90"
-                                                }`}
-                                        >
-                                            <div>
-                                                <p className="text-lg font-bold">{perfil.titulo}</p>
-                                                <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
-                                            </div>
-
-                                            <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-15 h-15 mt-8' />
-
-
-                                        </button>
-                                    )
-                                })}
-                            </div>
-
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    onClick={() => setView(0)}
-                                    className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
-                                >
-                                    <HugeiconsIcon icon={ArrowLeft01Icon} size={26} />
-                                </button>
-                                <Button
-                                    className="flex-1"
-                                    onClick={() => setView(2)}
-                                    disabled={!user.perfil}
-                                >
-                                    Próximo
-                                </Button>
-                            </div>
-                        </>
-                    )}
-
-                    {/* Step 2: Dados do perfil */}
-                    {view === 2 && (
-                        <>
-                            <div className='flex w-ful justify-center '>
-                                <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-20 h-20' />
-                            </div>
-
-                            <div className="text-center">
-                                <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                    {formularioSelecionado?.titulo}
-                                </p>
-                                <p className="text-lg text-neutral-500 mt-2 font-baskerville">
-                                    {formularioSelecionado?.descricao}
-                                </p>
-                            </div>
-
-                            <div className="space-y-4">
-                                {formularioSelecionado?.campos.map((campo) => (
-                                    <div key={campo.id} className="flex flex-col gap-2">
-                                        <Label htmlFor={campo.id}>{campo.label}</Label>
-                                        {campo.kind === 'select' ? (
-                                            <Select
-                                                id={campo.id}
-                                                icon={campo.icon}
-                                                value={user.dadosPerfil[campo.id] || ''}
-                                                onChange={(value) =>
-                                                    handleDataProfileChange(campo.id, value)
-                                                }
-                                                options={campo.options || []}
-                                            />
-                                        ) : (
-                                            <Input
-                                                id={campo.id}
-                                                icon={campo.icon}
-                                                type={campo.type}
-                                                placeholder={campo.placeholder}
-                                                value={user.dadosPerfil[campo.id] || ''}
-                                                noSpecialChars={campo.noSpecialChars}
-                                                onChange={(value) =>
-                                                    handleDataProfileChange(campo.id, value)
-                                                }
-                                            />
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="nome">Seu nome:</Label>
+                                        <Input
+                                            id="nome"
+                                            icon={LocationUser01Icon}
+                                            placeholder="Digite seu nome"
+                                            value={user.nome}
+                                            noSpecialChars
+                                            onChange={(value) => handleUserChange('nome', value)}
+                                        />
+                                        {user.nome.trim() !== '' && !nomeValido && (
+                                            <p className="text-xs text-neutral-400 pl-1">
+                                                O nome precisa ter pelo menos 3 caracteres.
+                                            </p>
                                         )}
                                     </div>
-                                ))}
-                            </div>
 
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    onClick={() => setView(1)}
-                                    className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
-                                >
-                                    <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                </button>
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="email">E-mail:</Label>
+                                        <Input
+                                            id="email"
+                                            icon={MailOpenLoveIcon}
+                                            placeholder="usuario@example.com"
+                                            value={user.email}
+                                            onChange={(value) => handleUserChange('email', value)}
+                                        />
+                                        {user.email.trim() !== '' && !emailValido && (
+                                            <p className="text-xs text-neutral-400 pl-1">
+                                                Digite um e-mail válido.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="phone" isOptional>
+                                            Telefone:
+                                        </Label>
+                                        <Input
+                                            id="phone"
+                                            icon={SmartPhone01Icon}
+                                            placeholder="(31) 99999-9999"
+                                            value={user.phone}
+                                            onChange={(value) => handleUserChange('phone', maskPhone(value))}
+                                        />
+                                    </div>
+                                </div>
+
                                 <Button
-                                    className="flex-1"
-                                    onClick={() => setView(3)}
-                                    disabled={!isView2Valid()}
+                                    className="w-full"
+                                    onClick={() => setView(1)}
+                                    disabled={!isView0Valid}
                                 >
                                     Próximo
                                 </Button>
-                            </div>
-                        </>
-                    )}
+                            </>
+                        )}
 
-                    {/* Step 3: Bio */}
-                    {view === 3 && (
-                        <>
-                            <div className='flex w-ful justify-center '>
-                                <img src="/src/assets/pen.png" alt="" className='w-20 h-20' />
-                            </div>
+                        {/* Step 1: Perfil */}
+                        {view === 1 && (
+                            <>
+                                <div className='flex w-ful justify-center '>
+                                    <img src="/src/assets/profile.png" alt="" className='w-20 h-20' />
+                                </div>
 
-                            <div className="text-center">
-                                <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                    Sua Bio
-                                </p>
-                                <p className="text-lg text-neutral-500 mt-2 font-baskerville">
-                                    Conte um pouco sobre você
-                                </p>
-                            </div>
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                        Perfil de uso
+                                    </p>
+                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                        Selecione o perfil que melhor se encaixa
+                                    </p>
+                                </div>
 
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="bio" isOptional>Biografia:</Label>
-                                <InputText
-                                    id="bio"
-                                    icon={PenTool03Icon}
-                                    placeholder="Escreva uma breve descrição sobre você, seus interesses e o que espera encontrar na plataforma."
-                                    value={user.bio}
-                                    onChange={(value) => handleUserChange('bio', value)}
-                                />
-                            </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {perfis.map((perfil) => {
+                                        const selecionado = user.perfil === perfil.id
 
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    onClick={() => setView(2)}
-                                    className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
-                                >
-                                    <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                </button>
-                                <Button className="flex-1" onClick={() => setView(4)}>
-                                    Próximo
-                                </Button>
-                            </div>
-                        </>
-                    )}
+                                        return (
+                                            <button
+                                                key={perfil.id}
+                                                type="button"
+                                                onClick={() => handleUserChange('perfil', perfil.id)}
+                                                className={`flex items-start cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 ${perfil.classes} ${selecionado ? "border-current/50" : "border-transparent opacity-90"
+                                                    }`}
+                                            >
+                                                <div>
+                                                    <p className="text-lg font-bold">{perfil.titulo}</p>
+                                                    <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
+                                                </div>
 
-                    {/* Step 4: Senha */}
-                    {view === 4 && (
-                        <>
-                            <div className='flex w-ful justify-center '>
-                                <img src="/src/assets/security.png" alt="" className='w-20 h-20' />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-3xl font-bold text-cloud-500 font-baskerville">
-                                    Criar Senha
-                                </p>
-                                <p className="text-lg text-neutral-500 mt-2 font-baskerville">
-                                    Crie uma senha segura para sua conta
-                                </p>
-                            </div>
+                                                <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-15 h-15 mt-8' />
 
-                            <div className="space-y-4">
+
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        onClick={() => setView(0)}
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                    >
+                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={26} />
+                                    </button>
+                                    <Button
+                                        className="flex-1"
+                                        onClick={() => setView(2)}
+                                        disabled={!user.perfil}
+                                    >
+                                        Próximo
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Step 2: Dados do perfil */}
+                        {view === 2 && (
+                            <>
+                                <div className='flex w-ful justify-center '>
+                                    <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-20 h-20' />
+                                </div>
+
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                        {formularioSelecionado?.titulo}
+                                    </p>
+                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                        {formularioSelecionado?.descricao}
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {formularioSelecionado?.campos.map((campo) => (
+                                        <div key={campo.id} className="flex flex-col gap-2">
+                                            <Label htmlFor={campo.id}>{campo.label}</Label>
+                                            {campo.kind === 'select' ? (
+                                                <Select
+                                                    id={campo.id}
+                                                    icon={campo.icon}
+                                                    value={user.dadosPerfil[campo.id] || ''}
+                                                    onChange={(value) =>
+                                                        handleDataProfileChange(campo.id, value)
+                                                    }
+                                                    options={campo.options || []}
+                                                />
+                                            ) : (
+                                                <Input
+                                                    id={campo.id}
+                                                    icon={campo.icon}
+                                                    type={campo.type}
+                                                    placeholder={campo.placeholder}
+                                                    value={user.dadosPerfil[campo.id] || ''}
+                                                    noSpecialChars={campo.noSpecialChars}
+                                                    onChange={(value) =>
+                                                        handleDataProfileChange(campo.id, value)
+                                                    }
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        onClick={() => setView(1)}
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                    >
+                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+                                    </button>
+                                    <Button
+                                        className="flex-1"
+                                        onClick={() => setView(3)}
+                                        disabled={!isView2Valid()}
+                                    >
+                                        Próximo
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Step 3: Bio */}
+                        {view === 3 && (
+                            <>
+                                <div className='flex w-ful justify-center '>
+                                    <img src="/src/assets/pen.png" alt="" className='w-20 h-20' />
+                                </div>
+
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                        Sua Bio
+                                    </p>
+                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                        Conte um pouco sobre você
+                                    </p>
+                                </div>
+
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="senha">Senha:</Label>
-                                    <Input
-                                        id="senha"
-                                        icon={CirclePasswordIcon}
-                                        type="password"
-                                        placeholder="Escreva sua melhor senha"
-                                        value={user.senha}
-                                        onChange={(value) => handleUserChange('senha', value)}
+                                    <Label htmlFor="bio" isOptional>Biografia:</Label>
+                                    <InputText
+                                        id="bio"
+                                        icon={PenTool03Icon}
+                                        placeholder="Escreva uma breve descrição sobre você, seus interesses e o que espera encontrar na plataforma."
+                                        value={user.bio}
+                                        onChange={(value) => handleUserChange('bio', value)}
                                     />
-                                    {user.senha.trim() !== '' && !senhaValida && (
+                                </div>
+
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        onClick={() => setView(2)}
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                    >
+                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+                                    </button>
+                                    <Button className="flex-1" onClick={() => setView(4)}>
+                                        Próximo
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Step 4: Senha */}
+                        {view === 4 && (
+                            <>
+                                <div className='flex w-ful justify-center '>
+                                    <img src="/src/assets/security.png" alt="" className='w-20 h-20' />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                        Criar Senha
+                                    </p>
+                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                        Crie uma senha segura para sua conta
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="senha">Senha:</Label>
+                                        <Input
+                                            id="senha"
+                                            icon={CirclePasswordIcon}
+                                            type="password"
+                                            placeholder="Escreva sua melhor senha"
+                                            value={user.senha}
+                                            onChange={(value) => handleUserChange('senha', value)}
+                                        />
+                                        {user.senha.trim() !== '' && !senhaValida && (
+                                            <p className="text-xs text-neutral-400 pl-1">
+                                                A senha precisa ter pelo menos 6 caracteres.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="confirmarSenha">Confirmar Senha:</Label>
+                                        <Input
+                                            id="confirmarSenha"
+                                            icon={CirclePasswordIcon}
+                                            type="password"
+                                            placeholder="Repita a senha"
+                                            value={user.confirmarSenha}
+                                            onChange={(value) => handleUserChange('confirmarSenha', value)}
+                                        />
+                                    </div>
+
+                                    {senhasValidas && !senhasIguais && (
                                         <p className="text-xs text-neutral-400 pl-1">
-                                            A senha precisa ter pelo menos 6 caracteres.
+                                            As senhas não coincidem.
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="confirmarSenha">Confirmar Senha:</Label>
-                                    <Input
-                                        id="confirmarSenha"
-                                        icon={CirclePasswordIcon}
-                                        type="password"
-                                        placeholder="Repita a senha"
-                                        value={user.confirmarSenha}
-                                        onChange={(value) => handleUserChange('confirmarSenha', value)}
-                                    />
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        onClick={() => setView(3)}
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                    >
+                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+                                    </button>
+                                    <Button
+                                        className="flex-1"
+                                        onClick={handleRegister}
+                                        disabled={!isView4Valid || loading}
+                                    >
+                                        {loading ? 'Criando conta...' : 'Criar Conta'}
+                                    </Button>
                                 </div>
+                            </>
+                        )}
 
-                                {senhasValidas && !senhasIguais && (
-                                    <p className="text-xs text-neutral-400 pl-1">
-                                        As senhas não coincidem.
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    onClick={() => setView(3)}
-                                    className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
-                                >
-                                    <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                </button>
-                                <Button
-                                    className="flex-1"
-                                    onClick={handleRegister}
-                                    disabled={!isView4Valid || loading}
-                                >
-                                    {loading ? 'Criando conta...' : 'Criar Conta'}
-                                </Button>
-                            </div>
-                        </>
-                    )}
-
-                    {/* Step 5: Sucesso */}
-                    {view === 0 && (
-                        <>
-
-                        
+                        {/* Step 5: Sucesso */}
+                        {view === 5 && (
+                            <>
                                 <div className="space-y-8 text-center flex flex-col items-center">
                                     <p className="text-3xl text-cloud-500 font-baskerville">
                                         Bem-vindo ao Sinaliza
                                     </p>
 
-                                   
+
                                     <div className="flex justify-center p-8 rounded-full bg-green-400/50">
-                                         <img src="/src/assets/approve.png" alt="" className='w-25 h-25' />
+                                        <img src="/src/assets/approve.png" alt="" className='w-25 h-25' />
                                     </div>
                                     <p className='text-neutral-500 font-medium text-md '>
                                         Sua conta foi criada com sucesso. Agora você faz parte de uma comunidade comprometida com a inclusão
@@ -633,14 +622,15 @@ const RegisterPage = () => {
                                 </div>
 
 
-                            <Button
-                                className="w-full"
-                                onClick={() => navigate('/auth/login')}
-                            >
-                                Ir para Login
-                            </Button>
-                        </>
-                    )}
+                                <Button
+                                    className="w-full"
+                                    onClick={() => navigate('/auth/login')}
+                                >
+                                    Ir para Login
+                                </Button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

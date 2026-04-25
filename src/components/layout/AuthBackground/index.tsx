@@ -23,12 +23,12 @@ const AuthBackground = () => {
         <div className="fixed inset-0 -z-10 overflow-hidden">
             <div
                 className="absolute inset-0"
-                style={{ background: 'linear-gradient(to bottom, #F5F9FC 50%, #ffffff 50%)' }}
+                style={{ background: 'linear-gradient(to bottom, #F5F9FC 65%, #ffffff 35%)' }}
             />
-
+           
             <div
                 className="absolute pointer-events-none"
-                style={{ bottom: '50%', left: '-5%', width: '110%', height: '260px' }}
+                style={{ bottom: '25%', left: '-5%', width: '110%', height: '260px' }}
             >
                 {/* Wave back */}
                 <div ref={w1Ref} className="absolute" style={{ bottom: '60px', left: 0, right: 0 }}>
