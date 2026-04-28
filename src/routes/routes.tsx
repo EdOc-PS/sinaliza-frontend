@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom'
 import type { RouteObject } from 'react-router-dom'
-import Home from '../pages/home'
-import LoginPage from '../pages/auth/login'
-import RegisterPage from '../pages/auth/register'
+import Home from '@pages/home'
+import LoginPage from '@pages/auth/login'
+import RegisterPage from '@pages/auth/register'
+import TestePage from '@pages/teste'
 
 const routes: RouteObject[] = [
     {
@@ -21,6 +22,10 @@ const routes: RouteObject[] = [
                 element: <RegisterPage />,
             },
         ],
+    },
+       {
+        path: '/teste',
+        element: <TestePage />,
     },
 ]
 

@@ -36,6 +36,12 @@
       "@routes/*": [
         "src/config/api/apiRoutes/*"
       ],
+      "@context/*": [
+        "src/config/context/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
       "@lib/*": [
         "src/lib/*"
       ],

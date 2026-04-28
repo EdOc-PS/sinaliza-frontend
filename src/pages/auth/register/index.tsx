@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/config/context/AuthContext'
+import { toast } from 'sonner'
 import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
@@ -25,8 +27,6 @@ import {
     TeacherIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { PostRequest } from '@api/requests'
-import { AUTH } from '@/config/api/apiRoutes/auth'
 import { maskPhone } from '@/lib/mask/mask'
 
 type PerfilId = 'student' | 'educator' | 'interpreter' | 'guardian'
@@ -185,6 +185,7 @@ type ProfileArrayProps = {
 
 const RegisterPage = () => {
     const navigate = useNavigate()
+    const { register: registerAuth, user: authUser } = useAuth()
 
     const [loading, setIsLoading] = useState(false)
     const [view, setView] = useState<number>(0)
@@ -274,13 +275,12 @@ const RegisterPage = () => {
                 bio: user.bio || undefined,
                 dataProfile: user.dadosPerfil,
             }
-            const response = await PostRequest(AUTH.REGISTER(), payload)
-            if (!response.success) {
-                console.log('Erro no cadastro:', response.message)
-                return
-            }
+            await registerAuth(payload)
+            console.log('Usuário registrado:', authUser)
+            toast.success('Conta criada com sucesso!')
             setView(5)
-        } catch (error) {
+        } catch (error: any) {
+            toast.error(error.message || 'Erro ao criar conta')
             console.error('Erro ao criar conta:', error)
         } finally {
             setIsLoading(false)
@@ -288,25 +288,25 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-start p-4 pt-8">
+        <div className="min-h-screen flex justify-center items-start px-4 py-6 sm:py-8">
             <AuthBackground />
-            <div className='flex flex-col items-center gap-4 w-full'>
-                <h1 className='text-3xl font-bold text-cloud-500'>sinaliza</h1>
-                <div className="w-full max-w-xl bg-white rounded-3xl p-8 border-2 border-neutral-300">
+            <div className='flex flex-col items-center gap-3 sm:gap-4 w-full'>
+                <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
+                <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-neutral-300">
                     <div className="space-y-6">
                         <ProgressBar currentStep={view} totalSteps={6} />
 
                         {/* Step 0: Dados pessoais */}
                         {view === 0 && (
                             <>
-                                <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/hello.png" alt="" className='w-20 h-20' />
+                                <div className='flex w-full justify-center'>
+                                    <img src="/src/assets/hello.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
                                         Dados pessoais
                                     </p>
-                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                    <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                                         Vamos começar com o básico
                                     </p>
                                 </div>
@@ -372,20 +372,20 @@ const RegisterPage = () => {
                         {/* Step 1: Perfil */}
                         {view === 1 && (
                             <>
-                                <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/profile.png" alt="" className='w-20 h-20' />
+                                <div className='flex w-full justify-center'>
+                                    <img src="/src/assets/profile.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
                                         Perfil de uso
                                     </p>
-                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                    <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                                         Selecione o perfil que melhor se encaixa
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {perfis.map((perfil) => {
                                         const selecionado = user.perfil === perfil.id
 
@@ -402,7 +402,7 @@ const RegisterPage = () => {
                                                     <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
                                                 </div>
 
-                                                <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-15 h-15 mt-8' />
+                                                <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />
 
 
                                             </button>
@@ -431,15 +431,15 @@ const RegisterPage = () => {
                         {/* Step 2: Dados do perfil */}
                         {view === 2 && (
                             <>
-                                <div className='flex w-ful justify-center '>
-                                    <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-20 h-20' />
+                                <div className='flex w-full justify-center'>
+                                    <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
                                         {formularioSelecionado?.titulo}
                                     </p>
-                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                    <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                                         {formularioSelecionado?.descricao}
                                     </p>
                                 </div>
@@ -497,14 +497,14 @@ const RegisterPage = () => {
                         {view === 3 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/pen.png" alt="" className='w-20 h-20' />
+                                    <img src="/src/assets/pen.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
                                         Sua Bio
                                     </p>
-                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                    <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                                         Conte um pouco sobre você
                                     </p>
                                 </div>
@@ -538,13 +538,13 @@ const RegisterPage = () => {
                         {view === 4 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/security.png" alt="" className='w-20 h-20' />
+                                    <img src="/src/assets/security.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
                                         Criar Senha
                                     </p>
-                                    <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                                    <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                                         Crie uma senha segura para sua conta
                                     </p>
                                 </div>
@@ -608,15 +608,15 @@ const RegisterPage = () => {
                         {view === 5 && (
                             <>
                                 <div className="space-y-8 text-center flex flex-col items-center">
-                                    <p className="text-3xl text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl text-cloud-500 font-baskerville">
                                         Bem-vindo ao Sinaliza
                                     </p>
 
 
-                                    <div className="flex justify-center p-8 rounded-full bg-green-400/50">
-                                        <img src="/src/assets/approve.png" alt="" className='w-25 h-25' />
+                                    <div className="flex justify-center p-6 sm:p-8 rounded-full bg-green-400/50">
+                                        <img src="/src/assets/approve.png" alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
                                     </div>
-                                    <p className='text-neutral-500 font-medium text-md '>
+                                    <p className='text-neutral-500 font-medium text-sm sm:text-base'>
                                         Sua conta foi criada com sucesso. Agora você faz parte de uma comunidade comprometida com a inclusão
                                     </p>
                                 </div>

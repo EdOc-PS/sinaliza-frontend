@@ -5,9 +5,8 @@ import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
 import { CirclePasswordIcon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
-import { PostRequest } from '@api/requests'
-import { AUTH } from '@routes/auth'
 import { toast } from 'sonner'
+import { useAuth } from '@/config/context/AuthContext'
 
 interface AuthProps {
     email: string
@@ -16,6 +15,7 @@ interface AuthProps {
 
 const LoginPage = () => {
     const navigate = useNavigate()
+    const { login, user } = useAuth()
     const [auth, setAuth] = useState<AuthProps>({
         email: '',
         password: '',
@@ -27,12 +27,12 @@ const LoginPage = () => {
     const handleLogin = async () => {
         setIsLoading(true)
         try {
-            const response = await PostRequest<AuthProps>(AUTH.LOGIN(), auth)
-            if (!response.success) {
-                console.log("erro")
-            }
-            console.log(response.object)
-        } catch (error) {
+            await login({ email: auth.email, password: auth.password })
+            console.log('Usuário logado:', user)
+            toast.success('Login realizado com sucesso!')
+            navigate('/teste')
+        } catch (error: any) {
+            toast.error(error.message || 'Erro ao fazer login')
             console.error('Erro ao fazer login:', error)
         } finally {
             setIsLoading(false)
@@ -40,19 +40,19 @@ const LoginPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
             <AuthBackground />
-            <div className="w-full max-w-xl bg-white rounded-3xl p-8  border-2 border-neutral-300 ">
+            <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-neutral-300">
                 <div className="space-y-6">
-                    <div className='flex w-ful justify-center '>
-                        <img src="/src/assets/sun.png" alt="" className='w-20 h-20' />
+                    <div className='flex w-full justify-center'>
+                        <img src="/src/assets/sun.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                     </div>
 
                     <div className="text-center">
-                        <p className="text-4xl font-bold text-cloud-500 font-baskerville">
+                        <p className="text-2xl sm:text-4xl font-bold text-cloud-500 font-baskerville">
                             Olá, <span className="text-campfire-500 font-baskerville">Bem vindo!</span>
                         </p>
-                        <p className="text-lg text-neutral-500 mt-2 font-baskerville">
+                        <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
                             Entre na sua conta para continuar
                         </p>
                     </div>
@@ -91,7 +91,7 @@ const LoginPage = () => {
 
                         <Button
                             className="w-full"
-                            onClick={() => toast.success('Sucesso!')}
+                            onClick={handleLogin}
                             disabled={isLoading}
                         >
                             {isLoading ? 'Entrando...' : 'Entrar na minha conta'}
