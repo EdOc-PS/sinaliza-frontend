@@ -1,0 +1,245 @@
+import { useState, type ReactNode } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FavouriteIcon, GlobalEducationIcon, Home06Icon, LibrariesIcon, Logout01Icon, Rotate01Icon, Setting06Icon, UserIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useAuth } from "@context/AuthContext";
+
+interface MenuItemProps {
+    icon: typeof Home06Icon;
+    label: string;
+    onClick?: () => void;
+    isDesktop?: boolean;
+    isActive?: boolean;
+}
+
+interface TooltipProps {
+    label: string;
+    isDesktop?: boolean;
+    children: ReactNode;
+    bgColor?: string;
+}
+
+// Definição de itens por role
+const menuItemsByRole = {
+    STUDENT: [
+        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
+        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+    ],
+    EDUCATOR: [
+        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
+        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+    ],
+    GUARDIAN: [
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
+        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+    ],
+    ADMIN: [
+        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
+        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+    ]
+};
+
+// Componente de Tooltip para hover do mouse
+const Tooltip = ({ label, isDesktop = false, children, bgColor = "bg-cloud-700" }: TooltipProps) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    const colorMap: Record<string, string> = {
+        "bg-cloud-700": "#132433",
+        "bg-salmon-500": "#EEA2A2",
+    };
+
+    const arrowFill = colorMap[bgColor] || "#132433";
+
+    return (
+        <div
+            className="relative"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {children}
+
+            {isHovered && (
+                <div
+                    className={`
+                        absolute z-50 text-white px-3 py-2 rounded-full text-sm font-medium
+                        whitespace-nowrap shadow-lg pointer-events-none
+                        ${bgColor}
+                        ${isDesktop ? "left-full ml-3 top-1/2 -translate-y-1/2" : "bottom-full mb-2 left-1/2 -translate-x-1/2"}
+                    `}
+                >
+                    {label}
+
+                    {isDesktop ? (
+                        <svg className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-7" viewBox="0 0 10 10" fill={arrowFill}>
+                            <path d="M 8 2 Q 4 5 8 8 L 2 5 Z" />
+                        </svg>
+                    ) : (
+                        <svg className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-7" viewBox="0 0 10 10" fill={arrowFill}>
+                            <path d="M 2 2 Q 5 4 8 2 L 5 8 Z" />
+                        </svg>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Componente de MenuItem que recebe ícone, label e função de clique
+const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }: MenuItemProps) => {
+    const [bouncing, setBouncing] = useState(false);
+
+    const handleClick = () => {
+        setBouncing(true);
+        setTimeout(() => setBouncing(false), 450);
+        onClick?.();
+    };
+
+    // Mobile: ícone + label desliza abaixo quando ativo
+    if (!isDesktop) {
+        return (
+            <button
+                onClick={handleClick}
+                className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 min-w-14 focus:outline-none"
+            >
+                <span className={`flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100" : ""}`}>
+                    <span className={bouncing ? "icon-bounce" : ""}>
+                        <HugeiconsIcon
+                            icon={icon}
+                            size={22}
+                            className={`transition-colors duration-300 ${isActive ? "text-lime-700" : "text-cloud-500"}`}
+                        />
+                    </span>
+                </span>
+                <span
+                    className={`text-[10px] font-bold leading-none transition-all duration-300 overflow-hidden ${
+                        isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
+                    }`}
+                >
+                    {label}
+                </span>
+            </button>
+        );
+    }
+
+    // Desktop: Tooltip + bounce no clique + transição suave do fundo
+    return (
+        <Tooltip label={label} isDesktop={true}>
+            <button
+                onClick={handleClick}
+                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
+                    isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
+                }`}
+            >
+                <span className={bouncing ? "icon-bounce" : ""}>
+                    <HugeiconsIcon
+                        icon={icon}
+                        size={24}
+                        className={`transition-colors duration-300 ${isActive ? "text-lime-700" : "text-cloud-500"}`}
+                    />
+                </span>
+            </button>
+        </Tooltip>
+    );
+};
+
+const MenuNavigation = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { user, logout } = useAuth();
+
+    // Seleciona os itens de menu baseado na role do usuário
+    const role = user?.role || "STUDENT";
+    const menuItems = menuItemsByRole[role as keyof typeof menuItemsByRole] || menuItemsByRole.STUDENT;
+
+    const handleLogout = () => {
+        logout();
+        navigate("/auth/login");
+    };
+
+    const handleProfileClick = () => {
+        navigate("/profile");
+    };
+
+    const isPathActive = (path: string) => location.pathname === path;
+
+    return (
+        <>
+            {/* Mobile: menu horizontal inferior (< 992px) */}
+            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-between gap-4 py-4  z-40">
+                <div className="bg-white rounded-2xl flex w-full max-w-md justify-around p-0.5">
+                    {menuItems.map((item, index) => (
+                        <MenuItem
+                            key={index}
+                            icon={item.icon}
+                            label={item.label}
+                            onClick={() => navigate(item.path)}
+                            isDesktop={false}
+                            isActive={isPathActive(item.path)}
+                        />
+                    ))}
+                </div>
+
+                {/* Perfil Mobile */}
+                <div className="flex gap-2">
+                    <Tooltip label="Perfil" isDesktop={false}>
+                        <button onClick={handleProfileClick} className="flex bg-white items-center justify-center w-11 h-11 rounded-xl hover:bg-cloud-200 transition-colors">
+                            <HugeiconsIcon icon={UserIcon} size={24} className="text-cloud-500" />
+                        </button>
+                    </Tooltip>
+                </div>
+            </nav>
+
+            {/* Desktop: menu lateral esquerda (>= 992px) */}
+            <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-20 bg-cloud-100 flex-col items-center pb-8 pt-4 gap-4 z-40">
+                {/* Logo */}
+                <img src="/logo/logo-simples.png" alt="Logo" className="w-12 h-12 mb-2" />
+                {/* Menu Items */}
+                <div className="bg-white rounded-2xl flex flex-col gap-2">
+                    {menuItems.map((item, index) => (
+                        <MenuItem
+                            key={index}
+                            icon={item.icon}
+                            label={item.label}
+                            onClick={() => navigate(item.path)}
+                            isDesktop={true}
+                            isActive={isPathActive(item.path)}
+                        />
+                    ))}
+                </div>
+
+                {/* Perfil */}
+                <div className="flex flex-col items-center gap-4 mt-auto">
+                    <div className="flex flex-col items-center rounded-xl bg-white">
+                        <Tooltip label="Favoritos" isDesktop={true}>
+                            <button onClick={() => navigate("/favorites")} className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-cloud-200 transition-colors">
+                                <HugeiconsIcon icon={FavouriteIcon} size={20} className="text-cloud-500" />
+                            </button>
+                        </Tooltip>
+
+                        <Tooltip label="Histórico" isDesktop={true}>
+                            <button onClick={() => navigate("/history")} className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-cloud-200 transition-colors">
+                                <HugeiconsIcon icon={Rotate01Icon} size={20} className="text-cloud-500" />
+                            </button>
+                        </Tooltip>
+                    </div>
+
+                    <Tooltip label="Perfil" isDesktop={true}>
+                        <button onClick={handleProfileClick} className="flex bg-white items-center justify-center w-12 h-12 rounded-2xl hover:bg-cloud-200 transition-colors">
+                            <HugeiconsIcon icon={UserIcon} size={24} className="text-cloud-500" />
+                        </button>
+                    </Tooltip>
+                    <Tooltip label="Sair" isDesktop={true} bgColor="bg-salmon-500">
+                        <button onClick={handleLogout} className="flex bg-salmon-100 items-center justify-center w-12 h-12 rounded-2xl hover:bg-salmon-200 transition-colors">
+                            <HugeiconsIcon icon={Logout01Icon} size={24} className="text-salmon-400" />
+                        </button>
+                    </Tooltip>
+                </div>
+            </aside>
+        </>
+    );
+};
+
+export default MenuNavigation;

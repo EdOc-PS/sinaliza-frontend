@@ -205,25 +205,25 @@ const RegisterPage = () => {
             id: 'student',
             titulo: 'Estudante',
             descricao: 'Aprendizado continuo e diario de estudos',
-            classes: 'bg-sky-100 text-sky-900',
+            classes: 'bg-sky-100 text-sky-800',
         },
         {
             id: 'educator',
             titulo: 'Professor',
-            descricao: 'Gestao de turmas e compartilhamento',
-            classes: 'bg-[#ffd6c9] text-[#8a3a24]',
+            descricao: 'Gestao de turmas e sinais',
+            classes: 'bg-salmon-100 text-salmon-800',
         },
         {
             id: 'interpreter',
             titulo: 'Interprete',
-            descricao: 'Praticas guiadas e acompanhamento',
-            classes: 'bg-yellow-100 text-yellow-900',
+            descricao: 'Criação de sinais e conexao com estudantes',
+            classes: 'bg-campfire-100 text-campfire-800',
         },
         {
             id: 'guardian',
             titulo: 'Familiar',
             descricao: 'Apoio domestico e conexao familiar',
-            classes: 'bg-lime-100 text-lime-900',
+            classes: 'bg-lime-100 text-lime-800',
         },
     ]
 
@@ -394,12 +394,12 @@ const RegisterPage = () => {
                                                 key={perfil.id}
                                                 type="button"
                                                 onClick={() => handleUserChange('perfil', perfil.id)}
-                                                className={`flex items-start cursor-pointer rounded-3xl px-5 py-6 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 ${perfil.classes} ${selecionado ? "border-current/50" : "border-transparent opacity-90"
+                                                className={`flex items-start cursor-pointer rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 ${perfil.classes} ${selecionado ? "border-current/50" : "border-transparent opacity-90"
                                                     }`}
                                             >
                                                 <div>
                                                     <p className="text-lg font-bold">{perfil.titulo}</p>
-                                                    <p className="mt-1 text-sm font-medium opacity-80">{perfil.descricao}</p>
+                                                    <p className="break-normal mt-1 text-sm font-medium opacity-90">{perfil.descricao}</p>
                                                 </div>
 
                                                 <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />

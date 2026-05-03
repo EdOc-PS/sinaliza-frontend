@@ -1,7 +1,8 @@
-import { useAuth } from "@/config/context/AuthContext"
+import { useAuth } from "@context/AuthContext"
+
 import { useEffect } from "react"
 
-const TestePage = () => {
+const ClassroomsPage = () => {
     const { user, getUser } = useAuth()
 
     useEffect(() => {
@@ -13,12 +14,12 @@ const TestePage = () => {
     }, [user])
 
     return (
-        <div>
+        <section>
             <h1>Página de Teste</h1>
             <hr />
             <pre>{JSON.stringify(user, null, 2)}</pre>
-        </div>
+        </section>
     )
 }
 
-export default TestePage
+export default ClassroomsPage
