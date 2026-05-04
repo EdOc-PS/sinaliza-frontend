@@ -142,3 +142,29 @@ button {
 .icon-bounce {
     animation: iconBounce 0.40s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
+
+/* Customização do Sonner Toast */
+[data-sonner-toast] {
+    background: #213547 !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    padding: 12px 16px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    gap: 12px !important;
+    color: #FFF !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+
+[data-sonner-toast][data-type="success"] svg {
+    color: #4CAF50 !important;
+}
+
+[data-sonner-toast][data-type="error"] svg {
+    color: #F44336 !important;
+}
+
+[data-sonner-toast][data-type="warning"] svg {
+    color: #E6AB6E !important;
+}

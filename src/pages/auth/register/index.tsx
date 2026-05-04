@@ -31,11 +31,17 @@ import { maskPhone } from '@/lib/mask/mask'
 
 type PerfilId = 'student' | 'educator' | 'interpreter' | 'guardian'
 
+// Intérprete agora é EDUCATOR com educatorType = INTERPRETER
 const perfilRoleMap: Record<PerfilId, string> = {
     student: 'STUDENT',
     educator: 'EDUCATOR',
-    interpreter: 'INTERPRETER',
+    interpreter: 'EDUCATOR',
     guardian: 'GUARDIAN',
+}
+
+const perfilEducatorTypeMap: Partial<Record<PerfilId, string>> = {
+    educator: 'TEACHER',
+    interpreter: 'INTERPRETER',
 }
 
 type CampoFormulario = {
@@ -266,6 +272,7 @@ const RegisterPage = () => {
         if (!user.perfil) return
         setIsLoading(true)
         try {
+            const educatorType = perfilEducatorTypeMap[user.perfil]
             const payload = {
                 name: user.nome,
                 email: user.email,
@@ -273,7 +280,10 @@ const RegisterPage = () => {
                 role: perfilRoleMap[user.perfil],
                 phone: user.phone || undefined,
                 bio: user.bio || undefined,
-                dataProfile: user.dadosPerfil,
+                dataProfile: {
+                    ...user.dadosPerfil,
+                    ...(educatorType ? { educatorType } : {}),
+                },
             }
             await registerAuth(payload)
             console.log('Usuário registrado:', authUser)

@@ -15,7 +15,8 @@ export type APIResponse<T = unknown> = {
 // Tipos de domínio (espelham o backend)
 // ─────────────────────────────────────────────
 
-export type Role = 'STUDENT' | 'EDUCATOR' | 'INTERPRETER' | 'GUARDIAN' | 'ADMIN';
+export type Role = 'STUDENT' | 'EDUCATOR' | 'GUARDIAN' | 'ADMIN';
+export type EducatorType = 'TEACHER' | 'INTERPRETER';
 export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
 
 export type DataProfile = {
@@ -23,10 +24,11 @@ export type DataProfile = {
   // STUDENT
   grauEscolar?: string;
   necessidadesEspeciais?: string;
-  // EDUCATOR
+  // EDUCATOR (Professor ou Intérprete — identificado por educatorType)
   department?: string;
   specialty?: string;
-  // INTERPRETER
+  educatorType?: EducatorType;
+  // Campos extras se educatorType = INTERPRETER
   certificate?: string;
   areaAtuacao?: string;
   proficienciaLibras?: LibrasLevel;

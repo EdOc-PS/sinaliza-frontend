@@ -5,7 +5,7 @@ const MobileHeader = () => {
     return (
         <header className="lg:hidden bg-cloud-100 p-4 flex items-center justify-between">
             {/* Logo */}
-            <img src="/public/logo/logo-simples.png" alt="Logo" className="w-10 h-10" />
+            <img src="/logo/logo-simples.png" alt="Logo" className="w-10 h-10" />
 
             {/* Icons */}
             <div className="flex gap-4 items-center rounded-xl bg-white ">

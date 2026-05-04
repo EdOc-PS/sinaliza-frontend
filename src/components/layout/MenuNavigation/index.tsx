@@ -19,15 +19,15 @@ interface TooltipProps {
     bgColor?: string;
 }
 
-// Definição de itens por role
-const menuItemsByRole = {
+// Definição de itens por role (INTERPRETER foi removido — usa EDUCATOR)
+const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; path: string }[]> = {
     STUDENT: [
-        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
         { icon: Setting06Icon, label: "Configurações", path: "/settings" }
     ],
     EDUCATOR: [
-        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
         { icon: Setting06Icon, label: "Configurações", path: "/settings" }
     ],
@@ -36,7 +36,7 @@ const menuItemsByRole = {
         { icon: Setting06Icon, label: "Configurações", path: "/settings" }
     ],
     ADMIN: [
-        { icon: GlobalEducationIcon, label: "Glossario", path: "/glossary" },
+        { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
         { icon: Setting06Icon, label: "Configurações", path: "/settings" }
     ]
@@ -152,7 +152,7 @@ const MenuNavigation = () => {
 
     // Seleciona os itens de menu baseado na role do usuário
     const role = user?.role || "STUDENT";
-    const menuItems = menuItemsByRole[role as keyof typeof menuItemsByRole] || menuItemsByRole.STUDENT;
+    const menuItems = menuItemsByRole[role] ?? menuItemsByRole.STUDENT;
 
     const handleLogout = () => {
         logout();
