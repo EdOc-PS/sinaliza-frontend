@@ -28,12 +28,10 @@ const LoginPage = () => {
         setIsLoading(true)
         try {
             await login({ email: auth.email, password: auth.password })
-            console.log('Usuário logado:', user)
             toast.success('Login realizado com sucesso!')
-            navigate('/teste')
+            navigate('/classrooms')
         } catch (error: any) {
             toast.error(error.message || 'Erro ao fazer login')
-            console.error('Erro ao fazer login:', error)
         } finally {
             setIsLoading(false)
         }

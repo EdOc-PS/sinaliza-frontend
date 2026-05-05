@@ -36,8 +36,14 @@
       "@routes/*": [
         "src/config/api/apiRoutes/*"
       ],
+      "@requests": [
+        "src/config/api/requests"
+      ],
       "@context/*": [
         "src/config/context/*"
+      ],
+      "@interfaces": [
+        "src/lib/interfaces/genericInterfaces.ts"
       ],
       "@pages/*": [
         "src/pages/*"
