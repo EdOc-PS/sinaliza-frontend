@@ -1,10 +1,8 @@
-import Modal from "@components/ui/Modal";
-
 import { useAuth } from "@context/AuthContext"
 import { SchoolBell01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { useState, useEffect } from "react"
-import { GetRequest, PostRequest } from "@requests";
+import { GetRequest, PostRequest, DeleteRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
 
 import { toast } from "sonner";
@@ -12,7 +10,9 @@ import { toast } from "sonner";
 import { CreateDiscipline, PRESET_COLORS } from "@/components/feature/classroom/CreateDisciplineForm";
 import { CreateClassroomCard } from "@components/feature/classroom/CreateClassroomCard";
 import { DisciplineCard } from "@/components/feature/classroom/DisciplineCard";
+import { ConfirmDeleteDicipline } from "@/components/feature/classroom/ConfirmDeleteDicipline";
 import Spinner from "@/components/ui/Spinner";
+import Modal from "@components/ui/Modal";
 
 
 export interface CreateDisciplineForm {
@@ -23,7 +23,7 @@ export interface CreateDisciplineForm {
     schoolLevel?: string;
 }
 
-interface CardsDicipline {
+export interface CardsDicipline {
     id: string;
     name: string;
     teacher: {
@@ -43,6 +43,8 @@ const ClassroomsPage = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [viewCreateModal, setViewCreateModal] = useState<boolean>(false);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; disciplineId?: string; name?: string }>({ open: false });
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const [classCards, setClassCards] = useState<CardsDicipline[]>([]);
 
@@ -111,6 +113,37 @@ const ClassroomsPage = () => {
         }
     };
 
+    const handleDeleteClick = (disciplineId: string, disciplineName: string) => {
+        setDeleteModal({ open: true, disciplineId, name: disciplineName });
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.disciplineId) return;
+
+        setDeletingId(deleteModal.disciplineId);
+        try {
+            const response = await DeleteRequest(`disciplines/${deleteModal.disciplineId}`);
+
+            if (!response.success) {
+                toast.error("Falha ao deletar turma: " + response.message);
+                return;
+            }
+            toast.success("Turma deletada com sucesso!");
+            setDeleteModal({ open: false });
+            getClassrooms();
+
+        } catch (error) {
+            console.error('Erro ao deletar turma:', error);
+            toast.error("Erro ao deletar turma");
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteModal({ open: false });
+    };
+
     useEffect(() => {
         getClassrooms();
     }, []);
@@ -147,14 +180,8 @@ const ClassroomsPage = () => {
                                 {classCards.map((card) => (
                                     <DisciplineCard
                                         key={card.id}
-                                        name={card.name}
-                                        description={card.description}
-                                        teacherName={card.teacher.name}
-                                        classCode={card.classCode}
-                                        colorBackground={card.colorBackground}
-                                        schoolLevel={card.schoolLevel}
-                                        schoolYear={card.schoolYear}
-                                        userCount={card.userCount}
+                                        dicipline={card}
+                                        onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))
                                 }
@@ -177,6 +204,15 @@ const ClassroomsPage = () => {
                     isValid={isValid}
                 />
             </Modal>
+
+            {/* Modal de confirmação de delete */}
+            <ConfirmDeleteDicipline
+                open={deleteModal.open}
+                disciplineName={deleteModal.name}
+                loading={deletingId !== null}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+            />
         </>
     );
 };

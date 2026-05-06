@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "cloud" | "lime" | "sky" | "campfire" | "salmon" | "outline";
+type ButtonVariant = "cloud" | "lime" | "sky" | "campfire" | "salmon" | "outline" | "error";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;
@@ -11,8 +11,9 @@ const variantStyles: Record<ButtonVariant, string> = {
     lime: "bg-lime-500 text-lime-100 hover:bg-lime-500/90",
     sky: "bg-sky-500 text-sky-100 hover:bg-sky-500/90",
     campfire: "bg-campfire-500 text-campfire-100 hover:bg-campfire-500/90",
-    salmon: "bg-salmon-500 text-salmon-100 hover:bg-salmon-500/90",
+    salmon: "bg-salmon-500 text-white hover:bg-salmon-500/90",
     outline: "border-2 border-cloud-500 bg-transparent text-cloud-500 hover:bg-cloud-100",
+    error: "bg-error-600 text-white hover:bg-error-600/90"
 };
 
 const Button = ({ className = "", variant = "cloud", type = "button", ...props }: ButtonProps) => {
