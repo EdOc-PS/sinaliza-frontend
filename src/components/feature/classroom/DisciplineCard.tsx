@@ -14,16 +14,15 @@ import type { CardsDicipline } from "@pages/classrooms";
 
 export interface DisciplineCardProps {
     dicipline: CardsDicipline;
+    onEdit?: () => void;
     onDelete?: () => void;
 }
 
 export const DisciplineCard = ({
     dicipline,
+    onEdit,
     onDelete
 }: DisciplineCardProps) => {
-    const onEdit = () => {
-        // Lógica para editar a disciplina
-    }
     
     const onCopyCode = () => {
         navigator.clipboard.writeText(dicipline.classCode)
@@ -47,7 +46,7 @@ export const DisciplineCard = ({
                         <DropdownMenuContent>
                             <DropdownMenuItem
                                 icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
-                                onSelect={onEdit}
+                                onSelect={() => onEdit?.()}
                             >
                                 Editar turma
                             </DropdownMenuItem>
@@ -80,7 +79,7 @@ export const DisciplineCard = ({
                             {dicipline.name}
                         </h3>
                         <p className="text-xs text-neutral-500">
-                            Prof. {dicipline.teacher.name} — {dicipline.schoolYear && `${dicipline.schoolYear}`}
+                            Prof. {dicipline.teacherName} — {dicipline.schoolYear && `${dicipline.schoolYear}`}
                             {dicipline.schoolLevel && ` · ${dicipline.schoolLevel}`}
                         </p>
                     </div>
