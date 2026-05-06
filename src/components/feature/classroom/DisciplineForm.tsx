@@ -152,7 +152,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                     placeholder="Ex: Libras Básico"
                     value={form.name}
                     onChange={(v) => handleChange("name", v)}
-                    noSpecialChars={false}
+                    noSpecialChars
                     autoFocus
                 />
                 <p className="text-xs text-cloud-400 pl-1">
@@ -168,7 +168,6 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                     placeholder="Ex: Turma de Libras para iniciantes"
                     value={form.description}
                     onChange={(v) => handleChange("description", v)}
-                    noSpecialChars={false}
                 />
             </div>
 
