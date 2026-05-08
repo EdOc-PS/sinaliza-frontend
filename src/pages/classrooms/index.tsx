@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { DisciplineForm } from "@/components/feature/classroom/DisciplineForm";
 import { JoinDisciplineForm } from "@/components/feature/classroom/JoinDisciplineForm";
 import { CreateClassroomCard } from "@components/feature/classroom/CreateClassroomCard";
+import { JoinClassroomCard } from "@components/feature/classroom/JoinClassroomCard";
+import { ClassroomFAB } from "@components/feature/classroom/ClassroomFAB";
 import { DisciplineCard } from "@/components/feature/classroom/DisciplineCard";
 import { ConfirmDeleteDicipline } from "@/components/feature/classroom/ConfirmDeleteDicipline";
 import Spinner from "@/components/ui/Spinner";
@@ -42,7 +44,7 @@ const ClassroomsPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [classCards, setClassCards] = useState<CardsDicipline[]>([]);
 
-    const [formModal, setFormModal] = useState<{ open: boolean; disciplineId?: string }>({ open: false });
+    const [formModal, setFormModal] = useState<{ open: boolean; disciplineId?: string; mode?: "create" | "edit" | "join" }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; disciplineId?: string; name?: string }>({ open: false });
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -118,35 +120,40 @@ const ClassroomsPage = () => {
                                     <DisciplineCard
                                         key={card.id}
                                         dicipline={card}
-                                        onEdit={() => setFormModal({ open: true, disciplineId: card.id })}
+                                        onEdit={() => setFormModal({ open: true, disciplineId: card.id, mode: "edit" })}
                                         onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))}
-                                <CreateClassroomCard onClick={() => setFormModal({ open: true })} userRole={user?.role} />
+                                {user?.role === "EDUCATOR" && (
+                                    <CreateClassroomCard onClick={() => setFormModal({ open: true, mode: "create" })} />
+                                )}
+                                <JoinClassroomCard onClick={() => setFormModal({ open: true, mode: "join" })} />
+
                             </>
                         )}
                     </div>
                 </div>
             </section>
 
-            {/* Modal criar / editar turma OU entrar em turma */}
+            {/* FAB */}
+            <ClassroomFAB
+                userRole={user?.role}
+                onCreateClick={() => setFormModal({ open: true, mode: "create" })}
+                onJoinClick={() => setFormModal({ open: true, mode: "join" })}
+            />
+
+            {/* Modal criar / editar / entrar em turma */}
             <Modal open={formModal.open} onClose={() => setFormModal({ open: false })}>
-                {user?.role === "EDUCATOR" ? (
+                {formModal.mode === "join" ? (
+                    <JoinDisciplineForm
+                        onClose={() => setFormModal({ open: false })}
+                        onSuccess={() => { setFormModal({ open: false }); getClassrooms(); }}
+                    />
+                ) : (
                     <DisciplineForm
                         disciplineId={formModal.disciplineId}
                         onClose={() => setFormModal({ open: false })}
-                        onSuccess={() => {
-                            setFormModal({ open: false });
-                            getClassrooms();
-                        }}
-                    />
-                ) : (
-                    <JoinDisciplineForm
-                        onClose={() => setFormModal({ open: false })}
-                        onSuccess={() => {
-                            setFormModal({ open: false });
-                            getClassrooms();
-                        }}
+                        onSuccess={() => { setFormModal({ open: false }); getClassrooms(); }}
                     />
                 )}
             </Modal>
