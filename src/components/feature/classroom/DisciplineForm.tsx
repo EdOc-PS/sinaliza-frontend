@@ -93,13 +93,13 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
     const handleChange = (field: keyof CreateDisciplineForm, value: string) => {
         setForm(prev => ({
             ...prev,
-            [field]: field === "schoolYear" ? (value ? Number(value) : undefined) : value || undefined,
+            [field]: field === "schoolYear" ? (value ? Number(value) : Number(new Date().getFullYear())) : value,
         }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name.trim()) return;
+        if (!form.name?.trim()) return;
 
         setLoading(true);
         try {
@@ -119,7 +119,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
         }
     };
 
-    const isValid = form.name.trim().length >= 3;
+    const isValid = (form.name?.trim()?.length ?? 0) >= 3;
 
     if (loadingData) {
         return (
@@ -221,11 +221,11 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
             </div>
 
             {/* Ações */}
-            <div className="flex gap-3 pt-1">
-                <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
+            <div className="flex gap-3 pt-1 justify-end">
+                <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>
                     Cancelar
                 </Button>
-                <Button type="submit" variant="cloud" className="flex-1" disabled={!isValid || loading}>
+                <Button type="submit" variant="cloud" className="w-3/5" disabled={!isValid || loading}>
                     {loading
                         ? (isEditMode ? "Salvando..." : "Criando...")
                         : (isEditMode ? "Salvar alterações" : "Criar turma")}

@@ -8,6 +8,7 @@ import { DISCIPLINES } from "@routes/disciplines";
 import { toast } from "sonner";
 
 import { DisciplineForm } from "@/components/feature/classroom/DisciplineForm";
+import { JoinDisciplineForm } from "@/components/feature/classroom/JoinDisciplineForm";
 import { CreateClassroomCard } from "@components/feature/classroom/CreateClassroomCard";
 import { DisciplineCard } from "@/components/feature/classroom/DisciplineCard";
 import { ConfirmDeleteDicipline } from "@/components/feature/classroom/ConfirmDeleteDicipline";
@@ -32,6 +33,7 @@ export interface CardsDicipline {
     schoolLevel?: string;
     classCode: string;
     userCount: number;
+    canManage: boolean;
 }
 
 const ClassroomsPage = () => {
@@ -87,7 +89,6 @@ const ClassroomsPage = () => {
     return (
         <>
             <section className="flex flex-col gap-10">
-                {/* Saudação */}
                 <div className="bg-white rounded-3xl p-6">
                     <p className="text-xl sm:text-4xl font-bold text-cloud-500 font-baskerville">
                         Olá,
@@ -121,23 +122,33 @@ const ClassroomsPage = () => {
                                         onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))}
-                                <CreateClassroomCard onClick={() => setFormModal({ open: true })} />
+                                <CreateClassroomCard onClick={() => setFormModal({ open: true })} userRole={user?.role} />
                             </>
                         )}
                     </div>
                 </div>
             </section>
 
-            {/* Modal criar / editar turma */}
+            {/* Modal criar / editar turma OU entrar em turma */}
             <Modal open={formModal.open} onClose={() => setFormModal({ open: false })}>
-                <DisciplineForm
-                    disciplineId={formModal.disciplineId}
-                    onClose={() => setFormModal({ open: false })}
-                    onSuccess={() => {
-                        setFormModal({ open: false });
-                        getClassrooms();
-                    }}
-                />
+                {user?.role === "EDUCATOR" ? (
+                    <DisciplineForm
+                        disciplineId={formModal.disciplineId}
+                        onClose={() => setFormModal({ open: false })}
+                        onSuccess={() => {
+                            setFormModal({ open: false });
+                            getClassrooms();
+                        }}
+                    />
+                ) : (
+                    <JoinDisciplineForm
+                        onClose={() => setFormModal({ open: false })}
+                        onSuccess={() => {
+                            setFormModal({ open: false });
+                            getClassrooms();
+                        }}
+                    />
+                )}
             </Modal>
 
             {/* Modal de confirmação de delete */}

@@ -24,7 +24,7 @@ export const ConfirmDeleteDicipline = ({
 
                 {/* Ícone de lixeira */}
                 <div className="flex justify-center pt-2">
-                    <div className="w-16 h-16 rounded-2xl bg-salmon-100 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-3xl bg-salmon-100 flex items-center justify-center">
                         <HugeiconsIcon icon={DeleteIcon} size={32} className="text-salmon-600" />
                     </div>
                 </div>
@@ -45,7 +45,7 @@ export const ConfirmDeleteDicipline = ({
                 )}
 
                 {/* Alerta */}
-                <div className="flex gap-3 p-4 bg-error-100 rounded-3xl border-2 border-error-500">
+                <div className="flex gap-3 p-4 bg-error-100 rounded-3xl ">
                     <HugeiconsIcon icon={AlertCircleIcon} size={20} className="text-error-700 shrink-0" />
                     <p className="text-sm text-error-700 font-medium">
                         Todos os sinais provisorios e histórico da turma serão apagados.
@@ -53,11 +53,11 @@ export const ConfirmDeleteDicipline = ({
                 </div>
 
                 {/* Ações */}
-                <div className="flex gap-3 pt-2 w-full">
+                <div className="flex gap-3 pt-2 w-4/5">
                     <Button
                         type="button"
                         variant="outline"
-                        className="flex-1 rounded-full"
+                        className="w-1/3"
                         onClick={onCancel}
                         disabled={loading}
                     >
@@ -66,7 +66,7 @@ export const ConfirmDeleteDicipline = ({
                     <Button
                         type="button"
                         variant="salmon"
-                        className="flex-1 rounded-full"
+                        className="flex-1"
                         onClick={onConfirm}
                         disabled={loading}
                     >

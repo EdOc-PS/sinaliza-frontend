@@ -36,39 +36,41 @@ export const DisciplineCard = ({
             <div className="relative rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1">
                 {/* Header com cor e menu */}
                 <div className="flex justify-end items-start px-4 h-2/5 py-3" style={{ backgroundColor: dicipline.colorBackground }}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className="p-2 rounded-xl hover:bg-white/20 transition-colors focus:outline-none">
-                                <HugeiconsIcon icon={MoreVerticalIcon} size={20} className="text-white opacity-70" />
-                            </button>
-                        </DropdownMenuTrigger>
+                    {dicipline.canManage && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="p-2 rounded-xl hover:bg-white/20 transition-colors focus:outline-none">
+                                    <HugeiconsIcon icon={MoreVerticalIcon} size={20} className="text-white opacity-70" />
+                                </button>
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
-                                onSelect={() => onEdit?.()}
-                            >
-                                Editar turma
-                            </DropdownMenuItem>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem
+                                    icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
+                                    onSelect={() => onEdit?.()}
+                                >
+                                    Editar turma
+                                </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                icon={<HugeiconsIcon icon={CopyIcon} size={18} />}
-                                onSelect={onCopyCode}
-                            >
-                                Copiar código
-                            </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    icon={<HugeiconsIcon icon={CopyIcon} size={18} />}
+                                    onSelect={onCopyCode}
+                                >
+                                    Copiar código
+                                </DropdownMenuItem>
 
-                            <DropdownMenuSeparator />
+                                <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                variant="danger"
-                                icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
-                                onSelect={onDelete}
-                            >
-                                Excluir turma
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                <DropdownMenuItem
+                                    variant="danger"
+                                    icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
+                                    onSelect={onDelete}
+                                >
+                                    Excluir turma
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
 
                 {/* Conteúdo */}
