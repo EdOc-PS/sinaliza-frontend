@@ -54,7 +54,7 @@ export const ClassroomFAB = ({ userRole, onCreateClick, onJoinClick }: Classroom
     };
 
     return (
-        <div className="fixed bottom-8 right-10 z-40 flex flex-col items-end gap-3">
+        <div className="fixed bottom-24 lg:bottom-10 right-5 lg:right-10 z-40 flex flex-col items-end gap-3">
 
             {isEducator && (
                 <div className="flex flex-col items-end gap-2.5">
@@ -86,11 +86,11 @@ export const ClassroomFAB = ({ userRole, onCreateClick, onJoinClick }: Classroom
             {/* FAB principal */}
             <button
                 onClick={handleFABClick}
-                className="w-16 h-16 rounded-full bg-cloud-500 shadow-xl shadow-cloud-500/30 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none"
+                className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-cloud-500 shadow-xl shadow-cloud-500/30 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none"
             >
                 <HugeiconsIcon
                     icon={AddIcon}
-                    size={30}
+                    size={22}
                     className={`text-white transition-transform duration-200 ease-in-out ${open ? "rotate-45" : "rotate-0"}`}
                 />
             </button>

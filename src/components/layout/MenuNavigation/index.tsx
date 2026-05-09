@@ -168,7 +168,7 @@ const MenuNavigation = () => {
     return (
         <>
             {/* Mobile: menu horizontal inferior (< 992px) */}
-            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-between gap-4 py-4  z-40">
+            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-between gap-4 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
                 <div className="bg-white rounded-2xl flex w-full max-w-md justify-around p-0.5">
                     {menuItems.map((item, index) => (
                         <MenuItem

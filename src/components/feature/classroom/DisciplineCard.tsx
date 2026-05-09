@@ -9,6 +9,7 @@ import {
 } from "@components/ui/DropdownMenu";
 
 import { toast } from "sonner";
+import { CardMemphisBackground } from "@components/ui/CardMemphisBackground";
 
 import type { CardsDicipline } from "@pages/classrooms";
 
@@ -34,12 +35,14 @@ export const DisciplineCard = ({
     return (
         <>
             <div className="relative rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1">
-                {/* Header com cor e menu */}
-                <div className="flex justify-end items-start px-4 h-2/5 py-3" style={{ backgroundColor: dicipline.colorBackground }}>
+                {/* Header com Memphis background */}
+                <div className="relative flex justify-end items-start px-4 h-2/5 py-3">
+                    <CardMemphisBackground seed={dicipline.id} color={dicipline.colorBackground} />
                     {dicipline.canManage && (
                         <DropdownMenu>
+
                             <DropdownMenuTrigger asChild>
-                                <button className="p-2 rounded-xl hover:bg-white/20 transition-colors focus:outline-none">
+                                <button className="relative z-10 p-2 rounded-xl hover:bg-white/20 transition-colors focus:outline-none">
                                     <HugeiconsIcon icon={MoreVerticalIcon} size={20} className="text-white opacity-70" />
                                 </button>
                             </DropdownMenuTrigger>

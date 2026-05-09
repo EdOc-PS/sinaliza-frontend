@@ -22,8 +22,10 @@ const MainLayout = () => {
         <MobileHeader />
         <MenuNavigation />
  
-        <main className="mx-auto max-w-5xl px-8 py-2 lg:py-10 lg:px-10">
-             <Outlet />
+        <main className="lg:ml-20 min-h-screen pb-28 lg:pb-10">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 py-4 lg:py-10">
+                <Outlet />
+            </div>
         </main>
         </>
 
