@@ -53,26 +53,72 @@ interface MemphisShape {
     opacity: number;
 }
 
+// Embaralha array com o RNG do card (Fisher-Yates)
+function shuffle<T>(arr: T[], rng: () => number): T[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// Gera posição dentro de uma célula da grade com jitter
+function cellPosition(
+    cellIdx: number,
+    cols: number,
+    rows: number,
+    margin: number,
+    rng: () => number
+) {
+    const cellW = 100 / cols;
+    const cellH = 100 / rows;
+    const col = cellIdx % cols;
+    const row = Math.floor(cellIdx / cols);
+    return {
+        x: col * cellW + margin + rng() * (cellW - margin * 2),
+        y: row * cellH + margin + rng() * (cellH - margin * 2),
+    };
+}
+
 function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisShape[] } {
     const rng = createRng(seed);
 
-    const icons: MemphisIcon[] = Array.from({ length: 7 }, () => ({
-        icon: ICON_POOL[Math.floor(rng() * ICON_POOL.length)],
-        x: rngBetween(rng, 2, 92),
-        y: rngBetween(rng, 2, 88),
-        size: rngBetween(rng, 14, 40),
-        rotate: rngBetween(rng, -50, 50),
-        opacity: rngBetween(rng, 0.10, 0.28),
-    }));
+    // Grade 4×2 = 8 células para ícones (usa 7, descarta 1 aleatória)
+    const ICON_COLS = 4, ICON_ROWS = 2;
+    const iconCells = shuffle(
+        Array.from({ length: ICON_COLS * ICON_ROWS }, (_, i) => i),
+        rng
+    ).slice(0, 7);
+
+    const icons: MemphisIcon[] = iconCells.map(cellIdx => {
+        const { x, y } = cellPosition(cellIdx, ICON_COLS, ICON_ROWS, 6, rng);
+        return {
+            icon: ICON_POOL[Math.floor(rng() * ICON_POOL.length)],
+            x, y,
+            size: rngBetween(rng, 14, 36),
+            rotate: rngBetween(rng, -50, 50),
+            opacity: rngBetween(rng, 0.10, 0.28),
+        };
+    });
+
+    // Grade 4×2 = 8 células para formas geométricas (usa todas)
+    const SHAPE_COLS = 4, SHAPE_ROWS = 2;
+    const shapeCells = shuffle(
+        Array.from({ length: SHAPE_COLS * SHAPE_ROWS }, (_, i) => i),
+        rng
+    );
 
     const shapeTypes: MemphisShape["type"][] = ["dot", "ring", "cross", "zigzag"];
-    const shapes: MemphisShape[] = Array.from({ length: 8 }, () => ({
-        type: shapeTypes[Math.floor(rng() * shapeTypes.length)],
-        x: rngBetween(rng, 3, 90),
-        y: rngBetween(rng, 3, 90),
-        size: rngBetween(rng, 6, 22),
-        opacity: rngBetween(rng, 0.10, 0.26),
-    }));
+    const shapes: MemphisShape[] = shapeCells.map(cellIdx => {
+        const { x, y } = cellPosition(cellIdx, SHAPE_COLS, SHAPE_ROWS, 5, rng);
+        return {
+            type: shapeTypes[Math.floor(rng() * shapeTypes.length)],
+            x, y,
+            size: rngBetween(rng, 6, 20),
+            opacity: rngBetween(rng, 0.10, 0.24),
+        };
+    });
 
     return { icons, shapes };
 }

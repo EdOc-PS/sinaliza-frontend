@@ -27,12 +27,15 @@ export function getAPIClient(): AxiosInstance {
     return config;
   });
 
-  // Opcional: Remova o interceptor de resposta ou deixe-o apenas para logar erros.
-  // Se você deixar o redirecionamento aqui, a recursividade do PostRequest não funcionará.
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      // Apenas repassa o erro para que o PostRequest/GetRequest trate no Switch Case
+      // Token expirado/inválido → só redireciona se a requisição enviou Bearer token
+      const sentToken = error.config?.headers?.Authorization;
+      if (error.response?.status === 401 && sentToken && typeof window !== 'undefined') {
+        localStorage.clear();
+        window.location.href = '/auth/login';
+      }
       return Promise.reject(error);
     }
   );

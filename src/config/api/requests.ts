@@ -99,8 +99,11 @@ function handleError<T>(error: unknown): APIResponse<T> {
       case 400:
         return { success: false, message: data.message ?? 'Requisição inválida.', errors: data.errors };
       case 401:
-        if (typeof window !== 'undefined') localStorage.clear();
-        return { success: false, message: 'Sessão expirada. Faça login novamente.' };
+        const isExpiredSession = !data.message || data.message.includes('Sessão') || data.message.includes('token');
+        if (isExpiredSession && typeof window !== 'undefined') {
+          localStorage.clear();
+        }
+        return { success: false, message: data.message ?? 'Acesso não autorizado.' };
       case 403:
         return { success: false, message: 'Acesso negado.' };
       case 404:

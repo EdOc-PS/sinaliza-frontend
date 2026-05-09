@@ -33,6 +33,7 @@ export interface CardsDicipline {
     colorBackground: string;
     schoolYear?: number;
     schoolLevel?: string;
+    schoolLevelLabel?: string;
     classCode: string;
     userCount: number;
     canManage: boolean;

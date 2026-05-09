@@ -9,9 +9,9 @@ import {
 } from "@components/ui/DropdownMenu";
 
 import { toast } from "sonner";
-import { CardMemphisBackground } from "@components/ui/CardMemphisBackground";
 
 import type { CardsDicipline } from "@pages/classrooms";
+import { CardMemphisBackground } from "./CardMemphisBackground";
 
 export interface DisciplineCardProps {
     dicipline: CardsDicipline;
@@ -24,7 +24,7 @@ export const DisciplineCard = ({
     onEdit,
     onDelete
 }: DisciplineCardProps) => {
-    
+
     const onCopyCode = () => {
         navigator.clipboard.writeText(dicipline.classCode)
             .then(() => {
@@ -34,7 +34,7 @@ export const DisciplineCard = ({
 
     return (
         <>
-            <div className="relative rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1">
+            <div className="relative cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1">
                 {/* Header com Memphis background */}
                 <div className="relative flex justify-end items-start px-4 h-2/5 py-3">
                     <CardMemphisBackground seed={dicipline.id} color={dicipline.colorBackground} />
@@ -84,9 +84,12 @@ export const DisciplineCard = ({
                             {dicipline.name}
                         </h3>
                         <p className="text-xs text-neutral-500">
-                            Prof. {dicipline.teacherName} — {dicipline.schoolYear && `${dicipline.schoolYear}`}
-                            {dicipline.schoolLevel && ` · ${dicipline.schoolLevel}`}
+                            Prof. {dicipline.teacherName} · {dicipline.schoolYear && `${dicipline.schoolYear}`}
                         </p>
+                        <p className="text-xs text-neutral-500">
+                            {dicipline.schoolLevelLabel && `${dicipline.schoolLevelLabel}`}
+                        </p>
+
                     </div>
 
                     {/* Footer com código e contagem */}
@@ -104,7 +107,7 @@ export const DisciplineCard = ({
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     );
 };
