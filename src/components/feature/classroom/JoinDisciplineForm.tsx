@@ -18,7 +18,7 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
     const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
         const classCode = digits.join("");

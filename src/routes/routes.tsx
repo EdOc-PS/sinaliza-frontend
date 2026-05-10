@@ -11,6 +11,7 @@ import RegisterPage from '@pages/auth/register'
 // App
 import MainLayout from '@pages/main-layout'
 import ClassroomsPage from '@/pages/classrooms'
+import WorkspacePage from '@/pages/workspace'
 
 // 404
 const NotFoundPage = () => <div className="flex items-center justify-center h-screen text-2xl">Página não encontrada (404)</div>
@@ -38,12 +39,12 @@ const routes: RouteObject[] = [
         element: <MainLayout />,
         children: [
             {
-                path: 'teste',
-                element: <LoginPage />,
-            },
-            {
                 path: 'classrooms',
                 element: <ClassroomsPage />,
+            },
+            {
+                path: 'workspace',
+                element: <WorkspacePage />,
             },
             {
                 path: 'glossary',
@@ -60,11 +61,7 @@ const routes: RouteObject[] = [
             {
                 path: 'profile',
                 element: <ClassroomsPage />,
-            },
-            {
-                path: 'settings',
-                element: <ClassroomsPage />,
-            },
+            }
         ],
     },
     {

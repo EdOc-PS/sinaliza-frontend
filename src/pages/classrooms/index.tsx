@@ -1,17 +1,16 @@
 import { useAuth } from "@context/AuthContext"
 import { SchoolBell01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { GetRequest, DeleteRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
+import { useFAB } from "@context/FABContext";
 
 import { toast } from "sonner";
 
 import { DisciplineForm } from "@/components/feature/classroom/DisciplineForm";
-import { JoinDisciplineForm } from "@/components/feature/classroom/JoinDisciplineForm";
-import { CreateClassroomCard } from "@components/feature/classroom/CreateClassroomCard";
-import { JoinClassroomCard } from "@components/feature/classroom/JoinClassroomCard";
-import { ClassroomFAB } from "@components/feature/classroom/ClassroomFAB";
+import { CreateClassroomCard } from "@/components/feature/classroom/CreateDisciplineCard";
+import { JoinClassroomCard } from "@/components/feature/classroom/JoinDiciplineCard";
 import { DisciplineCard } from "@/components/feature/classroom/DisciplineCard";
 import { ConfirmDeleteDicipline } from "@/components/feature/classroom/ConfirmDeleteDicipline";
 import Spinner from "@/components/ui/Spinner";
@@ -41,15 +40,16 @@ export interface CardsDicipline {
 
 const ClassroomsPage = () => {
     const { user } = useAuth();
+    const { registerRefresh } = useFAB();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [classCards, setClassCards] = useState<CardsDicipline[]>([]);
 
-    const [formModal, setFormModal] = useState<{ open: boolean; disciplineId?: string; mode?: "create" | "edit" | "join" }>({ open: false });
+    const [editModal, setEditModal] = useState<{ open: boolean; disciplineId?: string }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; disciplineId?: string; name?: string }>({ open: false });
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    const getClassrooms = async () => {
+    const getClassrooms = useCallback(async () => {
         setLoading(true);
         try {
             const response = await GetRequest<CardsDicipline[]>(DISCIPLINES.MINE());
@@ -61,7 +61,7 @@ const ClassroomsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     const handleDeleteClick = (disciplineId: string, disciplineName: string) => {
         setDeleteModal({ open: true, disciplineId, name: disciplineName });
@@ -87,7 +87,8 @@ const ClassroomsPage = () => {
 
     useEffect(() => {
         getClassrooms();
-    }, []);
+        registerRefresh(getClassrooms);
+    }, [getClassrooms, registerRefresh]);
 
     return (
         <>
@@ -121,42 +122,27 @@ const ClassroomsPage = () => {
                                     <DisciplineCard
                                         key={card.id}
                                         dicipline={card}
-                                        onEdit={() => setFormModal({ open: true, disciplineId: card.id, mode: "edit" })}
+                                        onEdit={() => setEditModal({ open: true, disciplineId: card.id })}
                                         onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))}
                                 {user?.role === "EDUCATOR" && (
-                                    <CreateClassroomCard onClick={() => setFormModal({ open: true, mode: "create" })} />
+                                    <CreateClassroomCard />
                                 )}
-                                <JoinClassroomCard onClick={() => setFormModal({ open: true, mode: "join" })} />
-
+                                <JoinClassroomCard />
                             </>
                         )}
                     </div>
                 </div>
             </section>
 
-            {/* FAB */}
-            <ClassroomFAB
-                userRole={user?.role}
-                onCreateClick={() => setFormModal({ open: true, mode: "create" })}
-                onJoinClick={() => setFormModal({ open: true, mode: "join" })}
-            />
-
-            {/* Modal criar / editar / entrar em turma */}
-            <Modal open={formModal.open} onClose={() => setFormModal({ open: false })}>
-                {formModal.mode === "join" ? (
-                    <JoinDisciplineForm
-                        onClose={() => setFormModal({ open: false })}
-                        onSuccess={() => { setFormModal({ open: false }); getClassrooms(); }}
-                    />
-                ) : (
-                    <DisciplineForm
-                        disciplineId={formModal.disciplineId}
-                        onClose={() => setFormModal({ open: false })}
-                        onSuccess={() => { setFormModal({ open: false }); getClassrooms(); }}
-                    />
-                )}
+            {/* Modal: editar turma */}
+            <Modal open={editModal.open} onClose={() => setEditModal({ open: false })}>
+                <DisciplineForm
+                    disciplineId={editModal.disciplineId}
+                    onClose={() => setEditModal({ open: false })}
+                    onSuccess={() => { setEditModal({ open: false }); getClassrooms(); }}
+                />
             </Modal>
 
             {/* Modal de confirmação de delete */}

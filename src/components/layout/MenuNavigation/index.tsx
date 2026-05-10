@@ -1,8 +1,18 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FavouriteIcon, GlobalEducationIcon, Home06Icon, LibrariesIcon, Logout01Icon, Rotate01Icon, Setting06Icon, UserIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useAuth } from "@context/AuthContext";
+
+import {
+    FavouriteIcon,
+    GlobalEducationIcon,
+    Home06Icon,
+    LibrariesIcon,
+    Logout01Icon,
+    PencilIcon,
+    Rotate01Icon,
+    UserIcon
+} from "@hugeicons/core-free-icons";
 
 interface MenuItemProps {
     icon: typeof Home06Icon;
@@ -23,22 +33,20 @@ interface TooltipProps {
 const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; path: string }[]> = {
     STUDENT: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
     ],
     EDUCATOR: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" }
     ],
     GUARDIAN: [
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
     ],
     ADMIN: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: Setting06Icon, label: "Configurações", path: "/settings" }
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" }
     ]
 };
 
@@ -114,9 +122,8 @@ const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }:
                     </span>
                 </span>
                 <span
-                    className={`text-[10px] font-bold leading-none transition-all duration-300 overflow-hidden ${
-                        isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
-                    }`}
+                    className={`text-[10px] font-bold leading-none transition-all duration-300 overflow-hidden ${isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
+                        }`}
                 >
                     {label}
                 </span>
@@ -129,9 +136,8 @@ const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }:
         <Tooltip label={label} isDesktop={true}>
             <button
                 onClick={handleClick}
-                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
-                    isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
-                }`}
+                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
+                    }`}
             >
                 <span className={bouncing ? "icon-bounce" : ""}>
                     <HugeiconsIcon

@@ -30,11 +30,13 @@ export function getAPIClient(): AxiosInstance {
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      // Token expirado/inválido → só redireciona se a requisição enviou Bearer token
-      const sentToken = error.config?.headers?.Authorization;
-      if (error.response?.status === 401 && sentToken && typeof window !== 'undefined') {
-        localStorage.clear();
-        window.location.href = '/auth/login';
+      if (error.response?.status === 401 && typeof window !== 'undefined') {
+        const message = error.response?.data?.message || '';
+        // Só redireciona se for token inválido/expirado
+        if (message.includes('Token') || message.includes('token')) {
+          localStorage.clear();
+          window.location.href = '/auth/login';
+        }
       }
       return Promise.reject(error);
     }

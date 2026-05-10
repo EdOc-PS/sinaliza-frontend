@@ -46,47 +46,48 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
     const [schoolLevelOptions, setSchoolLevelOptions] = useState<GenericOption[]>([]);
     const [loadingSchoolLevels, setLoadingSchoolLevels] = useState(false);
 
+    const fetchSchoolLevels = async () => {
+        setLoadingSchoolLevels(true);
+        try {
+            const response = await GetRequest<GenericOption[]>(DISCIPLINES.OPTIONS());
+            if (!response.success) toast.error("Falha ao obter níveis escolares: " + response.message);
+            setSchoolLevelOptions(response.object || []);
+        } finally {
+            setLoadingSchoolLevels(false);
+        }
+    };
+
+    const fetchDiscipline = async (disciplineId: string) => {
+        setLoadingData(true);
+        try {
+            const response = await GetRequest<any>(DISCIPLINES.FIND_ONE(disciplineId));
+            if (!response.success || !response.object) {
+                toast.error("Falha ao carregar turma: " + response.message);
+                onClose();
+                return;
+            }
+            const d = response.object;
+            setForm({
+                name: d.name ?? "",
+                description: d.description ?? "",
+                colorBackground: d.colorBackground ?? PRESET_COLORS[0].hex,
+                schoolYear: d.schoolYear ?? Number(new Date().getFullYear()),
+                schoolLevel: d.schoolLevel ?? undefined,
+            });
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
     // Busca dados da disciplina para pré-preencher o form no modo edição
     useEffect(() => {
         if (!disciplineId) return;
-
-        const fetchDiscipline = async () => {
-            setLoadingData(true);
-            try {
-                const response = await GetRequest<any>(DISCIPLINES.FIND_ONE(disciplineId));
-                if (!response.success || !response.object) {
-                    toast.error("Falha ao carregar turma: " + response.message);
-                    onClose();
-                    return;
-                }
-                const d = response.object;
-                setForm({
-                    name: d.name ?? "",
-                    description: d.description ?? "",
-                    colorBackground: d.colorBackground ?? PRESET_COLORS[0].hex,
-                    schoolYear: d.schoolYear ?? Number(new Date().getFullYear()),
-                    schoolLevel: d.schoolLevel ?? undefined,
-                });
-            } finally {
-                setLoadingData(false);
-            }
-        };
-
-        fetchDiscipline();
+        fetchDiscipline(disciplineId);
     }, [disciplineId]);
 
     // Busca opções de nível escolar
     useEffect(() => {
-        const fetchSchoolLevels = async () => {
-            setLoadingSchoolLevels(true);
-            try {
-                const response = await GetRequest<GenericOption[]>(DISCIPLINES.OPTIONS());
-                if (!response.success) toast.error("Falha ao obter níveis escolares: " + response.message);
-                setSchoolLevelOptions(response.object || []);
-            } finally {
-                setLoadingSchoolLevels(false);
-            }
-        };
+
         fetchSchoolLevels();
     }, []);
 
@@ -97,7 +98,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         if (!form.name?.trim()) return;
 
