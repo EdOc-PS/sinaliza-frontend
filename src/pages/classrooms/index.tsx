@@ -8,13 +8,14 @@ import { useFAB } from "@context/FABContext";
 
 import { toast } from "sonner";
 
-import { DisciplineForm } from "@/components/feature/classroom/DisciplineForm";
-import { CreateClassroomCard } from "@/components/feature/classroom/CreateDisciplineCard";
-import { JoinClassroomCard } from "@/components/feature/classroom/JoinDiciplineCard";
-import { DisciplineCard } from "@/components/feature/classroom/DisciplineCard";
-import { ConfirmDeleteDicipline } from "@/components/feature/classroom/ConfirmDeleteDicipline";
-import Spinner from "@/components/ui/Spinner";
+import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
+import { CreateClassroomCard } from "@components/feature/classroom/CreateDisciplineCard";
+import { JoinClassroomCard } from "@components/feature/classroom/JoinDiciplineCard";
+import { DisciplineCard } from "@components/feature/classroom/DisciplineCard";
+
+import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
+import ConfirmDeleteModal from "@/components/layout/ConfirmDeleteModal";
 
 export interface CreateDisciplineForm {
     name: string;
@@ -146,12 +147,21 @@ const ClassroomsPage = () => {
             </Modal>
 
             {/* Modal de confirmação de delete */}
-            <ConfirmDeleteDicipline
+            <ConfirmDeleteModal
                 open={deleteModal.open}
-                disciplineName={deleteModal.name}
-                loading={deletingId !== null}
+                onClose={() => setDeleteModal({ open: false })}
                 onConfirm={handleDeleteConfirm}
-                onCancel={() => setDeleteModal({ open: false })}
+                loading={deletingId !== null}
+                title={<>Excluir <span className="text-salmon-600 italic">Disciplina</span>?</>}
+                description={
+                    <>
+                        A turma{" "}
+                        <span className="font-semibold text-salmon-600 italic">{deleteModal.name}</span>{" "}
+                        será removida permanentemente. Os alunos perderão o acesso e todos os sinais
+                        provisórios serão apagados. Esta ação não pode ser desfeita.
+                    </>
+                }
+                confirmText="Excluir turma"
             />
         </>
     );

@@ -169,6 +169,42 @@ export async function PatchRequest<T>(
 }
 
 // ─────────────────────────────────────────────
+// POST (multipart/form-data)
+// ─────────────────────────────────────────────
+
+export async function PostFormDataRequest<T>(
+  path: string,
+  data: FormData
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.post<APIResponse<T>>(path, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+
+// ─────────────────────────────────────────────
+// PATCH (multipart/form-data)
+// ─────────────────────────────────────────────
+
+export async function PatchFormDataRequest<T>(
+  path: string,
+  data: FormData
+): Promise<APIResponse<T>> {
+  try {
+    const result = await api.patch<APIResponse<T>>(path, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return result.data;
+  } catch (error) {
+    return handleError<T>(error);
+  }
+}
+
+// ─────────────────────────────────────────────
 // DELETE
 // ─────────────────────────────────────────────
 

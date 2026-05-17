@@ -64,9 +64,13 @@ export const FAB = () => {
 
     const handleSuccess = () => {
         closeForm();
-        if (location.pathname === "/classrooms") {
+        const currentPath = location.pathname;
+
+        // Se está em classrooms ou workspace, apenas refresh
+        if (currentPath === "/classrooms" || currentPath === "/workspace") {
             triggerRefresh();
         } else {
+            // Caso contrário, navega para classrooms
             navigate("/classrooms");
         }
     };
@@ -78,7 +82,7 @@ export const FAB = () => {
                     <div className="flex flex-col items-end gap-2.5">
                         <FABAction
                             visible={open}
-                            delay="120ms"
+                            delay="180ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
                                     <img src="src/assets/app/create-class.png" alt="" className="w-6 h-6" />
@@ -89,7 +93,7 @@ export const FAB = () => {
                         />
                         <FABAction
                             visible={open}
-                            delay="60ms"
+                            delay="120ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-100">
                                     <img src="src/assets/app/join-class.png" alt="" className="w-6 h-6" />
@@ -100,7 +104,7 @@ export const FAB = () => {
                         />
                         <FABAction
                             visible={open}
-                            delay="0ms"
+                            delay="60ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
                                     <img src="src/assets/app/create-hand.png" alt="" className="w-6 h-6" />
@@ -108,6 +112,18 @@ export const FAB = () => {
                             }
                             label="Criar configuração de mão"
                             onClick={() => handleOpenForm("create-hand-config")}
+                        />
+
+                        <FABAction
+                            visible={open}
+                            delay="0ms"
+                            icon={
+                                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-salmon-100">
+                                    <img src="src/assets/app/create-signal.png" alt="" className="w-6 h-6" />
+                                </span>
+                            }
+                            label="Criar sinal"
+                            onClick={() => handleOpenForm("create-signal")}
                         />
                     </div>
                 )}
@@ -136,7 +152,7 @@ export const FAB = () => {
 
             {/* Modal: Criar configuração de mão */}
             <Modal open={activeForm === "create-hand-config"} onClose={closeForm}>
-                <HandConfigForm onClose={closeForm} onSuccess={closeForm} />
+                <HandConfigForm onClose={closeForm} onSuccess={handleSuccess} />
             </Modal>
         </>
     );

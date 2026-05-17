@@ -35,7 +35,7 @@ export const InputCode = ({ digits, onChange, length = 6 }: InputCodeProps) => {
     };
 
     return (
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-2 sm:gap-3 justify-center w-full">
             {Array.from({ length }).map((_, index) => (
                 <input
                     key={index}
@@ -47,7 +47,7 @@ export const InputCode = ({ digits, onChange, length = 6 }: InputCodeProps) => {
                     value={digits[index] || ""}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className={`caret-transparent w-14 h-16 text-center text-lg font-bold rounded-2xl border-2 transition-all focus:outline-none ${
+                    className={`caret-transparent flex-1 min-w-0 max-w-14 h-12 sm:h-14 text-center text-base sm:text-lg font-bold rounded-2xl border-2 transition-all focus:outline-none ${
                         digits[index]
                             ? "border-lime-400 bg-lime-50"
                             : "border-neutral-300 bg-white hover:border-neutral-400 focus:border-lime-400"

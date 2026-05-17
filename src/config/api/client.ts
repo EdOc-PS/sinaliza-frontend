@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
-const BASE_API_URL = 'http://localhost:3000';
+const BASE_API_URL = 'http://localhost:3004';
 
 let apiInstance: AxiosInstance | null = null;
 
@@ -14,10 +14,9 @@ export function getAPIClient(): AxiosInstance {
     timeout: 10000,
   });
 
-  // Mantenha este interceptor: ele garante que toda requisição
-  // pegue o token mais recente do localStorage antes de sair.
+  // Pega o token mais recente do localStorage antes de sair.
   api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    // Verificar se localStorage existe (evita erro em SSR)
+    // Verificar se localStorage
     if (typeof window !== 'undefined') {
       const freshToken = localStorage.getItem('@token');
       if (freshToken) {
@@ -32,7 +31,6 @@ export function getAPIClient(): AxiosInstance {
     (error) => {
       if (error.response?.status === 401 && typeof window !== 'undefined') {
         const message = error.response?.data?.message || '';
-        // Só redireciona se for token inválido/expirado
         if (message.includes('Token') || message.includes('token')) {
           localStorage.clear();
           window.location.href = '/auth/login';

@@ -61,7 +61,7 @@ const LoginPage = () => {
                             <Input
                                 id="email"
                                 icon={MailOpenLoveIcon}
-                                placeholder="usuario@example.com"
+                                placeholder="usuario@exemplo.com"
                                 value={auth.email}
                                 onChange={(value) => setAuth({ ...auth, email: value })}
                             />

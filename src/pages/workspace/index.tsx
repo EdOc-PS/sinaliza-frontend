@@ -1,34 +1,40 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
-import { GetRequest } from "@requests";
-import { HAND_CONFIG } from "@/config/api/apiRoutes/handConfigs";
-import Spinner from "@components/ui/Spinner";
+import { useFAB } from "@context/FABContext";
 
-export interface HandConfigTypeForm {
-    name: string;
-    imgUrl?: string;
-}
+import Modal from "@components/ui/Modal";
+import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
+import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 
 const WorkspacePage = () => {
+    const { registerRefresh } = useFAB();
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [handConfigs, setHandConfigs] = useState<HandConfigTypeForm[]>([]);
+    const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
+    const [editModal, setEditModal] = useState<boolean>(false);
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-    const fetchAllHandConfigs = async () => {
-        setLoading(true);
-        try {
-            const response = await GetRequest<HandConfigTypeForm[]>(HAND_CONFIG.FIND_ALL());
-            if (!response.success) toast.error("Falha ao obter configurações de mão: " + response.message);
-            setHandConfigs(response.object || []);
-        } finally {
-            setLoading(false);
-        }
+    const handleEditConfig = (config: HandConfigTypeForm) => {
+        setEditingConfig(config);
+        setEditModal(true);
     };
 
+    const handleEditSuccess = () => {
+        setEditModal(false);
+        setEditingConfig(null);
+        setRefreshTrigger(prev => prev + 1);
+    };
+
+    const handleEditClose = () => {
+        setEditModal(false);
+        setEditingConfig(null);
+    };
+
+    // Registra a função de refresh para o FAB usar quando criar nova config
     useEffect(() => {
-        fetchAllHandConfigs();
-    }, []);
+        registerRefresh(() => {
+            setRefreshTrigger(prev => prev + 1);
+        });
+    }, [registerRefresh]);
 
     return (
         <>
@@ -42,29 +48,21 @@ const WorkspacePage = () => {
                 </div>
 
                 <div className="bg-white rounded-3xl p-6">
-                    <div className="mb-4">
-                        <h1 className="text-lg font-baskerville text-cloud-500">Teclado Visual de Mão</h1>
-                        <p className="text-sm text-neutral-600">Gerencie a configuração de mão</p>
-                    </div>
-
-                    {loading ? (
-                        <div className="col-span-full flex items-center justify-center py-10">
-                            <Spinner size={32} color="#6B7280" />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {handConfigs.map((config) => (
-                                <div key={config.name} className="bg-gray-100 p-4 rounded-lg">
-                                    <h2 className="text-lg font-baskerville text-cloud-500">{config.name}</h2>
-                                    {config.imgUrl && (
-                                        <img src={config.imgUrl} alt={config.name} className="w-full h-auto rounded-md" />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <VisualKeyboard
+                        onEdit={handleEditConfig}
+                        refreshTrigger={refreshTrigger}
+                    />
                 </div>
             </section>
+
+            {/* Modal de edição  */}
+            <Modal open={editModal} onClose={handleEditClose}>
+                <HandConfigForm
+                    handConfig={editingConfig ?? undefined}
+                    onClose={handleEditClose}
+                    onSuccess={handleEditSuccess}
+                />
+            </Modal>
         </>
     );
 };

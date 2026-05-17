@@ -1,30 +1,57 @@
 import type { ButtonHTMLAttributes } from "react";
+import Spinner from "../Spinner";
 
 type ButtonVariant = "cloud" | "lime" | "sky" | "campfire" | "salmon" | "outline" | "error";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;
+    loading?: boolean;
+    loadingText?: string;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-    cloud: "bg-cloud-500 text-cloud-100 hover:bg-cloud-500/90",
-    lime: "bg-lime-500 text-lime-100 hover:bg-lime-500/90",
-    sky: "bg-sky-500 text-sky-100 hover:bg-sky-500/90",
+    cloud:    "bg-cloud-500 text-cloud-100 hover:bg-cloud-500/90",
+    lime:     "bg-lime-500 text-lime-100 hover:bg-lime-500/90",
+    sky:      "bg-sky-500 text-sky-100 hover:bg-sky-500/90",
     campfire: "bg-campfire-500 text-campfire-100 hover:bg-campfire-500/90",
-    salmon: "bg-salmon-500 text-white hover:bg-salmon-500/90",
-    outline: "border-2 border-cloud-500 bg-transparent text-cloud-500 hover:bg-cloud-100",
-    error: "bg-error-600 text-white hover:bg-error-600/90"
+    salmon:   "bg-salmon-500 text-white hover:bg-salmon-500/90",
+    outline:  "border-2 border-cloud-500 bg-transparent text-cloud-500 hover:bg-cloud-100",
+    error:    "bg-error-600 text-white hover:bg-error-600/90",
 };
 
-const Button = ({ className = "", variant = "cloud", type = "button", ...props }: ButtonProps) => {
+const Button = ({
+    className = "",
+    variant = "cloud",
+    type = "button",
+    loading = false,
+    loadingText,
+    children,
+    disabled,
+    ...props
+}: ButtonProps) => {
+    const isDisabled = disabled || loading;
+
     return (
         <button
             type={type}
-            className={`cursor-pointer flex h-16 items-center justify-center rounded-3xl px-6 text-base font-bold transition-colors duration-200 
-                disabled:cursor-not-allowed disabled:opacity-60 
-                ${variantStyles[variant]} ${className}`}
+            disabled={isDisabled}
+            className={`
+                cursor-pointer flex h-16 items-center rounded-3xl px-6 text-base font-bold
+                transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60
+                ${loading ? "justify-between" : "justify-center"}
+                ${variantStyles[variant]} ${className}
+            `}
             {...props}
-        />
+        >
+            {loading ? (
+                <>
+                    <span>{loadingText ?? children}</span>
+                    <Spinner />
+                </>
+            ) : (
+                children
+            )}
+        </button>
     );
 };
 

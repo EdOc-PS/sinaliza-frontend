@@ -226,10 +226,15 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                 <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>
                     Cancelar
                 </Button>
-                <Button type="submit" variant="cloud" className="w-3/5" disabled={!isValid || loading}>
-                    {loading
-                        ? (isEditMode ? "Salvando..." : "Criando...")
-                        : (isEditMode ? "Salvar alterações" : "Criar turma")}
+                <Button
+                    type="submit"
+                    variant="cloud"
+                    className="w-3/5"
+                    disabled={!isValid}
+                    loading={loading}
+                    loadingText={isEditMode ? "Salvando..." : "Criando..."}
+                >
+                    {isEditMode ? "Salvar alterações" : "Criar turma"}
                 </Button>
             </div>
         </form>

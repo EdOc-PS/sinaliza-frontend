@@ -48,7 +48,7 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
     const isValid = digits.every(d => d.length === 1);
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 jcustify-center items-center">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6 items-center">
             {/* Ícone */}
             <div className="flex items-center justify-between mb-2">
                 <div className="w-16 h-16 rounded-3xl bg-sky-100 flex items-center justify-center">
@@ -75,11 +75,11 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
             </p>
 
             {/* Botões */}
-            <div className="flex gap-3 w-4/5">
+            <div className="flex gap-3 w-full">
                 <Button
                     type="button"
                     variant="outline"
-                    className="flex-1"
+                    className="w-2/5"
                     onClick={onClose}
                 >
                     Cancelar
@@ -88,9 +88,11 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
                     type="submit"
                     variant="cloud"
                     className="flex-1"
-                    disabled={!isValid || loading}
+                    disabled={!isValid}
+                    loading={loading}
+                    loadingText="Entrando..."
                 >
-                    {loading ? "Entrando..." : "Entrar na turma"}
+                    Entrar na turma
                 </Button>
             </div>
         </form>
