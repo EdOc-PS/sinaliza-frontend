@@ -10,6 +10,7 @@ import Modal from "@components/ui/Modal";
 import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
 import { JoinDisciplineForm } from "@components/feature/classroom/JoinDisciplineForm";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
+import { SignForm } from "@components/feature/workspace/SignForm";
 
 interface FABActionProps {
     icon: React.ReactNode;
@@ -153,6 +154,11 @@ export const FAB = () => {
             {/* Modal: Criar configuração de mão */}
             <Modal open={activeForm === "create-hand-config"} onClose={closeForm}>
                 <HandConfigForm onClose={closeForm} onSuccess={handleSuccess} />
+            </Modal>
+
+            {/* Modal: Criar sinal */}
+            <Modal open={activeForm === "create-signal"} onClose={closeForm} size="3xl">
+                <SignForm onClose={closeForm} onSuccess={handleSuccess} />
             </Modal>
         </>
     );
