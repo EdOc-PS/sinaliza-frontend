@@ -1,35 +1,31 @@
 import { useRef, useState } from "react";
-import { Cancel02Icon, Image01Icon } from "@hugeicons/core-free-icons";
+import { Cancel02Icon, Video01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 
-interface InputImageProps {
-    initialPreview?: string;
+interface InputVideoProps {
     description?: string;
     onChange: (file: File | null) => void;
 }
 
-const ACCEPTED = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+const ACCEPTED = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
 
-const InputImage = ({ initialPreview, description, onChange }: InputImageProps) => {
-    const [file, setFile]       = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(initialPreview ?? null);
+const InputVideo = ({ description, onChange }: InputVideoProps) => {
+    const [file, setFile]     = useState<File | null>(null);
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleFile = (selected: File) => {
         if (!ACCEPTED.includes(selected.type)) {
-            toast.error("Formato inválido. Use PNG, JPG ou WEBP.");
+            toast.error("Formato inválido. Use MP4, WebM ou MOV.");
             return;
         }
         setFile(selected);
-        setPreview(URL.createObjectURL(selected));
         onChange(selected);
     };
 
     const handleRemove = () => {
         setFile(null);
-        setPreview(null);
         onChange(null);
         if (inputRef.current) inputRef.current.value = "";
     };
@@ -43,21 +39,19 @@ const InputImage = ({ initialPreview, description, onChange }: InputImageProps) 
 
     return (
         <div>
-            {preview ? (
-                <div className="relative w-full rounded-2xl overflow-hidden border-2 border-cloud-200 bg-neutral-50" style={{ height: 160 }}>
-                    <img src={preview} alt="Preview" className="w-full h-full object-contain" />
+            {file ? (
+                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 border-cloud-200 bg-neutral-50">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <HugeiconsIcon icon={Video01Icon} size={18} className="text-salmon-500 shrink-0" />
+                        <span className="text-sm text-cloud-700 font-medium truncate">{file.name}</span>
+                    </div>
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="absolute top-2 right-2 p-1.5 cursor-pointer rounded-full duration-300 bg-cloud-100 text-cloud-500 hover:bg-cloud-300/50"
+                        className="p-1.5 cursor-pointer rounded-full duration-300 bg-cloud-100 text-cloud-500 hover:bg-cloud-300/50 shrink-0"
                     >
-                        <HugeiconsIcon icon={Cancel02Icon} size={16} />
+                        <HugeiconsIcon icon={Cancel02Icon} size={14} />
                     </button>
-                    {file && (
-                        <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-0.5 rounded-full">
-                            {file.name}
-                        </span>
-                    )}
                 </div>
             ) : (
                 <div
@@ -69,16 +63,16 @@ const InputImage = ({ initialPreview, description, onChange }: InputImageProps) 
                         w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer
                         flex flex-col items-center justify-center gap-2 transition-all
                         ${dragging
-                            ? "border-sunflower-400 bg-sunflower-100"
-                            : "border-cloud-400/30 bg-cloud-100 hover:border-sunflower-400 hover:bg-sunflower-100"
+                            ? "border-salmon-400 bg-salmon-100"
+                            : "border-cloud-400/30 bg-cloud-100 hover:border-salmon-400 hover:bg-salmon-100"
                         }
                     `}
                 >
-                    <span className="flex items-center justify-center w-12 h-12 rounded-2xl bg-campfire-100">
-                        <HugeiconsIcon icon={Image01Icon} size={24} className="text-campfire-500" />
+                    <span className="flex items-center justify-center w-12 h-12 rounded-2xl bg-salmon-200">
+                        <HugeiconsIcon icon={Video01Icon} size={24} className="text-salmon-500" />
                     </span>
                     <div className="text-center">
-                        <p className="text-sm font-semibold text-cloud-700">Enviar imagem (PNG ou JPG)</p>
+                        <p className="text-sm font-semibold text-cloud-700">Enviar vídeo (MP4, WebM, MOV)</p>
                         {description && (
                             <p className="text-xs text-neutral-400">{description}</p>
                         )}
@@ -89,7 +83,7 @@ const InputImage = ({ initialPreview, description, onChange }: InputImageProps) 
             <input
                 ref={inputRef}
                 type="file"
-                accept=".png,.jpg,.jpeg,.webp"
+                accept=".mp4,.webm,.mov,.ogg"
                 className="hidden"
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
             />
@@ -97,4 +91,4 @@ const InputImage = ({ initialPreview, description, onChange }: InputImageProps) 
     );
 };
 
-export default InputImage;
+export default InputVideo;

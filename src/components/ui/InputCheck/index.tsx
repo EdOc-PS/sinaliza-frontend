@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Cancel01Icon, Cancel02Icon } from "@hugeicons/core-free-icons";
+import { Cancel02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 
 interface CheckInputProps {

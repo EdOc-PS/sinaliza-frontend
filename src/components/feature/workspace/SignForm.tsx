@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
 import InputText from "@components/ui/InputText";
 import InputImage from "@components/ui/InputImage";
+import InputVideo from "@components/ui/InputVideo";
+import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
 import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
 import ProgressBar from "@components/layout/ProgressBar";
@@ -12,7 +14,6 @@ import InputCheck from "@/components/ui/InputCheck";
 
 import {
     ArrowLeft01Icon,
-    Cancel01Icon,
     LayersIcon,
     LinkSquare02Icon,
     RotateRight01Icon,
@@ -20,21 +21,13 @@ import {
     SpeechIcon,
     TagsIcon,
     TextSelectIcon,
-    Video01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
-import { HAND_CONFIG } from "@routes/handConfigs";
 import { DISCIPLINES } from "@routes/disciplines";
 import { GetRequest, PostFormDataRequest } from "@requests";
-
-interface HandConfigOption {
-    id: string;
-    name: string;
-    imgUrl: string;
-}
 
 interface DisciplineOption {
     id: string;
@@ -46,8 +39,6 @@ interface SignFormProps {
     onSuccess: () => void;
 }
 
-const ACCEPTED_VIDEO = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
-const ACCEPTED_IMAGE = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
     const [view, setView] = useState(0);
@@ -67,26 +58,17 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
     const [loading, setLoading]                       = useState(false);
     const [loadingOptions, setLoadingOptions]         = useState(false);
     const [grammaticalOptions, setGrammaticalOptions] = useState<GenericOption[]>([]);
-    const [handConfigOptions, setHandConfigOptions]   = useState<GenericOption[]>([]);
     const [disciplineOptions, setDisciplineOptions]   = useState<GenericOption[]>([]);
-
-    const videoRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const load = async () => {
             setLoadingOptions(true);
             try {
-                const [grammaticalRes, handConfigRes, disciplineRes] = await Promise.all([
+                const [grammaticalRes, disciplineRes] = await Promise.all([
                     GetRequest<GenericOption[]>(SIGNS.OPTIONS()),
-                    GetRequest<HandConfigOption[]>(HAND_CONFIG.FIND_ALL()),
                     GetRequest<DisciplineOption[]>(DISCIPLINES.MINE()),
                 ]);
                 if (grammaticalRes.success) setGrammaticalOptions(grammaticalRes.object ?? []);
-                if (handConfigRes.success) {
-                    setHandConfigOptions(
-                        (handConfigRes.object ?? []).map((hc) => ({ label: hc.name, value: hc.id }))
-                    );
-                }
                 if (disciplineRes.success) {
                     setDisciplineOptions(
                         (disciplineRes.object ?? []).map((d) => ({ label: d.name, value: d.id }))
@@ -98,19 +80,6 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
         };
         load();
     }, []);
-
-    const handleVideo = (file: File) => {
-        if (!ACCEPTED_VIDEO.includes(file.type)) {
-            toast.error("Formato inválido. Use MP4, WebM ou MOV.");
-            return;
-        }
-        setVideoFile(file);
-    };
-
-    const handleRemoveVideo = () => {
-        setVideoFile(null);
-        if (videoRef.current) videoRef.current.value = "";
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -149,7 +118,8 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
         nameValid &&
         !!grammaticalClass &&
         !!disciplineId &&
-        !!handConfigId;
+        !!handConfigId &&
+        tags.length > 0;
 
     const isStep2Valid = !!videoFile || !!anotherUrl.trim();
 
@@ -225,22 +195,14 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
                         </div>
                     </div>
 
-                    {/* Config. de mão */}
+                    {/* Config. de mão (teclado visual) */}
                     <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="hand-config">Config. de mão</Label>
-                        <Select
-                            id="hand-config"
-                            icon={SignLanguageCIcon}
-                            placeholder={loadingOptions ? "Carregando..." : "Selecione"}
-                            options={handConfigOptions}
-                            value={handConfigId}
-                            onChange={setHandConfigId}
-                            disabled={loadingOptions}
-                        />
+                        <Label>Config. de mão</Label>
+                        <HandConfigPicker value={handConfigId} onChange={setHandConfigId} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="tag-input" isOptional>Tags / sinais relacionados</Label>
+                        <Label htmlFor="tag-input">Tags / sinais relacionados</Label>
                         <InputCheck
                             id="tag-input"
                             icon={TagsIcon}
@@ -333,42 +295,7 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
 
                     <div className="flex flex-col gap-1.5">
                         <Label>Vídeo</Label>
-
-                        {videoFile ? (
-                            <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 border-cloud-200 bg-neutral-50">
-                                <div className="flex items-center gap-2 min-w-0">
-                                    <HugeiconsIcon icon={Video01Icon} size={18} className="text-salmon-500 shrink-0" />
-                                    <span className="text-sm text-cloud-700 font-medium truncate">{videoFile.name}</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={handleRemoveVideo}
-                                    className="p-1.5 cursor-pointer rounded-full duration-300 bg-cloud-100 text-cloud-500 hover:bg-cloud-300/50 shrink-0"
-                                >
-                                    <HugeiconsIcon icon={Cancel01Icon} size={14} />
-                                </button>
-                            </div>
-                        ) : (
-                            <div
-                                onClick={() => videoRef.current?.click()}
-                                className="w-full py-8 rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 cursor-pointer
-                                    flex flex-col items-center justify-center gap-2 transition-all
-                                    hover:border-salmon-400 hover:bg-salmon-50"
-                            >
-                                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-salmon-100">
-                                    <HugeiconsIcon icon={Video01Icon} size={20} className="text-salmon-500" />
-                                </span>
-                                <p className="text-sm font-semibold text-cloud-700">Enviar vídeo (MP4, WebM, MOV)</p>
-                            </div>
-                        )}
-
-                        <input
-                            ref={videoRef}
-                            type="file"
-                            accept=".mp4,.webm,.mov,.ogg"
-                            className="hidden"
-                            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleVideo(f); }}
-                        />
+                        <InputVideo onChange={setVideoFile} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
