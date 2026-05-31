@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, Cancel02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 
 interface CheckInputProps {
@@ -10,7 +10,7 @@ interface CheckInputProps {
     onChange: (tags: string[]) => void;
 }
 
-const CheckInput = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter...", tags, onChange }: CheckInputProps) => {
+const InputCheck = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter...", tags, onChange }: CheckInputProps) => {
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,8 +36,8 @@ const CheckInput = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter.
 
     return (
         <div
-            className="flex flex-wrap items-center gap-1.5 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5
-                transition-colors focus-within:border-cloud-500 cursor-text min-h-[52px]"
+            className="flex flex-wrap items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5
+                transition-colors focus-within:border-cloud-500 cursor-text min-h-13"
             onClick={() => inputRef.current?.focus()}
         >
             {/* Ícone */}
@@ -51,15 +51,15 @@ const CheckInput = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter.
             {tags.map(tag => (
                 <span
                     key={tag}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-lime-200 text-lime-800"
+                    className="flex flex-row-reverse items-center gap-1 px-2.5 py-1 rounded-full font-semibold bg-lime-200 text-lime-800"
                 >
                     {tag}
                     <button
                         type="button"
                         onMouseDown={(e) => { e.preventDefault(); removeTag(tag); }}
-                        className="cursor-pointer text-lime-600 hover:text-lime-900"
+                        className="cursor-pointer text-lime-700 hover:text-lime-900"
                     >
-                        <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        <HugeiconsIcon icon={Cancel02Icon} size={18} />
                     </button>
                 </span>
             ))}
@@ -74,10 +74,10 @@ const CheckInput = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter.
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={() => { if (inputValue.trim()) addTag(inputValue); }}
-                className="flex-1 min-w-[120px] bg-transparent text-neutral-900 outline-none placeholder:text-neutral-600 text-sm"
+                className="flex-1 min-w-30 bg-transparent text-neutral-900 outline-none placeholder:text-neutral-600"
             />
         </div>
     );
 };
 
-export default CheckInput;
+export default InputCheck;

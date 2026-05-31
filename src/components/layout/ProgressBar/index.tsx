@@ -1,11 +1,12 @@
 interface ProgressBarProps {
     currentStep: number
     totalSteps: number
+    style?: React.CSSProperties
 }
 
-const ProgressBar = ({ currentStep, totalSteps }: ProgressBarProps) => {
+const ProgressBar = ({ currentStep, totalSteps, style }: ProgressBarProps) => {
     return (
-        <div className="flex justify-center gap-2 mb-8">
+        <div className="flex gap-2" style={style}>
             {Array.from({ length: totalSteps }).map((_, step) => (
                 <div
                     key={step}

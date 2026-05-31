@@ -246,7 +246,7 @@ const RegisterPage = () => {
         }))
     }
 
-    // ──── Validações ────────────────────────────
+    // Validações
 
     // View 0: Dados pessoais (nome e email obrigatórios; nome mínimo 3 chars)
     const nomeValido = user.nome.trim().length >= 3
@@ -304,7 +304,7 @@ const RegisterPage = () => {
                 <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
                 <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-neutral-300">
                     <div className="space-y-6">
-                        <ProgressBar currentStep={view} totalSteps={6} />
+                        <ProgressBar currentStep={view} totalSteps={6} style={{ marginBottom: "2rem", justifyContent: "center" }} />
 
                         {/* Step 0: Dados pessoais */}
                         {view === 0 && (
@@ -423,7 +423,7 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         onClick={() => setView(0)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
                                     >
                                         <HugeiconsIcon icon={ArrowLeft01Icon} size={26} />
                                     </button>
@@ -488,7 +488,7 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         onClick={() => setView(1)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
                                     >
                                         <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
                                     </button>
@@ -533,7 +533,7 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         onClick={() => setView(2)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
                                     >
                                         <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
                                     </button>
@@ -599,7 +599,7 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         onClick={() => setView(3)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80"
+                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
                                     >
                                         <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
                                     </button>

@@ -156,13 +156,19 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                     noSpecialChars
                     autoFocus
                 />
-                <p className="text-xs text-cloud-400 pl-1">
-                    Use um nome claro que ajude os alunos a identificar.
-                </p>
+                {form.name.trim() !== "" && (form.name.trim().length < 3) ? (
+                    <p className="text-xs text-neutral-400 pl-1">
+                        O nome precisa ter pelo menos 3 caracteres.
+                    </p>
+                ) : (
+                    <p className="text-xs text-cloud-400 pl-1">
+                        Use um nome claro que ajude os alunos a identificar.
+                    </p>
+                )}
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <Label htmlFor="discipline-description">Descrição</Label>
+                <Label htmlFor="discipline-description" isOptional>Descrição</Label>
                 <Input
                     id="discipline-description"
                     icon={TextSelectIcon}
@@ -175,7 +181,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
             {/* Ano e Nível escolar */}
             <div className="grid grid-cols-3 gap-3">
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="school-year">Ano letivo</Label>
+                    <Label htmlFor="school-year" isOptional>Ano letivo</Label>
                     <Input
                         id="school-year"
                         icon={Calendar01Icon}
@@ -187,7 +193,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                 </div>
 
                 <div className="flex flex-col gap-1.5 col-span-2">
-                    <Label htmlFor="school-level">Nível escolar</Label>
+                    <Label htmlFor="school-level" isOptional>Nível escolar</Label>
                     <Select
                         id="school-level"
                         icon={Layers01Icon}
