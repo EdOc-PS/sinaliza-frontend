@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { DeleteRequest, GetRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
 import { SIGNS } from "@routes/signs";
+import { FAVORITES } from "@routes/favorites";
 import { useAuth } from "@context/AuthContext";
 
 import Spinner from "@components/ui/Spinner";
@@ -17,14 +18,23 @@ import { SignForm } from "@components/feature/workspace/SignForm";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+    Bookshelf01Icon,
     Edit02Icon,
+    FavouriteIcon,
     HandPointingLeft02Icon,
     Settings02Icon,
     SignLanguageCIcon,
+    UserAdd01Icon,
     UserGroupIcon,
     ViewIcon,
 } from "@hugeicons/core-free-icons";
 import NavTabs from "@components/ui/NavTabs";
+
+interface Member {
+    roleInClass: string;
+    createdAt: string;
+    user: { id: string; name: string; avatar?: string; role: string };
+}
 
 interface DisciplineDetail {
     id: string;
@@ -37,6 +47,64 @@ interface DisciplineDetail {
     teacher: { id: string; name: string; avatar?: string };
 }
 
+const ROLE_LABEL: Record<string, string> = {
+    EDUCATOR:    "Educador",
+    INTERPRETER: "Intérprete",
+    ASSISTANT:   "Assistente",
+    STUDENT:     "Aluno",
+    FAMILY:      "Familiar",
+};
+
+interface MemberSectionProps {
+    title: string;
+    members: Member[];
+    canManage: boolean;
+}
+
+const MemberSection = ({ title, members }: MemberSectionProps) => (
+    <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between border-b border-cloud-200 pb-2">
+            <h3 className="font-baskerville text-lg text-cloud-600">{title}</h3>
+            <HugeiconsIcon icon={UserAdd01Icon} size={20} className="text-cloud-400 cursor-pointer hover:text-cloud-600 transition-colors" />
+        </div>
+
+        {members.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <HugeiconsIcon icon={UserGroupIcon} size={36} className="text-cloud-200" />
+                <p className="text-sm text-neutral-400">Nenhum participante nesta seção.</p>
+            </div>
+        ) : (
+            <div className="flex flex-col gap-1">
+                {members.map((m) => (
+                    <div
+                        key={m.user.id}
+                        className="flex items-center gap-3 rounded-2xl px-3 py-2.5 hover:bg-cloud-100/60 transition-colors"
+                    >
+                        {/* Avatar */}
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cloud-300 text-sm font-semibold text-white overflow-hidden">
+                            {m.user.avatar ? (
+                                <img src={m.user.avatar} alt={m.user.name} className="h-full w-full object-cover" />
+                            ) : (
+                                m.user.name.charAt(0).toUpperCase()
+                            )}
+                        </div>
+
+                        {/* Nome */}
+                        <span className="flex-1 text-sm font-medium text-cloud-600">{m.user.name}</span>
+
+                        {/* Role badge */}
+                        {m.roleInClass && (
+                            <span className="rounded-lg bg-cloud-100 px-2 py-0.5 text-[11px] font-medium text-cloud-400">
+                                {ROLE_LABEL[m.roleInClass] ?? m.roleInClass}
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+);
+
 const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -46,7 +114,11 @@ const ClassroomDetailPage = () => {
     const [discipline, setDiscipline] = useState<DisciplineDetail | null>(null);
     const [signs, setSigns] = useState<SignCardData[]>([]);
     const [editModal, setEditModal] = useState(false);
-    const [detailView, setDetailView] = useState<"signs" | "settings">("signs");
+    const [detailView, setDetailView] = useState<"signs" | "favorites" | "settings">("signs");
+    const [favoritesSigns, setFavoritesSigns] = useState<SignCardData[]>([]);
+    const [loadingFavorites, setLoadingFavorites] = useState(false);
+    const [members, setMembers] = useState<Member[]>([]);
+    const [loadingMembers, setLoadingMembers] = useState(false);
 
     const [editSignModal, setEditSignModal] = useState<{ open: boolean; signId?: string }>({ open: false });
     const [deleteSignModal, setDeleteSignModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
@@ -85,6 +157,34 @@ const ClassroomDetailPage = () => {
             setLoading(false);
         }
     }, [id]);
+
+    const loadDisciplineFavorites = async () => {
+        if (!id) return;
+        setLoadingFavorites(true);
+        try {
+            const res = await GetRequest<SignCardData[]>(DISCIPLINES.SIGNS_FAVORITES(id));
+            setFavoritesSigns(res.object ?? []);
+        } finally {
+            setLoadingFavorites(false);
+        }
+    };
+
+    const loadMembers = async () => {
+        if (!id) return;
+        setLoadingMembers(true);
+        try {
+            const res = await GetRequest<Member[]>(DISCIPLINES.MEMBERS(id));
+            setMembers(res.object ?? []);
+        } finally {
+            setLoadingMembers(false);
+        }
+    };
+
+    const handleTabChange = (tab: "signs" | "favorites" | "settings") => {
+        setDetailView(tab);
+        if (tab === "favorites" && favoritesSigns.length === 0) loadDisciplineFavorites();
+        if (tab === "settings" && members.length === 0) loadMembers();
+    };
 
     useEffect(() => {
         load();
@@ -175,9 +275,10 @@ const ClassroomDetailPage = () => {
                 {/* Nav interna */}
                 <NavTabs
                     active={detailView}
-                    onChange={setDetailView}
+                    onChange={handleTabChange}
                     items={[
-                        { key: "signs", label: "Todos os sinais", icon: ViewIcon },
+                        { key: "signs",     label: "Todos os sinais", icon: Bookshelf01Icon },
+                        { key: "favorites", label: "Favoritos",       icon: FavouriteIcon },
                     ]}
                     endItems={[
                         { key: "settings", label: "Configurações", icon: Settings02Icon },
@@ -215,11 +316,71 @@ const ClassroomDetailPage = () => {
                     </div>
                 )}
 
-                {/* View: Configurações */}
+                {/* View: Favoritos */}
+                {detailView === "favorites" && (
+                    <div className="flex flex-col gap-5">
+                        <div className="flex items-center justify-between">
+                            <h2 className="font-baskerville text-xl text-cloud-500">Sinais favoritos</h2>
+                            {!loadingFavorites && (
+                                <span className="text-xs text-neutral-400">{favoritesSigns.length} sinais</span>
+                            )}
+                        </div>
+
+                        {loadingFavorites ? (
+                            <div className="flex items-center justify-center py-16">
+                                <Spinner size={28} color="#6B7280" />
+                            </div>
+                        ) : favoritesSigns.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
+                                <HugeiconsIcon icon={FavouriteIcon} size={36} className="text-cloud-300" />
+                                <p className="text-sm text-neutral-500">
+                                    Nenhum sinal favoritado nesta disciplina ainda.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                {favoritesSigns.map((sign) => (
+                                    <SignCard
+                                        key={sign.id}
+                                        sign={sign}
+                                        canManage={canManage}
+                                        onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
+                                        onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* View: Participantes */}
                 {detailView === "settings" && (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
-                        <HugeiconsIcon icon={Settings02Icon} size={36} className="text-cloud-300" />
-                        <p className="text-sm text-neutral-500">Em breve.</p>
+                    <div className="flex flex-col gap-8">
+                        {loadingMembers ? (
+                            <div className="flex items-center justify-center py-16">
+                                <Spinner size={28} color="#6B7280" />
+                            </div>
+                        ) : (
+                            <>
+                                {/* Educadores */}
+                                <MemberSection
+                                    title="Educadores"
+                                    members={[
+                                        // Professor da disciplina sempre aparece primeiro
+                                        { roleInClass: "EDUCATOR", createdAt: "", user: { id: discipline.teacher.id, name: discipline.teacher.name, avatar: discipline.teacher.avatar, role: "EDUCATOR" } },
+                                        ...members.filter((m) => ["EDUCATOR", "INTERPRETER", "ASSISTANT"].includes(m.roleInClass) && m.user.id !== discipline.teacher.id),
+                                    ]}
+                                    canManage={canManage}
+                                />
+
+                                {/* Alunos */}
+                                <MemberSection
+                                    title="Alunos"
+                                    members={members.filter((m) => ["STUDENT", "FAMILY"].includes(m.roleInClass))}
+                                    canManage={canManage}
+                                />
+                            </>
+                        )}
                     </div>
                 )}
             </section>
