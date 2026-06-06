@@ -5,6 +5,7 @@ export const DISCIPLINES = {
     ENROLLED: ()           => `disciplines/enrolled`,
     JOIN:     ()           => `disciplines/join`,
     FIND_ONE: (id: string) => `disciplines/${id}`,
+    SIGNS:    (id: string) => `disciplines/${id}/signs`,
     UPDATE:   (id: string) => `disciplines/${id}`,
     DELETE:   (id: string) => `disciplines/${id}`,
 }

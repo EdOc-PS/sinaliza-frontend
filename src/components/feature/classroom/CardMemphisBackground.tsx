@@ -9,7 +9,7 @@ import {
     DiplomaIcon,
 } from "@hugeicons/core-free-icons";
 
-// ── Pool de ícones de educação / mãos / misc ─────────────────────────
+// Pool de ícones
 const ICON_POOL = [
     BookIcon, BooksIcon, MortarboardIcon, CertificateIcon,
     CompassIcon, PencilRulerIcon, AbacusIcon, CalculatorIcon,
@@ -20,7 +20,7 @@ const ICON_POOL = [
     DiplomaIcon,
 ];
 
-// ── Seeded LCG pseudo-random generator ───────────────────────────────
+// Gerador pseudo-aleatório com seed
 function createRng(seed: string) {
     let h = 0;
     for (let i = 0; i < seed.length; i++) {
@@ -53,7 +53,7 @@ interface MemphisShape {
     opacity: number;
 }
 
-// Embaralha array com o RNG do card (Fisher-Yates)
+// Fisher-Yates com seed
 function shuffle<T>(arr: T[], rng: () => number): T[] {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -63,7 +63,7 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
     return a;
 }
 
-// Gera posição dentro de uma célula da grade com jitter
+// Posição dentro de célula da grade com jitter
 function cellPosition(
     cellIdx: number,
     cols: number,
@@ -84,7 +84,7 @@ function cellPosition(
 function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisShape[] } {
     const rng = createRng(seed);
 
-    // Grade 4×2 = 8 células para ícones (usa 7, descarta 1 aleatória)
+    // Ícones: grade 4×2, usa 7 células
     const ICON_COLS = 4, ICON_ROWS = 2;
     const iconCells = shuffle(
         Array.from({ length: ICON_COLS * ICON_ROWS }, (_, i) => i),
@@ -102,7 +102,7 @@ function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisSha
         };
     });
 
-    // Grade 4×2 = 8 células para formas geométricas (usa todas)
+    // Formas geométricas: grade 4×2, usa todas
     const SHAPE_COLS = 4, SHAPE_ROWS = 2;
     const shapeCells = shuffle(
         Array.from({ length: SHAPE_COLS * SHAPE_ROWS }, (_, i) => i),
@@ -126,18 +126,19 @@ function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisSha
 interface CardMemphisBackgroundProps {
     seed: string;
     color: string;
+    rounded?: string;
 }
 
-export const CardMemphisBackground = ({ seed, color }: CardMemphisBackgroundProps) => {
+export const CardMemphisBackground = ({ seed, color, rounded = "rounded-t-3xl" }: CardMemphisBackgroundProps) => {
     const { icons, shapes } = generateItems(seed);
 
     return (
         <div
-            className="absolute inset-0 overflow-hidden rounded-t-3xl"
+            className={`absolute inset-0 overflow-hidden ${rounded}`}
             style={{ backgroundColor: color }}
             aria-hidden="true"
         >
-            {/* Gradiente radial suave para profundidade */}
+            {/* Gradiente de profundidade */}
             <div
                 className="absolute inset-0"
                 style={{
@@ -147,7 +148,7 @@ export const CardMemphisBackground = ({ seed, color }: CardMemphisBackgroundProp
                 }}
             />
 
-            {/* Ícones espalhados */}
+            {/* Ícones */}
             {icons.map((item, i) => (
                 <HugeiconsIcon
                     key={i}
@@ -165,7 +166,7 @@ export const CardMemphisBackground = ({ seed, color }: CardMemphisBackgroundProp
                 />
             ))}
 
-            {/* Formas geométricas */}
+            {/* Formas */}
             {shapes.map((shape, i) => {
                 const style: React.CSSProperties = {
                     position: "absolute",

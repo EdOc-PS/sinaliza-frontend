@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import Button from "@components/ui/Button";
+import Spinner from "@components/ui/Spinner";
 import Input from "@components/ui/Input";
 import InputText from "@components/ui/InputText";
 import InputImage from "@components/ui/InputImage";
@@ -27,7 +28,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
 import { DISCIPLINES } from "@routes/disciplines";
-import { GetRequest, PostFormDataRequest } from "@requests";
+import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests";
 
 interface DisciplineOption {
     id: string;
@@ -35,12 +36,28 @@ interface DisciplineOption {
 }
 
 interface SignFormProps {
+    signId?: string;
     onClose: () => void;
     onSuccess: () => void;
 }
 
+interface SignDetail {
+    id: string;
+    name: string;
+    grammaticalClass: string;
+    handConfigId: string;
+    disciplineId?: string | null;
+    tags: string[];
+    examplePt?: string | null;
+    exampleLibras?: string | null;
+    movementDescription?: string | null;
+    videoUrl?: string | null;
+    anotherUrl?: string | null;
+    imgUrl?: string | null;
+}
 
-export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
+export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
+    const isEditMode = !!signId;
     const [view, setView] = useState(0);
 
     const [name, setName]                         = useState("");
@@ -54,32 +71,58 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
     const [anotherUrl, setAnotherUrl]             = useState("");
     const [videoFile, setVideoFile]               = useState<File | null>(null);
     const [imageFile, setImageFile]               = useState<File | null>(null);
+    const [initialVideoUrl, setInitialVideoUrl]   = useState<string | undefined>();
+    const [initialImageUrl, setInitialImageUrl]   = useState<string | undefined>();
 
     const [loading, setLoading]                       = useState(false);
+    const [loadingData, setLoadingData]               = useState(false);
     const [loadingOptions, setLoadingOptions]         = useState(false);
     const [grammaticalOptions, setGrammaticalOptions] = useState<GenericOption[]>([]);
     const [disciplineOptions, setDisciplineOptions]   = useState<GenericOption[]>([]);
 
-    useEffect(() => {
-        const load = async () => {
-            setLoadingOptions(true);
-            try {
-                const [grammaticalRes, disciplineRes] = await Promise.all([
-                    GetRequest<GenericOption[]>(SIGNS.OPTIONS()),
-                    GetRequest<DisciplineOption[]>(DISCIPLINES.MINE()),
-                ]);
-                if (grammaticalRes.success) setGrammaticalOptions(grammaticalRes.object ?? []);
-                if (disciplineRes.success) {
-                    setDisciplineOptions(
-                        (disciplineRes.object ?? []).map((d) => ({ label: d.name, value: d.id }))
-                    );
-                }
-            } finally {
-                setLoadingOptions(false);
+    const loadAll = async () => {
+        setLoadingOptions(true);
+        if (signId) setLoadingData(true);
+        try {
+            const requests: Promise<any>[] = [
+                GetRequest<GenericOption[]>(SIGNS.OPTIONS()),
+                GetRequest<DisciplineOption[]>(DISCIPLINES.MINE()),
+            ];
+            if (signId) requests.push(GetRequest<SignDetail>(SIGNS.FIND_ONE(signId)));
+
+            const [grammaticalRes, disciplineRes, signRes] = await Promise.all(requests);
+
+            if (grammaticalRes.success) setGrammaticalOptions(grammaticalRes.object ?? []);
+            if (disciplineRes.success) {
+                setDisciplineOptions(
+                    (disciplineRes.object ?? []).map((d: DisciplineOption) => ({ label: d.name, value: d.id }))
+                );
             }
-        };
-        load();
-    }, []);
+
+            if (signRes) {
+                if (!signRes.success || !signRes.object) {
+                    toast.error("Falha ao carregar sinal: " + signRes.message);
+                    onClose();
+                    return;
+                }
+                const s: SignDetail = signRes.object;
+                setName(s.name);
+                setGrammaticalClass(s.grammaticalClass);
+                setHandConfigId(s.handConfigId);
+                setDisciplineId(s.disciplineId ?? "");
+                setTags(s.tags ?? []);
+                setExamplePt(s.examplePt ?? "");
+                setExampleLibras(s.exampleLibras ?? "");
+                setMovementDesc(s.movementDescription ?? "");
+                setAnotherUrl(s.anotherUrl ?? "");
+                setInitialVideoUrl(s.videoUrl ?? undefined);
+                setInitialImageUrl(s.imgUrl ?? undefined);
+            }
+        } finally {
+            setLoadingOptions(false);
+            setLoadingData(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,12 +143,15 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
 
         setLoading(true);
         try {
-            const response = await PostFormDataRequest(SIGNS.CREATE(), formData);
+            const response = isEditMode
+                ? await PatchFormDataRequest(SIGNS.UPDATE(signId!), formData)
+                : await PostFormDataRequest(SIGNS.CREATE(), formData);
+
             if (!response.success) {
                 toast.error(response.message);
                 return;
             }
-            toast.success("Sinal criado com sucesso!");
+            toast.success(isEditMode ? "Sinal atualizado com sucesso!" : "Sinal criado com sucesso!");
             onSuccess();
         } finally {
             setLoading(false);
@@ -121,7 +167,11 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
         !!handConfigId &&
         tags.length > 0;
 
-    const isStep2Valid = !!videoFile || !!anotherUrl.trim();
+    const isStep2Valid = isEditMode || !!videoFile || !!anotherUrl.trim();
+
+    useEffect(() => { 
+        loadAll(); 
+    }, [signId]);
 
     const BackBtn = ({ onClick }: { onClick: () => void }) => (
         <button
@@ -133,6 +183,14 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
         </button>
     );
 
+    if (loadingData) {
+        return (
+            <div className="flex items-center justify-center py-16">
+                <Spinner size={32} />
+            </div>
+        );
+    }
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <ProgressBar currentStep={view} totalSteps={3} />
@@ -141,8 +199,12 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
             {view === 0 && (
                 <>
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Criar novo sinal</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Preencha as informações principais do sinal.</p>
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
+                            {isEditMode ? "Editar sinal" : "Criar novo sinal"}
+                        </h2>
+                        <p className="text-sm text-cloud-400 leading-snug">
+                            {isEditMode ? "Atualize as informações do sinal." : "Preencha as informações principais do sinal."}
+                        </p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -294,8 +356,8 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <Label>Vídeo</Label>
-                        <InputVideo onChange={setVideoFile} />
+                        <Label isOptional={isEditMode}>Vídeo</Label>
+                        <InputVideo initialPreview={initialVideoUrl} onChange={setVideoFile} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -312,6 +374,7 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
                     <div className="flex flex-col gap-1.5">
                         <Label isOptional>Imagem ilustrativa</Label>
                         <InputImage
+                            initialPreview={initialImageUrl}
                             description="Imagem de referência para o sinal · PNG ou JPG"
                             onChange={setImageFile}
                         />
@@ -325,9 +388,9 @@ export const SignForm = ({ onClose, onSuccess }: SignFormProps) => {
                             className="flex-1"
                             disabled={!isStep2Valid}
                             loading={loading}
-                            loadingText="Criando sinal..."
+                            loadingText={isEditMode ? "Salvando..." : "Criando sinal..."}
                         >
-                            Criar sinal
+                            {isEditMode ? "Salvar alterações" : "Criar sinal"}
                         </Button>
                     </div>
                 </>

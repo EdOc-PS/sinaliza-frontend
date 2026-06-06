@@ -1,5 +1,6 @@
 import { Key02Icon, MoreVerticalIcon, CopyIcon, DeleteIcon, UserGroupIcon, Edit02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useNavigate } from "react-router-dom";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -25,6 +26,8 @@ export const DisciplineCard = ({
     onDelete
 }: DisciplineCardProps) => {
 
+    const navigate = useNavigate();
+
     const onCopyCode = () => {
         navigator.clipboard.writeText(dicipline.classCode)
             .then(() => {
@@ -34,11 +37,15 @@ export const DisciplineCard = ({
 
     return (
         <>
-            <div className="relative cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1">
+            <div
+                onClick={() => navigate(`/classrooms/${dicipline.id}`)}
+                className="relative cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1"
+            >
                 {/* Header com Memphis background */}
                 <div className="relative flex justify-end items-start px-4 h-2/5 py-3">
                     <CardMemphisBackground seed={dicipline.id} color={dicipline.colorBackground} />
                     {dicipline.canManage && (
+                        <div onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
 
                             <DropdownMenuTrigger asChild>
@@ -73,6 +80,7 @@ export const DisciplineCard = ({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+                        </div>
                     )}
                 </div>
 

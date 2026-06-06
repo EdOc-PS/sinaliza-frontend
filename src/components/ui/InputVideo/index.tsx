@@ -4,14 +4,16 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 
 interface InputVideoProps {
+    initialPreview?: string;
     description?: string;
     onChange: (file: File | null) => void;
 }
 
 const ACCEPTED = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
 
-const InputVideo = ({ description, onChange }: InputVideoProps) => {
-    const [file, setFile]     = useState<File | null>(null);
+const InputVideo = ({ initialPreview, description, onChange }: InputVideoProps) => {
+    const [file, setFile]         = useState<File | null>(null);
+    const [preview, setPreview]   = useState<string | undefined>(initialPreview);
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -21,11 +23,13 @@ const InputVideo = ({ description, onChange }: InputVideoProps) => {
             return;
         }
         setFile(selected);
+        setPreview(undefined);
         onChange(selected);
     };
 
     const handleRemove = () => {
         setFile(null);
+        setPreview(undefined);
         onChange(null);
         if (inputRef.current) inputRef.current.value = "";
     };
@@ -39,11 +43,13 @@ const InputVideo = ({ description, onChange }: InputVideoProps) => {
 
     return (
         <div>
-            {file ? (
+            {file || preview ? (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 border-cloud-200 bg-neutral-50">
                     <div className="flex items-center gap-2 min-w-0">
                         <HugeiconsIcon icon={Video01Icon} size={18} className="text-salmon-500 shrink-0" />
-                        <span className="text-sm text-cloud-700 font-medium truncate">{file.name}</span>
+                        <span className="text-sm text-cloud-700 font-medium truncate">
+                            {file ? file.name : "Vídeo atual"}
+                        </span>
                     </div>
                     <button
                         type="button"

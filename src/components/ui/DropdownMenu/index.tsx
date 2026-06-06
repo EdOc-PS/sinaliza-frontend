@@ -123,7 +123,8 @@ interface DropdownMenuContentProps extends DropdownMenuPrimitive.DropdownMenuCon
 const DropdownMenuContent = ({
     children,
     className = "",
-    sideOffset = 10,
+    sideOffset = 6,
+    alignOffset = -10,
     align = "end",
     ...props
 }: DropdownMenuContentProps) => (
@@ -131,6 +132,7 @@ const DropdownMenuContent = ({
         <DropdownMenuPrimitive.Content
             sideOffset={sideOffset}
             align={align}
+            alignOffset={alignOffset}
             className={`
                 group relative z-50 min-w-48 overflow-visible rounded-3xl
                 border-2 border-cloud-400/30 bg-white

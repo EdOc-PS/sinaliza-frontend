@@ -11,6 +11,7 @@ import RegisterPage from '@pages/auth/register'
 // App
 import MainLayout from '@pages/main-layout'
 import ClassroomsPage from '@/pages/classrooms'
+import ClassroomDetailPage from '@/pages/classroom-detail'
 import WorkspacePage from '@/pages/workspace'
 
 // 404
@@ -41,6 +42,10 @@ const routes: RouteObject[] = [
             {
                 path: 'classrooms',
                 element: <ClassroomsPage />,
+            },
+            {
+                path: 'classrooms/:id',
+                element: <ClassroomDetailPage />,
             },
             {
                 path: 'workspace',
