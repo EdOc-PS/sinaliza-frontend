@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { DeleteRequest, GetRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
 import { SIGNS } from "@routes/signs";
-import { FAVORITES } from "@routes/favorites";
 import { useAuth } from "@context/AuthContext";
 
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
+import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
@@ -22,19 +22,12 @@ import {
     Edit02Icon,
     FavouriteIcon,
     HandPointingLeft02Icon,
+    Logout03Icon,
     Settings02Icon,
     SignLanguageCIcon,
-    UserAdd01Icon,
     UserGroupIcon,
-    ViewIcon,
 } from "@hugeicons/core-free-icons";
 import NavTabs from "@components/ui/NavTabs";
-
-interface Member {
-    roleInClass: string;
-    createdAt: string;
-    user: { id: string; name: string; avatar?: string; role: string };
-}
 
 interface DisciplineDetail {
     id: string;
@@ -44,66 +37,8 @@ interface DisciplineDetail {
     schoolYear?: number;
     schoolLevelLabel?: string;
     userCount: number;
-    teacher: { id: string; name: string; avatar?: string };
+    teacher: { id: string; name: string; avatar?: string; educatorType?: "TEACHER" | "INTERPRETER" | null };
 }
-
-const ROLE_LABEL: Record<string, string> = {
-    EDUCATOR:    "Educador",
-    INTERPRETER: "Intérprete",
-    ASSISTANT:   "Assistente",
-    STUDENT:     "Aluno",
-    FAMILY:      "Familiar",
-};
-
-interface MemberSectionProps {
-    title: string;
-    members: Member[];
-    canManage: boolean;
-}
-
-const MemberSection = ({ title, members }: MemberSectionProps) => (
-    <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between border-b border-cloud-200 pb-2">
-            <h3 className="font-baskerville text-lg text-cloud-600">{title}</h3>
-            <HugeiconsIcon icon={UserAdd01Icon} size={20} className="text-cloud-400 cursor-pointer hover:text-cloud-600 transition-colors" />
-        </div>
-
-        {members.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-10 text-center">
-                <HugeiconsIcon icon={UserGroupIcon} size={36} className="text-cloud-200" />
-                <p className="text-sm text-neutral-400">Nenhum participante nesta seção.</p>
-            </div>
-        ) : (
-            <div className="flex flex-col gap-1">
-                {members.map((m) => (
-                    <div
-                        key={m.user.id}
-                        className="flex items-center gap-3 rounded-2xl px-3 py-2.5 hover:bg-cloud-100/60 transition-colors"
-                    >
-                        {/* Avatar */}
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cloud-300 text-sm font-semibold text-white overflow-hidden">
-                            {m.user.avatar ? (
-                                <img src={m.user.avatar} alt={m.user.name} className="h-full w-full object-cover" />
-                            ) : (
-                                m.user.name.charAt(0).toUpperCase()
-                            )}
-                        </div>
-
-                        {/* Nome */}
-                        <span className="flex-1 text-sm font-medium text-cloud-600">{m.user.name}</span>
-
-                        {/* Role badge */}
-                        {m.roleInClass && (
-                            <span className="rounded-lg bg-cloud-100 px-2 py-0.5 text-[11px] font-medium text-cloud-400">
-                                {ROLE_LABEL[m.roleInClass] ?? m.roleInClass}
-                            </span>
-                        )}
-                    </div>
-                ))}
-            </div>
-        )}
-    </div>
-);
 
 const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -123,6 +58,8 @@ const ClassroomDetailPage = () => {
     const [editSignModal, setEditSignModal] = useState<{ open: boolean; signId?: string }>({ open: false });
     const [deleteSignModal, setDeleteSignModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
     const [deletingSignId, setDeletingSignId] = useState<string | null>(null);
+    const [leaveModal, setLeaveModal] = useState(false);
+    const [leaving, setLeaving] = useState(false);
 
     const handleDeleteSign = async () => {
         if (!deleteSignModal.signId) return;
@@ -177,6 +114,19 @@ const ClassroomDetailPage = () => {
             setMembers(res.object ?? []);
         } finally {
             setLoadingMembers(false);
+        }
+    };
+
+    const handleLeave = async () => {
+        if (!id) return;
+        setLeaving(true);
+        try {
+            const res = await DeleteRequest(DISCIPLINES.LEAVE(id));
+            if (!res.success) { toast.error("Falha ao sair da disciplina: " + res.message); return; }
+            toast.success("Você saiu da disciplina");
+            navigate("/classrooms");
+        } finally {
+            setLeaving(false);
         }
     };
 
@@ -290,7 +240,7 @@ const ClassroomDetailPage = () => {
                     <div className="flex flex-col gap-5">
                         <div className="flex items-center justify-between">
                             <h2 className="font-baskerville text-xl text-cloud-500">Sinais cadastrados</h2>
-                            <span className="text-xs text-neutral-400">Ordenado por nome</span>
+                            {/* <span className="text-xs text-neutral-400">Ordenado por nome</span> */}
                         </div>
 
                         {signs.length === 0 ? (
@@ -307,6 +257,7 @@ const ClassroomDetailPage = () => {
                                         key={sign.id}
                                         sign={sign}
                                         canManage={canManage}
+                                        onClick={() => navigate(`/signs/${sign.id}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
                                     />
@@ -344,6 +295,7 @@ const ClassroomDetailPage = () => {
                                         key={sign.id}
                                         sign={sign}
                                         canManage={canManage}
+                                        onClick={() => navigate(`/signs/${sign.id}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
                                     />
@@ -367,18 +319,26 @@ const ClassroomDetailPage = () => {
                                     title="Educadores"
                                     members={[
                                         // Professor da disciplina sempre aparece primeiro
-                                        { roleInClass: "EDUCATOR", createdAt: "", user: { id: discipline.teacher.id, name: discipline.teacher.name, avatar: discipline.teacher.avatar, role: "EDUCATOR" } },
-                                        ...members.filter((m) => ["EDUCATOR", "INTERPRETER", "ASSISTANT"].includes(m.roleInClass) && m.user.id !== discipline.teacher.id),
+                                        { roleInClass: "EDUCATOR", createdAt: "", user: { id: discipline.teacher.id, name: discipline.teacher.name, avatar: discipline.teacher.avatar, role: "EDUCATOR", educatorType: discipline.teacher.educatorType } },
+                                        ...members.filter((m) => ["EDUCATOR", "INTERPRETER"].includes(m.roleInClass) && m.user.id !== discipline.teacher.id),
                                     ]}
-                                    canManage={canManage}
                                 />
 
                                 {/* Alunos */}
                                 <MemberSection
                                     title="Alunos"
-                                    members={members.filter((m) => ["STUDENT", "FAMILY"].includes(m.roleInClass))}
-                                    canManage={canManage}
+                                    members={members.filter((m) => ["STUDENT", "GUARDIAN"].includes(m.roleInClass))}
                                 />
+
+                                {!canManage && (
+                                    <button
+                                        onClick={() => setLeaveModal(true)}
+                                        className="flex items-center justify-center gap-2 self-start rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-4 py-2 text-sm font-medium text-salmon-600"
+                                    >
+                                        <HugeiconsIcon icon={Logout03Icon} size={18} />
+                                        Sair da turma
+                                    </button>
+                                )}
                             </>
                         )}
                     </div>
@@ -418,6 +378,24 @@ const ClassroomDetailPage = () => {
                     </>
                 }
                 confirmText="Excluir sinal"
+            />
+
+            {/* Modal de confirmar saída da disciplina */}
+            <ConfirmDeleteModal
+                open={leaveModal}
+                onClose={() => setLeaveModal(false)}
+                onConfirm={handleLeave}
+                loading={leaving}
+                title={<>Sair da <span className="text-salmon-600 italic">Turma</span>?</>}
+                description={
+                    <>
+                        Você deixará de ter acesso aos sinais e materiais de{" "}
+                        <span className="font-semibold text-salmon-600 italic">{discipline.name}</span>.
+                        Para voltar, será necessário um novo convite.
+                    </>
+                }
+                confirmText="Sair da turma"
+                loadingText="Saindo..."
             />
         </>
     );

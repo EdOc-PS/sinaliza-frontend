@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FavouriteIcon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
@@ -10,6 +11,7 @@ import Spinner from "@components/ui/Spinner";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 
 const FavoritesPage = () => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [signs, setSigns] = useState<SignCardData[]>([]);
 
@@ -95,6 +97,7 @@ const FavoritesPage = () => {
                             <SignCard
                                 key={sign.id}
                                 sign={sign}
+                                onClick={() => navigate(`/signs/${sign.id}`)}
                             />
                         ))}
                     </div>

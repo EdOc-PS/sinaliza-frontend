@@ -10,4 +10,5 @@ export const DISCIPLINES = {
     MEMBERS:         (id: string) => `disciplines/${id}/members`,
     UPDATE:   (id: string) => `disciplines/${id}`,
     DELETE:   (id: string) => `disciplines/${id}`,
+    LEAVE:    (id: string) => `disciplines/${id}/leave`,
 }
