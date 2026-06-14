@@ -97,6 +97,7 @@ const FavoritesPage = () => {
                             <SignCard
                                 key={sign.id}
                                 sign={sign}
+                                isFavorite
                                 onClick={() => navigate(`/signs/${sign.id}`)}
                             />
                         ))}

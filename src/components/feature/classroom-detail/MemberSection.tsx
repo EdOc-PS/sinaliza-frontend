@@ -19,9 +19,8 @@ interface MemberSectionProps {
 const ROLE_META: Record<string, { label: string; icon: typeof Knowledge01Icon; className: string }> = {
     EDUCATOR:    { label: "Educador",   icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
     INTERPRETER: { label: "Intérprete", icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
-    ASSISTANT:   { label: "Assistente", icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
     STUDENT:     { label: "Aluno",      icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
-    FAMILY:      { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
+    GUARDIAN:    { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
 };
 
 // Educador/intérprete são a mesma role (EDUCATOR); o tipo vem de user.educatorType

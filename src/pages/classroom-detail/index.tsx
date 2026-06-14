@@ -295,6 +295,7 @@ const ClassroomDetailPage = () => {
                                         key={sign.id}
                                         sign={sign}
                                         canManage={canManage}
+                                        isFavorite
                                         onClick={() => navigate(`/signs/${sign.id}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}

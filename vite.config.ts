@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
       '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
       '@routes': fileURLToPath(new URL('./src/config/api/apiRoutes', import.meta.url)),
       '@requests': fileURLToPath(new URL('./src/config/api/requests', import.meta.url)),

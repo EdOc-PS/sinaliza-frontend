@@ -11,7 +11,10 @@ import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { SignForm } from "@components/feature/workspace/SignForm";
-import { SignCard, type SignCardData, GRAMMATICAL_META } from "@components/feature/classroom-detail/SignCard";
+import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
+import { EmptyImage } from "@components/feature/sign-detail/EmptyImage";
+import { getYouTubeEmbedUrl, getYouTubeId } from "@/lib/youtube/youtube";
+import { GRAMMATICAL_META } from "@lib/constants/grammaticalClass";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,7 +24,7 @@ import {
     Edit02Icon,
     FavouriteIcon,
     HandPointingLeft02Icon,
-    ImageNotFound02Icon,
+    RotateRight01Icon,
     SignLanguageCIcon,
     SpeechIcon,
 } from "@hugeicons/core-free-icons";
@@ -51,20 +54,6 @@ const MOCK_RELATED: SignCardData[] = [
     { id: "mock-4", name: "Caminhão", grammaticalClass: "NOUN",      videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
     { id: "mock-5", name: "Comemorar", grammaticalClass: "VERB",     videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
 ];
-
-// Extrai o id de um link do YouTube (watch?v=, youtu.be/, embed/)
-function getYouTubeId(url: string): string | null {
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
-    return match ? match[1] : null;
-}
-
-// Placeholder estilizado para imagem não cadastrada
-const EmptyImage = ({ iconSize = 32, label = "Sem imagem" }: { iconSize?: number; label?: string }) => (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-cloud-200 text-cloud-500">
-        <HugeiconsIcon icon={ImageNotFound02Icon} size={iconSize} />
-        {label && <span className="text-xs font-medium">{label}</span>}
-    </div>
-);
 
 const SignDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -183,7 +172,7 @@ const SignDetailPage = () => {
                         {youTubeId ? (
                             <iframe
                                 className="h-full w-full"
-                                src={`https://www.youtube.com/embed/${youTubeId}`}
+                                src={getYouTubeEmbedUrl(youTubeId)}
                                 title={sign.name}
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
@@ -283,26 +272,38 @@ const SignDetailPage = () => {
                     </div>
                 </div>
 
-                {/* Cards de exemplo (Libras / Português) */}
-                {(sign.exampleLibras || sign.examplePt) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-2 rounded-3xl bg-white p-5">
-                            <div className="flex items-center gap-2 text-campfire-500">
-                                <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                                <span className="text-sm font-semibold">Exemplo em Libras</span>
+                {/* Cards de descrição do movimento e exemplos */}
+                {(sign.movementDescription || sign.exampleLibras || sign.examplePt) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                        <div className="flex flex-col gap-2 rounded-3xl bg-white p-5 h-full">
+                            <div className="flex items-center gap-2 text-salmon-500">
+                                <HugeiconsIcon icon={RotateRight01Icon} size={18} />
+                                <span className="text-sm font-semibold">Descrição do movimento</span>
                             </div>
                             <p className="text-sm text-cloud-600 leading-relaxed">
-                                {sign.exampleLibras || "—"}
+                                {sign.movementDescription || "—"}
                             </p>
                         </div>
-                        <div className="flex flex-col gap-2 rounded-3xl bg-white p-5">
-                            <div className="flex items-center gap-2 text-sky-500">
-                                <HugeiconsIcon icon={SpeechIcon} size={18} />
-                                <span className="text-sm font-semibold">Exemplo em Português</span>
+
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2 rounded-3xl bg-white p-5">
+                                <div className="flex items-center gap-2 text-campfire-500">
+                                    <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
+                                    <span className="text-sm font-semibold">Exemplo em Libras</span>
+                                </div>
+                                <p className="text-sm text-cloud-600 leading-relaxed">
+                                    {sign.exampleLibras || "—"}
+                                </p>
                             </div>
-                            <p className="text-sm text-cloud-600 leading-relaxed">
-                                {sign.examplePt || "—"}
-                            </p>
+                            <div className="flex flex-col gap-2 rounded-3xl bg-white p-5">
+                                <div className="flex items-center gap-2 text-sky-500">
+                                    <HugeiconsIcon icon={SpeechIcon} size={18} />
+                                    <span className="text-sm font-semibold">Exemplo em Português</span>
+                                </div>
+                                <p className="text-sm text-cloud-600 leading-relaxed">
+                                    {sign.examplePt || "—"}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}
