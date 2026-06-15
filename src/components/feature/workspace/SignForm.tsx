@@ -12,9 +12,9 @@ import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
 import ProgressBar from "@components/layout/ProgressBar";
 import InputCheck from "@/components/ui/InputCheck";
+import BackButton from "@components/ui/BackButton";
 
 import {
-    ArrowLeft01Icon,
     LayersIcon,
     LinkSquare02Icon,
     RotateRight01Icon,
@@ -23,7 +23,6 @@ import {
     TagsIcon,
     TextSelectIcon,
 } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
@@ -172,16 +171,6 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     useEffect(() => { 
         loadAll(); 
     }, [signId]);
-
-    const BackBtn = ({ onClick }: { onClick: () => void }) => (
-        <button
-            type="button"
-            onClick={onClick}
-            className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
-        >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={26} />
-        </button>
-    );
 
     if (loadingData) {
         return (
@@ -334,7 +323,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                     </div>
 
                     <div className="flex gap-3 pt-1">
-                        <BackBtn onClick={() => setView(0)} />
+                        <BackButton onClick={() => setView(0)} />
                         <Button
                             type="button"
                             variant="cloud"
@@ -381,7 +370,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                     </div>
 
                     <div className="flex gap-3 pt-1">
-                        <BackBtn onClick={() => setView(1)} />
+                        <BackButton onClick={() => setView(1)} />
                         <Button
                             type="submit"
                             variant="cloud"

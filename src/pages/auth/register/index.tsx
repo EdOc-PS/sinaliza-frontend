@@ -10,165 +10,28 @@ import Select from '@components/ui/Select'
 import InputText from '@components/ui/InputText'
 import ProgressBar from '@/components/layout/ProgressBar'
 import {
-    ArrowLeft01Icon,
-    Backpack01Icon,
     CirclePasswordIcon,
-    ConversationIcon,
-    DiplomaIcon,
-    HealtcareIcon,
-    HierarchyCircle02Icon,
     LocationUser01Icon,
-    Mail01Icon,
     MailOpenLoveIcon,
     PenTool03Icon,
-    SchoolIcon,
     SmartPhone01Icon,
-    StationeryIcon,
-    TeacherIcon,
 } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { maskPhone } from '@/lib/mask/mask'
-
-type PerfilId = 'student' | 'educator' | 'interpreter' | 'guardian'
+import BackButton from '@components/ui/BackButton'
+import { maskPhone } from '@lib/mask/mask'
+import { PERFIL_FORMULARIOS as perfilFormularios, type PerfilId } from '@lib/constants/profileFields'
+import type { EducatorType, Role } from '@api/requests'
 
 // Intérprete agora é EDUCATOR com educatorType = INTERPRETER
-const perfilRoleMap: Record<PerfilId, string> = {
+const perfilRoleMap: Record<PerfilId, Role> = {
     student: 'STUDENT',
     educator: 'EDUCATOR',
     interpreter: 'EDUCATOR',
     guardian: 'GUARDIAN',
 }
 
-const perfilEducatorTypeMap: Partial<Record<PerfilId, string>> = {
+const perfilEducatorTypeMap: Partial<Record<PerfilId, EducatorType>> = {
     educator: 'TEACHER',
     interpreter: 'INTERPRETER',
-}
-
-type CampoFormulario = {
-    id: string
-    label: string
-    placeholder?: string
-    icon?: typeof LocationUser01Icon
-    type?: string
-    kind?: 'input' | 'select'
-    options?: Array<{ label: string; value: string }>
-    noSpecialChars?: boolean
-}
-
-const perfilFormularios: Record<
-    PerfilId,
-    { titulo: string; descricao: string; campos: CampoFormulario[] }
-> = {
-    student: {
-        titulo: 'Dados do estudante',
-        descricao: 'Complete as informações acadêmicas e de apoio.',
-        campos: [
-            {
-                id: 'institute',
-                label: 'Instituto:',
-                placeholder: 'Nome da instituição',
-                icon: SchoolIcon,
-                noSpecialChars: true,
-            },
-            {
-                id: 'grauEscolar',
-                label: 'Grau escolar:',
-                placeholder: 'Ex: 8º ano, ensino médio, graduação',
-                icon: Backpack01Icon,
-            },
-            {
-                id: 'necessidadesEspeciais',
-                label: 'Necessidades especiais:',
-                placeholder: 'Descreva se houver alguma',
-                icon: HealtcareIcon,
-                noSpecialChars: true,
-            },
-        ],
-    },
-    educator: {
-        titulo: 'Dados do educador',
-        descricao: 'Informe a atuação acadêmica principal.',
-        campos: [
-            {
-                id: 'institute',
-                label: 'Instituto:',
-                placeholder: 'Nome da instituição',
-                icon: SchoolIcon,
-                noSpecialChars: true,
-            },
-            {
-                id: 'department',
-                label: 'Departamento:',
-                placeholder: 'Ex: Matemática, Pedagogia',
-                icon: TeacherIcon,
-                noSpecialChars: true,
-            },
-            {
-                id: 'specialty',
-                label: 'Especialidade:',
-                placeholder: 'Área de maior atuação',
-                icon: StationeryIcon,
-                noSpecialChars: true,
-            },
-        ],
-    },
-    interpreter: {
-        titulo: 'Dados do intérprete',
-        descricao: 'Detalhe a formação e a área de apoio.',
-        campos: [
-            {
-                id: 'institute',
-                label: 'Instituto:',
-                placeholder: 'Nome da instituição',
-                icon: SchoolIcon,
-            },
-            {
-                id: 'proficienciaLibras',
-                label: 'Proficiência em Libras:',
-                icon: ConversationIcon,
-                kind: 'select',
-                options: [
-                    { label: 'Básico', value: 'BASICO' },
-                    { label: 'Intermediário', value: 'INTERMEDIARIO' },
-                    { label: 'Avançado', value: 'AVANCADO' },
-                    { label: 'Fluente', value: 'FLUENTE' },
-                ],
-            },
-            {
-                id: 'certificate',
-                label: 'Certificado:',
-                placeholder: 'Informação sobre certificação',
-                icon: DiplomaIcon,
-                noSpecialChars: true,
-            },
-            {
-                id: 'areaAtuacao',
-                label: 'Área de atuação:',
-                placeholder: 'Ex: reforço escolar, interpretação',
-                icon: TeacherIcon,
-                noSpecialChars: true,
-            },
-        ],
-    },
-    guardian: {
-        titulo: 'Dados do responsável',
-        descricao: 'Preencha as informações de vínculo.',
-        campos: [
-            {
-                id: 'studentEmail',
-                label: 'Email do aluno:',
-                placeholder: 'aluno@email.com',
-                icon: Mail01Icon,
-            },
-            {
-                id: 'parentesco',
-                label: 'Parentesco:',
-                placeholder: 'Ex: mãe, pai, avó',
-                icon: HierarchyCircle02Icon,
-                noSpecialChars: true,
-            },
-        ],
-    },
 }
 
 type UserProps = {
@@ -245,8 +108,6 @@ const RegisterPage = () => {
             dadosPerfil: { ...prev.dadosPerfil, [fieldId]: value },
         }))
     }
-
-    // Validações
 
     // View 0: Dados pessoais (nome e email obrigatórios; nome mínimo 3 chars)
     const nomeValido = user.nome.trim().length >= 3
@@ -421,12 +282,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <button
-                                        onClick={() => setView(0)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
-                                    >
-                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={26} />
-                                    </button>
+                                    <BackButton onClick={() => setView(0)} />
                                     <Button
                                         className="flex-1"
                                         onClick={() => setView(2)}
@@ -486,12 +342,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <button
-                                        onClick={() => setView(1)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
-                                    >
-                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                    </button>
+                                    <BackButton onClick={() => setView(1)} />
                                     <Button
                                         className="flex-1"
                                         onClick={() => setView(3)}
@@ -531,12 +382,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <button
-                                        onClick={() => setView(2)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
-                                    >
-                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                    </button>
+                                    <BackButton onClick={() => setView(2)} />
                                     <Button className="flex-1" onClick={() => setView(4)}>
                                         Próximo
                                     </Button>
@@ -597,12 +443,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <button
-                                        onClick={() => setView(3)}
-                                        className="w-16 flex justify-center cursor-pointer items-center p-2 rounded-3xl bg-cloud-300/80 hover:bg-cloud-400/60 transition-colors duration-200"
-                                    >
-                                        <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
-                                    </button>
+                                    <BackButton onClick={() => setView(3)} />
                                     <Button
                                         className="flex-1"
                                         onClick={handleRegister}

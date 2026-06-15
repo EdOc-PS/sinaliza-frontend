@@ -7,8 +7,8 @@ import {
     Cancel01Icon,
     Clock01Icon,
     Delete02Icon,
+    Rotate01Icon,
     SignLanguageCIcon,
-    TimeQuarterPassIcon,
     ViewIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -56,6 +56,7 @@ const relativeTime = (iso: string): string => {
 
 const HistoryPage = () => {
     const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
     const [signs, setSigns] = useState<HistorySign[]>([]);
     const [clearModal, setClearModal] = useState(false);
@@ -122,7 +123,7 @@ const HistoryPage = () => {
                 <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
                     {/* Ícone */}
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-400/20 ">
-                        <HugeiconsIcon icon={TimeQuarterPassIcon} size={28} className="text-sky-600" />
+                        <HugeiconsIcon icon={Rotate01Icon} size={28} className="text-sky-600" />
                     </div>
 
                     {/* Título + descrição */}
@@ -189,7 +190,6 @@ const HistoryPage = () => {
                     {/* Grupos por data */}
                     {groups.map((group) => (
                         <div key={group.label} className="flex flex-col gap-5">
-                            {/* Separator com a data */}
                             <div className="flex items-center gap-3">
                                 <span className="text-xs font-semibold uppercase tracking-wide text-cloud-500">
                                     {group.label}

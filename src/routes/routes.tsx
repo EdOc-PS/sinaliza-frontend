@@ -14,6 +14,7 @@ import ClassroomsPage from '@/pages/classrooms'
 import ClassroomDetailPage from '@/pages/classroom-detail'
 import FavoritesPage from '@/pages/favorites'
 import HistoryPage from '@/pages/history'
+import ProfilePage from '@/pages/profile'
 import SignDetailPage from '@/pages/sign-detail'
 import WorkspacePage from '@/pages/workspace'
 
@@ -72,7 +73,7 @@ const routes: RouteObject[] = [
             },
             {
                 path: 'profile',
-                element: <ClassroomsPage />,
+                element: <ProfilePage />,
             }
         ],
     },

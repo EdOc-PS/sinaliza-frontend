@@ -1,13 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import {
     GetRequest,
+    PatchRequest,
     PostRequest,
     type User,
     type LoginPayload,
     type LoginResponse,
     type RegisterPayload,
+    type UpdateUserPayload,
 } from '@api/requests'
 import { AUTH } from '@routes/auth'
+import { USERS } from '@routes/users'
 
 const TOKEN_KEY = '@token'
 
@@ -19,6 +22,7 @@ type AuthContextValue = {
     user: User | null
     login: (credentials: LoginPayload) => Promise<void>
     register: (data: RegisterPayload) => Promise<void>
+    updateUser: (data: UpdateUserPayload) => Promise<void>
     logout: () => void
     getUser: () => Promise<void>
 }
@@ -83,6 +87,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    // Atualiza os dados do usuário autenticado e sincroniza o contexto
+    async function updateUser(data: UpdateUserPayload) {
+        if (!user) throw new Error('Nenhum usuário autenticado.')
+
+        const response = await PatchRequest<User>(USERS.UPDATE(user.id), data)
+
+        if (!response.success) {
+            throw new Error(response.message || 'Erro ao atualizar conta.')
+        }
+
+        await getUser()
+    }
+
     // Remove o token e limpa o usuário
     function logout() {
         localStorage.removeItem(TOKEN_KEY)
@@ -95,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, getUser }}>
+        <AuthContext.Provider value={{ user, login, register, updateUser, logout, getUser }}>
             {children}
         </AuthContext.Provider>
     )
