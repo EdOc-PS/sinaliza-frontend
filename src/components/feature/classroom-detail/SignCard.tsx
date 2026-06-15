@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
     DeleteIcon,
     Edit02Icon,
@@ -34,6 +34,14 @@ export interface SignCardData {
     createdAt: string;
 }
 
+// Item extra de dropdown específico de uma tela (ex: "Remover do histórico")
+export interface SignCardAction {
+    label: string;
+    icon: IconSvgElement;
+    onSelect: () => void;
+    variant?: "default" | "danger";
+}
+
 interface SignCardProps {
     sign: SignCardData;
     canManage?: boolean;
@@ -43,6 +51,7 @@ interface SignCardProps {
     onEdit?: () => void;
     onDelete?: () => void;
     onPromote?: () => void;
+    actions?: SignCardAction[];
 }
 
 // Delay do hover (desktop) e do long-press (mobile) para iniciar a reprodução
@@ -58,6 +67,7 @@ export const SignCard = ({
     onEdit,
     onDelete,
     onPromote,
+    actions,
 }: SignCardProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const hoverTimer = useRef<number | null>(null);
@@ -74,16 +84,10 @@ export const SignCard = ({
     const youtubeThumbnail = !sign.videoUrl && sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null;
     const hasVideo = !!sign.videoUrl || !!youtubeId;
 
-
-
     const clearTimers = () => {
         if (hoverTimer.current) { clearTimeout(hoverTimer.current); hoverTimer.current = null; }
         if (touchTimer.current) { clearTimeout(touchTimer.current); touchTimer.current = null; }
     };
-
-    useEffect(() => setFavorite(isFavorite), [isFavorite]);
-
-    useEffect(() => clearTimers, []);
 
     const startPlay = () => {
         if (!hasVideo) return;
@@ -124,6 +128,10 @@ export const SignCard = ({
             setFavLoading(false);
         }
     };
+
+    useEffect(() => setFavorite(isFavorite), [isFavorite]);
+
+    useEffect(() => clearTimers, []);
 
     return (
         <>
@@ -243,6 +251,17 @@ export const SignCard = ({
                                         Ver vídeo
                                     </DropdownMenuItem>
                                 )}
+
+                                {actions?.map((action) => (
+                                    <DropdownMenuItem
+                                        key={action.label}
+                                        variant={action.variant}
+                                        icon={<HugeiconsIcon icon={action.icon} size={18} />}
+                                        onSelect={action.onSelect}
+                                    >
+                                        {action.label}
+                                    </DropdownMenuItem>
+                                ))}
 
                                 {canManage && (
                                     <>

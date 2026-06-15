@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { DeleteRequest, GetRequest, PostRequest } from "@requests";
 import { SIGNS } from "@routes/signs";
 import { FAVORITES } from "@routes/favorites";
+import { HISTORY } from "@routes/history";
 import { useAuth } from "@context/AuthContext";
 
 import Spinner from "@components/ui/Spinner";
@@ -93,6 +94,9 @@ const SignDetailPage = () => {
             }
             setSign(signRes.object ?? null);
             setIsFavorite((favRes.object ?? []).some((s) => s.id === id));
+
+            // Registra o acesso no histórico (não bloqueia a tela em caso de falha)
+            PostRequest(HISTORY.REGISTER(id), {}).catch(() => { });
         } finally {
             setLoading(false);
         }
