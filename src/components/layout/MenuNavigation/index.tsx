@@ -151,6 +151,67 @@ const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }:
     );
 };
 
+interface ActionItemProps {
+    icon: typeof Home06Icon;
+    label: string;
+    onClick?: () => void;
+    isActive?: boolean;
+    size?: number;
+    sizeClass?: string;
+    idleBg?: string;
+    logout?: boolean;
+}
+
+// Botões da seção inferior (Favoritos, Histórico, Perfil, Sair) com bounce no clique e verde ativo
+const ActionItem = ({
+    icon,
+    label,
+    onClick,
+    isActive = false,
+    size = 24,
+    sizeClass = "w-12 h-12 rounded-2xl",
+    idleBg = "bg-white hover:bg-cloud-200",
+    logout = false,
+}: ActionItemProps) => {
+    const [bouncing, setBouncing] = useState(false);
+
+    const handleClick = () => {
+        setBouncing(true);
+        setTimeout(() => setBouncing(false), 450);
+        onClick?.();
+    };
+
+    // No "Sair" aplicamos só a animação (mantém o salmon, sem verde ativo)
+    const bgClass = logout
+        ? "bg-salmon-100 hover:bg-salmon-200"
+        : isActive
+            ? "bg-lime-100/80"
+            : idleBg;
+
+    const iconColor = logout
+        ? "text-salmon-400"
+        : isActive
+            ? "text-lime-700"
+            : "text-cloud-500";
+
+    return (
+        <Tooltip label={label} isDesktop={true} bgColor={logout ? "bg-salmon-500" : "bg-cloud-700"}>
+            <button
+                onClick={handleClick}
+                className={`flex items-center justify-center transition-all duration-300 ${sizeClass} ${bgClass}`}
+            >
+                <span className={bouncing ? "icon-bounce" : ""}>
+                    <HugeiconsIcon
+                        icon={icon}
+                        size={size}
+                        className={`transition-colors duration-300 ${iconColor}`}
+                    />
+                </span>
+            </button>
+        </Tooltip>
+    );
+};
+
 const MenuNavigation = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -219,29 +280,39 @@ const MenuNavigation = () => {
                 {/* Perfil */}
                 <div className="flex flex-col items-center gap-4 mt-auto">
                     <div className="flex flex-col items-center rounded-xl bg-white">
-                        <Tooltip label="Favoritos" isDesktop={true}>
-                            <button onClick={() => navigate("/favorites")} className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-cloud-200 transition-colors">
-                                <HugeiconsIcon icon={FavouriteIcon} size={20} className="text-cloud-500" />
-                            </button>
-                        </Tooltip>
+                        <ActionItem
+                            icon={FavouriteIcon}
+                            label="Favoritos"
+                            size={20}
+                            sizeClass="w-10 h-10 rounded-xl"
+                            idleBg="hover:bg-cloud-200"
+                            onClick={() => navigate("/favorites")}
+                            isActive={isPathActive("/favorites")}
+                        />
 
-                        <Tooltip label="Histórico" isDesktop={true}>
-                            <button onClick={() => navigate("/history")} className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-cloud-200 transition-colors">
-                                <HugeiconsIcon icon={Rotate01Icon} size={20} className="text-cloud-500" />
-                            </button>
-                        </Tooltip>
+                        <ActionItem
+                            icon={Rotate01Icon}
+                            label="Histórico"
+                            size={20}
+                            sizeClass="w-10 h-10 rounded-xl"
+                            idleBg="hover:bg-cloud-200"
+                            onClick={() => navigate("/history")}
+                            isActive={isPathActive("/history")}
+                        />
                     </div>
 
-                    <Tooltip label="Perfil" isDesktop={true}>
-                        <button onClick={handleProfileClick} className="flex bg-white items-center justify-center w-12 h-12 rounded-2xl hover:bg-cloud-200 transition-colors">
-                            <HugeiconsIcon icon={UserIcon} size={24} className="text-cloud-500" />
-                        </button>
-                    </Tooltip>
-                    <Tooltip label="Sair" isDesktop={true} bgColor="bg-salmon-500">
-                        <button onClick={handleLogout} className="flex bg-salmon-100 items-center justify-center w-12 h-12 rounded-2xl hover:bg-salmon-200 transition-colors">
-                            <HugeiconsIcon icon={Logout01Icon} size={24} className="text-salmon-400" />
-                        </button>
-                    </Tooltip>
+                    <ActionItem
+                        icon={UserIcon}
+                        label="Perfil"
+                        onClick={handleProfileClick}
+                        isActive={isPathActive("/profile")}
+                    />
+                    <ActionItem
+                        icon={Logout01Icon}
+                        label="Sair"
+                        onClick={handleLogout}
+                        logout
+                    />
                 </div>
             </aside>
         </>
