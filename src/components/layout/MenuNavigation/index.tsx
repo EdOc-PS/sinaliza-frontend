@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { toast } from "sonner";
 import { useAuth } from "@context/AuthContext";
 
 import {
@@ -222,8 +223,9 @@ const MenuNavigation = () => {
     const menuItems = menuItemsByRole[role] ?? menuItemsByRole.STUDENT;
 
     const handleLogout = () => {
+        toast.success("Até logo!");
         logout();
-        navigate("/auth/login");
+        // PrivateRoute detecta user=null e redireciona automaticamente
     };
 
     const handleProfileClick = () => {

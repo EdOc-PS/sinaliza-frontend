@@ -1,4 +1,4 @@
-import { AddIcon } from "@hugeicons/core-free-icons";
+﻿import { AddIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { useState } from "react";
@@ -86,7 +86,7 @@ export const FAB = () => {
                             delay="180ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src="src/assets/app/create-class.png" alt="" className="w-6 h-6" />
+                                    <img src="src/assets/images/app/create-class.png" alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar uma turma"
@@ -97,7 +97,7 @@ export const FAB = () => {
                             delay="120ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-100">
-                                    <img src="src/assets/app/join-class.png" alt="" className="w-6 h-6" />
+                                    <img src="src/assets/images/app/join-class.png" alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Participar de uma turma"
@@ -108,7 +108,7 @@ export const FAB = () => {
                             delay="60ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src="src/assets/app/create-hand.png" alt="" className="w-6 h-6" />
+                                    <img src="src/assets/images/app/create-hand.png" alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar configuração de mão"
@@ -120,7 +120,7 @@ export const FAB = () => {
                             delay="0ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-salmon-100">
-                                    <img src="src/assets/app/create-signal.png" alt="" className="w-6 h-6" />
+                                    <img src="src/assets/images/app/create-signal.png" alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar sinal"

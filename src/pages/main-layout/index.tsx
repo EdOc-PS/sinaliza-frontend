@@ -3,18 +3,9 @@ import MobileHeader from "@components/layout/MobileHeader"
 import { FAB } from "@components/layout/FAB"
 
 import { FABProvider } from "@context/FABContext"
-import { useAuth } from "@context/AuthContext"
-
-import { useEffect } from "react"
 import { Outlet } from "react-router-dom"
 
 const MainLayout = () => {
-    const { getUser } = useAuth()
-
-    useEffect(() => {
-        getUser()
-    }, [])
-
     return (
         <FABProvider>
             <MobileHeader />

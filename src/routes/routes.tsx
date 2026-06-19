@@ -10,6 +10,7 @@ import RegisterPage from '@pages/auth/register'
 
 // App
 import MainLayout from '@pages/main-layout'
+import PrivateRoute from '@/components/layout/PrivateRoute'
 import ClassroomsPage from '@/pages/classrooms'
 import ClassroomDetailPage from '@/pages/classroom-detail'
 import FavoritesPage from '@/pages/favorites'
@@ -41,40 +42,45 @@ const routes: RouteObject[] = [
     },
     {
         path: '/',
-        element: <MainLayout />,
+        element: <PrivateRoute />,
         children: [
             {
-                path: 'classrooms',
-                element: <ClassroomsPage />,
+                element: <MainLayout />,
+                children: [
+                    {
+                        path: 'classrooms',
+                        element: <ClassroomsPage />,
+                    },
+                    {
+                        path: 'classrooms/:id',
+                        element: <ClassroomDetailPage />,
+                    },
+                    {
+                        path: 'signs/:id',
+                        element: <SignDetailPage />,
+                    },
+                    {
+                        path: 'workspace',
+                        element: <WorkspacePage />,
+                    },
+                    {
+                        path: 'glossary',
+                        element: <ClassroomsPage />,
+                    },
+                    {
+                        path: 'favorites',
+                        element: <FavoritesPage />,
+                    },
+                    {
+                        path: 'history',
+                        element: <HistoryPage />,
+                    },
+                    {
+                        path: 'profile',
+                        element: <ProfilePage />,
+                    },
+                ],
             },
-            {
-                path: 'classrooms/:id',
-                element: <ClassroomDetailPage />,
-            },
-            {
-                path: 'signs/:id',
-                element: <SignDetailPage />,
-            },
-            {
-                path: 'workspace',
-                element: <WorkspacePage />,
-            },
-            {
-                path: 'glossary',
-                element: <ClassroomsPage />,
-            },
-            {
-                path: 'favorites',
-                element: <FavoritesPage />,
-            },
-            {
-                path: 'history',
-                element: <HistoryPage />,
-            },
-            {
-                path: 'profile',
-                element: <ProfilePage />,
-            }
         ],
     },
     {

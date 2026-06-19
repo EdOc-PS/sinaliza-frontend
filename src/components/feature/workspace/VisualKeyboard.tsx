@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+﻿import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon } from "@hugeicons/core-free-icons";
@@ -237,7 +237,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger }: VisualKeyboardProps) 
                                 onClick={() => openForm("create-hand-config")}
                                 className="aspect-square bg-lime-50 border-2 border-dashed border-lime-400 rounded-xl flex items-center justify-center hover:bg-lime-100 hover:border-lime-500 transition-all hover:-translate-y-1 duration-300"
                             >
-                                <img src="src/assets/app/create-hand.png" alt="" className="w-8 h-8 sm:w-10 sm:h-10" />
+                                <img src="src/assets/images/app/create-hand.png" alt="" className="w-8 h-8 sm:w-10 sm:h-10" />
                             </button>
                         )}
                     </div>

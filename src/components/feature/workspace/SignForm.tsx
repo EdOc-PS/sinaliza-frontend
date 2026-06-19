@@ -26,12 +26,11 @@ import {
 
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
-import { DISCIPLINES } from "@routes/disciplines";
 import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests";
 
-interface DisciplineOption {
-    id: string;
-    name: string;
+interface SignOptions {
+    grammaticalClasses: GenericOption[];
+    disciplines: GenericOption[];
 }
 
 interface SignFormProps {
@@ -84,18 +83,15 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
         if (signId) setLoadingData(true);
         try {
             const requests: Promise<any>[] = [
-                GetRequest<GenericOption[]>(SIGNS.OPTIONS()),
-                GetRequest<DisciplineOption[]>(DISCIPLINES.MINE()),
+                GetRequest<SignOptions>(SIGNS.OPTIONS()),
             ];
             if (signId) requests.push(GetRequest<SignDetail>(SIGNS.FIND_ONE(signId)));
 
-            const [grammaticalRes, disciplineRes, signRes] = await Promise.all(requests);
+            const [optionsRes, signRes] = await Promise.all(requests);
 
-            if (grammaticalRes.success) setGrammaticalOptions(grammaticalRes.object ?? []);
-            if (disciplineRes.success) {
-                setDisciplineOptions(
-                    (disciplineRes.object ?? []).map((d: DisciplineOption) => ({ label: d.name, value: d.id }))
-                );
+            if (optionsRes.success && optionsRes.object) {
+                setGrammaticalOptions(optionsRes.object.grammaticalClasses ?? []);
+                setDisciplineOptions(optionsRes.object.disciplines ?? []);
             }
 
             if (signRes) {

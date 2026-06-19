@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/config/context/AuthContext'
 import { toast } from 'sonner'
@@ -128,6 +128,16 @@ const RegisterPage = () => {
     const senhasValidas = user.senha.trim() !== '' && user.confirmarSenha.trim() !== ''
     const isView4Valid = senhasValidas && senhasIguais && senhaValida
 
+    // Avança/submete o step atual ao pressionar Enter ou clicar no botão principal
+    const handleStepSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (view === 0 && isView0Valid) { setView(1); return; }
+        if (view === 1 && user.perfil) { setView(2); return; }
+        if (view === 2 && isView2Valid()) { setView(3); return; }
+        if (view === 3) { setView(4); return; }
+        if (view === 4 && isView4Valid) { handleRegister(); }
+    };
+
     // Função de registro
     const handleRegister = async () => {
         if (!user.perfil) return
@@ -159,11 +169,18 @@ const RegisterPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-start px-4 py-6 sm:py-8">
+        <div className="min-h-screen flex justify-center items-start px-4 py-6 sm:py-8 relative">
             <AuthBackground />
+
             <div className='flex flex-col items-center gap-3 sm:gap-4 w-full'>
-                <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
-                <div className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-neutral-300">
+                {/* Logo */}
+                <div className='flex items-center'>
+                    <img src="/src/assets/images/logo/logo-simples.png" alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
+                    <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
+                </div>
+
+                {/* Formulário de Registro */}
+                <form onSubmit={handleStepSubmit} className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-neutral-300">
                     <div className="space-y-6">
                         <ProgressBar currentStep={view} totalSteps={6} style={{ marginBottom: "2rem", justifyContent: "center" }} />
 
@@ -171,7 +188,7 @@ const RegisterPage = () => {
                         {view === 0 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src="/src/assets/hello.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src="/src/assets/images/hello.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
                                     <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
@@ -231,8 +248,8 @@ const RegisterPage = () => {
                                 </div>
 
                                 <Button
+                                    type="submit"
                                     className="w-full"
-                                    onClick={() => setView(1)}
                                     disabled={!isView0Valid}
                                 >
                                     Próximo
@@ -244,7 +261,7 @@ const RegisterPage = () => {
                         {view === 1 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src="/src/assets/profile.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src="/src/assets/images/profile.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -273,7 +290,7 @@ const RegisterPage = () => {
                                                     <p className="break-normal mt-1 text-sm font-medium opacity-90">{perfil.descricao}</p>
                                                 </div>
 
-                                                <img src={`/src/assets/${perfil.id}.png`} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />
+                                                <img src={`/src/assets/images/${perfil.id}.png`} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />
 
 
                                             </button>
@@ -284,8 +301,8 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <BackButton onClick={() => setView(0)} />
                                     <Button
+                                        type="submit"
                                         className="flex-1"
-                                        onClick={() => setView(2)}
                                         disabled={!user.perfil}
                                     >
                                         Próximo
@@ -298,7 +315,7 @@ const RegisterPage = () => {
                         {view === 2 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src={`/src/assets/${user.perfil}.png`} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={`/src/assets/images/${user.perfil}.png`} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -344,8 +361,8 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <BackButton onClick={() => setView(1)} />
                                     <Button
+                                        type="submit"
                                         className="flex-1"
-                                        onClick={() => setView(3)}
                                         disabled={!isView2Valid()}
                                     >
                                         Próximo
@@ -358,7 +375,7 @@ const RegisterPage = () => {
                         {view === 3 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/pen.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src="/src/assets/images/pen.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -383,7 +400,7 @@ const RegisterPage = () => {
 
                                 <div className="flex gap-3 pt-4">
                                     <BackButton onClick={() => setView(2)} />
-                                    <Button className="flex-1" onClick={() => setView(4)}>
+                                    <Button type="submit" className="flex-1">
                                         Próximo
                                     </Button>
                                 </div>
@@ -394,7 +411,7 @@ const RegisterPage = () => {
                         {view === 4 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/security.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src="/src/assets/images/security.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
                                     <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
@@ -445,8 +462,8 @@ const RegisterPage = () => {
                                 <div className="flex gap-3 pt-4">
                                     <BackButton onClick={() => setView(3)} />
                                     <Button
+                                        type="submit"
                                         className="flex-1"
-                                        onClick={handleRegister}
                                         disabled={!isView4Valid || loading}
                                     >
                                         {loading ? 'Criando conta...' : 'Criar Conta'}
@@ -465,7 +482,7 @@ const RegisterPage = () => {
 
 
                                     <div className="flex justify-center p-6 sm:p-8 rounded-full bg-green-400/50">
-                                        <img src="/src/assets/approve.png" alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
+                                        <img src="/src/assets/images/approve.png" alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
                                     </div>
                                     <p className='text-neutral-500 font-medium text-sm sm:text-base'>
                                         Sua conta foi criada com sucesso. Agora você faz parte de uma comunidade comprometida com a inclusão
@@ -482,6 +499,17 @@ const RegisterPage = () => {
                             </>
                         )}
                     </div>
+                </form>
+
+                {/* Mobile: abaixo do form | md+: canto superior direito */}
+                <div className="mt-1 flex items-center gap-4 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-4 md:absolute md:right-4 md:top-4 md:mt-0">
+                    <p className="text-cloud-500 font-medium">Já tem uma conta?</p>
+                    <button
+                        onClick={() => navigate('/auth/login')}
+                        className="cursor-pointer rounded-2xl bg-campfire-500 px-5 py-3 font-bold text-cloud-100 transition-all duration-300 hover:bg-campfire-500/90"
+                    >
+                        Faça login
+                    </button>
                 </div>
             </div>
         </div>

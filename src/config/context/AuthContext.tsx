@@ -20,6 +20,7 @@ const TOKEN_KEY = '@token'
 
 type AuthContextValue = {
     user: User | null
+    initialized: boolean
     login: (credentials: LoginPayload) => Promise<void>
     register: (data: RegisterPayload) => Promise<void>
     updateUser: (data: UpdateUserPayload) => Promise<void>
@@ -39,6 +40,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
+    const [initialized, setInitialized] = useState(false)
 
     // Busca o usuário autenticado a partir do token salvo
     async function getUser() {
@@ -46,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!token) {
             setUser(null)
+            setInitialized(true)
             return
         }
 
@@ -55,13 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (response.success && response.object) {
                 setUser(response.object)
             } else {
-                // Token inválido ou sessão expirada
                 localStorage.removeItem(TOKEN_KEY)
                 setUser(null)
             }
         } catch (error) {
             console.error('Erro ao buscar usuário:', error)
             setUser(null)
+        } finally {
+            setInitialized(true)
         }
     }
 
@@ -112,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, login, register, updateUser, logout, getUser }}>
+        <AuthContext.Provider value={{ user, initialized, login, register, updateUser, logout, getUser }}>
             {children}
         </AuthContext.Provider>
     )
