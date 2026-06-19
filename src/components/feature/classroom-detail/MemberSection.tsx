@@ -45,7 +45,7 @@ export const MemberSection = ({ title, members }: MemberSectionProps) => (
                             <span className="flex-1 text-sm font-medium text-cloud-600">{m.user.name}</span>
 
                             {/* Role badge */}
-                            <RoleBadge user={{ role: m.roleInClass, educatorType: m.user.educatorType }} />
+                            <RoleBadge role={m.roleInClass} educatorType={m.user.educatorType} />
                         </div>
                     ))}
                 </div>

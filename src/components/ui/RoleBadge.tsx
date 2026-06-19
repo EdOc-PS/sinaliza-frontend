@@ -5,11 +5,6 @@ import {
     Settings02Icon,
 } from "@hugeicons/core-free-icons";
 
-export interface RoleBadgeUser {
-    role: string;
-    educatorType?: "TEACHER" | "INTERPRETER" | null;
-}
-
 interface RoleMeta {
     label: string;
     icon: IconSvgElement;
@@ -24,26 +19,27 @@ const ROLE_META: Record<string, RoleMeta> = {
     ADMIN:       { label: "Admin",      icon: Settings02Icon,  className: "bg-lime-100 text-lime-700" },
 };
 
-// Educador/intérprete são a mesma role (EDUCATOR); o tipo vem de user.educatorType
-export const getRoleMeta = (user: RoleBadgeUser): RoleMeta => {
-    if (user.role === "EDUCATOR" && user.educatorType === "INTERPRETER") {
+// Educador/intérprete são a mesma role (EDUCATOR); o tipo vem de educatorType
+export const getRoleMeta = (role: string, educatorType?: "TEACHER" | "INTERPRETER" | null): RoleMeta => {
+    if (role === "EDUCATOR" && educatorType === "INTERPRETER") {
         return ROLE_META.INTERPRETER;
     }
-    return ROLE_META[user.role] ?? { label: user.role, icon: Knowledge02Icon, className: "bg-cloud-100 text-cloud-500" };
+    return ROLE_META[role] ?? { label: role, icon: Knowledge02Icon, className: "bg-cloud-100 text-cloud-500" };
 };
 
 interface RoleBadgeProps {
-    user: RoleBadgeUser;
+    role: string;
+    educatorType?: "TEACHER" | "INTERPRETER" | null;
     className?: string;
 }
 
-export const RoleBadge = ({ user, className = "" }: RoleBadgeProps) => {
-    const role = getRoleMeta(user);
+export const RoleBadge = ({ role, educatorType, className = "" }: RoleBadgeProps) => {
+    const meta = getRoleMeta(role, educatorType);
 
     return (
-        <span className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold ${role.className} ${className}`}>
-            <HugeiconsIcon icon={role.icon} size={13} />
-            {role.label}
+        <span className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold ${meta.className} ${className}`}>
+            <HugeiconsIcon icon={meta.icon} size={13} />
+            {meta.label}
         </span>
     );
 };

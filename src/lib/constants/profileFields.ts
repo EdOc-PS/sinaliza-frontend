@@ -143,10 +143,11 @@ export const PERFIL_FORMULARIOS: Record<
     },
 };
 
-// Mapeia role + educatorType (Educador/Intérprete são a mesma role) para o perfil de campos correspondente
-export const getPerfilId = (role: Role, educatorType?: EducatorType | null): PerfilId | null => {
-    if (role === "STUDENT") return "student";
-    if (role === "GUARDIAN") return "guardian";
-    if (role === "EDUCATOR") return educatorType === "INTERPRETER" ? "interpreter" : "educator";
+// Mapeia roles + educatorType (Educador/Intérprete são a mesma role) para o perfil de campos correspondente.
+// Como um usuário pode ter múltiplas roles, usa a de maior prioridade para o formulário de perfil.
+export const getPerfilId = (roles: Role[], educatorType?: EducatorType | null): PerfilId | null => {
+    if (roles.includes("EDUCATOR")) return educatorType === "INTERPRETER" ? "interpreter" : "educator";
+    if (roles.includes("GUARDIAN")) return "guardian";
+    if (roles.includes("STUDENT")) return "student";
     return null;
 };

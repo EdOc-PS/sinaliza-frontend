@@ -159,7 +159,7 @@ const ClassroomDetailPage = () => {
         );
     }
 
-    const canManage = user?.role === "EDUCATOR" && discipline.teacher.id === user?.id;
+    const canManage = !!user?.roles?.includes("EDUCATOR") && discipline.teacher.id === user?.id;
     const color = discipline.colorBackground || "#213547";
 
     return (

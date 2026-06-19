@@ -108,9 +108,11 @@ const ProfilePage = () => {
                                         </span>
                                     )}
 
-                                    {/* Badges de role */}
+                                    {/* Badges de role — usuário pode ter mais de uma */}
                                     <div className="mt-1 flex flex-wrap items-center gap-2">
-                                        <RoleBadge user={user} />
+                                        {user.roles.map((role) => (
+                                            <RoleBadge key={role} role={role} educatorType={user.educatorType} />
+                                        ))}
                                     </div>
                                 </div>
                             </div>

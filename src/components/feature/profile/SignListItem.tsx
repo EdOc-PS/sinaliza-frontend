@@ -31,7 +31,7 @@ export const SignListItem = ({ sign, onClick, meta }: SignListItemProps) => {
             {/* Thumbnail */}
             <div className="relative h-14 w-26 shrink-0 overflow-hidden rounded-xl bg-cloud-500">
                 {sign.videoUrl ? (
-                    <video src={`${sign.videoUrl}#t=0.1`} muted preload="metadata" className="h-full w-full object-cover" />
+                    <video src={`${sign.videoUrl}#t=2`} muted preload="metadata" className="h-full w-full object-cover" />
                 ) : thumbnail ? (
                     <img src={thumbnail} alt={sign.name} className="h-full w-full object-cover" />
                 ) : (

@@ -35,7 +35,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
     const [phone, setPhone] = useState(user?.phone ? maskPhone(user.phone) : "");
     const [bio, setBio] = useState(user?.bio ?? "");
 
-    const perfilId = user ? getPerfilId(user.role, user.educatorType) : null;
+    const perfilId = user ? getPerfilId(user.roles, user.educatorType) : null;
     const formularioPerfil = perfilId ? PERFIL_FORMULARIOS[perfilId] : null;
     const [dataProfile, setDataProfile] = useState<Record<string, string>>(() => {
         const initial: Record<string, string> = {};

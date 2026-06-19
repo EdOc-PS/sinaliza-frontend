@@ -46,7 +46,7 @@ export type User = {
   avatar?: string;
   bio?: string;
   status: boolean;
-  role: Role;
+  roles: Role[];
   educatorType?: EducatorType | null;
   institute?: string | null;
   dataProfile?: DataProfile | null;
@@ -84,6 +84,10 @@ export type UpdateUserPayload = {
   bio?: string;
   status?: boolean;
   dataProfile?: Partial<DataProfile>;
+};
+
+export type UpdateRolesPayload = {
+  roles: Role[];
 };
 
 export type LoginResponse = {

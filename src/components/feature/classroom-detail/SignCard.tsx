@@ -99,7 +99,7 @@ export const SignCard = ({
         clearTimers();
         setPlaying(false);
         const v = videoRef.current;
-        if (v) { v.pause(); v.currentTime = 0.1; }
+        if (v) { v.pause(); v.currentTime = 2; }
     };
 
     const handleMouseEnter = () => {
@@ -152,7 +152,7 @@ export const SignCard = ({
                     {sign.videoUrl ? (
                         <video
                             ref={videoRef}
-                            src={`${sign.videoUrl}#t=0.1`}
+                            src={`${sign.videoUrl}#t=2`}
                             muted
                             playsInline
                             loop
@@ -160,18 +160,21 @@ export const SignCard = ({
                             onLoadedMetadata={(e) => {
                                 const v = e.currentTarget;
                                 setDuration(formatDuration(v.duration));
-                                if (!playing) v.currentTime = 0.1;
+                                if (!playing) v.currentTime = 2;
                             }}
                             className="absolute inset-0 h-full w-full object-cover"
                         />
                     ) : youtubeId && playing ? (
-                        <iframe
-                            className="absolute inset-0 h-full w-full"
-                            src={getYouTubeEmbedUrl(youtubeId, { autoplay: true, mute: true, controls: false })}
-                            title={sign.name}
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                        />
+                        <>
+                            <iframe
+                                className="absolute inset-0 h-full w-full"
+                                src={getYouTubeEmbedUrl(youtubeId, { autoplay: true, mute: true, controls: false })}
+                                title={sign.name}
+                                allow="autoplay; encrypted-media"
+                            />
+                            {/* Overlay bloqueia interação direta com o iframe no preview, removendo o popup do Firefox */}
+                            <div className="absolute inset-0" />
+                        </>
                     ) : youtubeThumbnail ? (
                         <img
                             src={youtubeThumbnail}

@@ -127,7 +127,7 @@ const ClassroomsPage = () => {
                                         onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))}
-                                {user?.role === "EDUCATOR" && (
+                                {user?.roles?.includes("EDUCATOR") && (
                                     <CreateClassroomCard />
                                 )}
                                 <JoinClassroomCard />

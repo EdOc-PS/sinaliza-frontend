@@ -48,7 +48,7 @@ export const FAB = () => {
 
     const [open, setOpen] = useState(false);
 
-    const isEducator = user?.role === "EDUCATOR";
+    const isEducator = !!user?.roles?.includes("EDUCATOR");
 
     const handleFABClick = () => {
         if (!isEducator) {

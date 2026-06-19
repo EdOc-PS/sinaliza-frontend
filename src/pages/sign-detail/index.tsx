@@ -153,7 +153,7 @@ const SignDetailPage = () => {
         );
     }
 
-    const canManage = user?.role === "EDUCATOR" && sign.creatorId === user?.id;
+    const canManage = !!user?.roles?.includes("EDUCATOR") && sign.creatorId === user?.id;
     const grammatical = GRAMMATICAL_META[sign.grammaticalClass] ?? GRAMMATICAL_META.OTHER;
     const youTubeId = sign.anotherUrl ? getYouTubeId(sign.anotherUrl) : null;
 

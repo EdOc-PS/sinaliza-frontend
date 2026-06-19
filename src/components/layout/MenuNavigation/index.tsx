@@ -219,8 +219,15 @@ const MenuNavigation = () => {
     const { user, logout } = useAuth();
 
     // Seleciona os itens de menu baseado na role do usuário
-    const role = user?.role || "STUDENT";
-    const menuItems = menuItemsByRole[role] ?? menuItemsByRole.STUDENT;
+    // Usuário pode ter várias roles — mescla os itens de menu de todas (sem duplicar por path)
+    const roles = user?.roles?.length ? user.roles : ["STUDENT"];
+    const menuItems = Array.from(
+        new Map(
+            roles
+                .flatMap((r) => menuItemsByRole[r] ?? [])
+                .map((item) => [item.path, item]),
+        ).values(),
+    );
 
     const handleLogout = () => {
         toast.success("Até logo!");
