@@ -7,9 +7,10 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChan
     onChange?: (value: string, event: ChangeEvent<HTMLInputElement>) => void;
     icon?: IconSvgElement;
     noSpecialChars?: boolean;
+    wrapperClassName?: string;
 }
 
-const Input = ({ className = "", onChange, icon, type, noSpecialChars, ...props }: InputProps) => {
+const Input = ({ className = "", wrapperClassName = "", onChange, icon, type, noSpecialChars, ...props }: InputProps) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === "password";
     const inputType = isPassword ? (showPassword ? "text" : "password") : (type ?? "text");
@@ -50,7 +51,7 @@ const Input = ({ className = "", onChange, icon, type, noSpecialChars, ...props 
                 }
             `}</style>
 
-            <div className="flex items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ">
+            <div className={`flex items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ${wrapperClassName}`}>
                 {icon && (
                     <div className="rounded-2xl bg-cloud-300/80 p-2">
                         <HugeiconsIcon

@@ -6,12 +6,14 @@ import { DeleteRequest, GetRequest, PostRequest } from "@requests";
 import { SIGNS } from "@routes/signs";
 import { FAVORITES } from "@routes/favorites";
 import { HISTORY } from "@routes/history";
+import { SEARCH } from "@routes/search";
 import { useAuth } from "@context/AuthContext";
 
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { SignForm } from "@components/feature/workspace/SignForm";
+import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
 import { EmptyImage } from "@components/feature/sign-detail/EmptyImage";
 import { getYouTubeEmbedUrl, getYouTubeId } from "@/lib/youtube/youtube";
@@ -47,15 +49,6 @@ interface SignDetail {
     discipline?: { id: string; name: string } | null;
 }
 
-// Sinais recomendados — mocado até existir endpoint de recomendação
-const MOCK_RELATED: SignCardData[] = [
-    { id: "mock-1", name: "Abacaxi",  grammaticalClass: "NOUN",      videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
-    { id: "mock-2", name: "Admirar",  grammaticalClass: "VERB",      videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
-    { id: "mock-3", name: "Bonito",   grammaticalClass: "ADJECTIVE", videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
-    { id: "mock-4", name: "Caminhão", grammaticalClass: "NOUN",      videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
-    { id: "mock-5", name: "Comemorar", grammaticalClass: "VERB",     videoUrl: null, anotherUrl: null, createdAt: new Date().toISOString() },
-];
-
 const SignDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -63,6 +56,7 @@ const SignDetailPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [sign, setSign] = useState<SignDetail | null>(null);
+    const [related, setRelated] = useState<SignCardData[]>([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [favLoading, setFavLoading] = useState(false);
 
@@ -97,9 +91,22 @@ const SignDetailPage = () => {
 
             // Registra o acesso no histórico (não bloqueia a tela em caso de falha)
             PostRequest(HISTORY.REGISTER(id), {}).catch(() => { });
+
+            // Sinais semelhantes (não bloqueia a tela em caso de falha)
+            loadRelated(id);
         } finally {
             setLoading(false);
         }
+    };
+
+    const loadRelated = async (signId: string) => {
+        const res = await GetRequest<SignCardData[]>(SEARCH.RELATED(signId));
+        setRelated(res.object ?? []);
+    };
+
+    const handleSelectHandConfig = (config: HandConfigTypeForm) => {
+        if (!config.id) return;
+        navigate(`/search?handConfigId=${config.id}`);
     };
 
     const handleToggleFavorite = async () => {
@@ -312,34 +319,45 @@ const SignDetailPage = () => {
                     </div>
                 )}
 
-                {/* Sinais recomendados (carrossel) */}
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-baskerville text-xl text-cloud-500">Sinais semelhantes</h2>
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => scrollCarousel("prev")}
-                                className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                            >
-                                <HugeiconsIcon icon={ChevronLeft} size={18} />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => scrollCarousel("next")}
-                                className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                            >
-                                <HugeiconsIcon icon={ChevronRight} size={18} />
-                            </button>
+                {/* Sinais semelhantes (carrossel) */}
+                {related.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="font-baskerville text-xl text-cloud-500">Sinais semelhantes</h2>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => scrollCarousel("prev")}
+                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                >
+                                    <HugeiconsIcon icon={ChevronLeft} size={18} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => scrollCarousel("next")}
+                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                >
+                                    <HugeiconsIcon icon={ChevronRight} size={18} />
+                                </button>
+                            </div>
+                        </div>
+                        <div ref={carouselRef} className="flex gap-5 overflow-x-hidden pb-2 -mx-1 px-1">
+                            {related.map((item) => (
+                                <div key={item.id} className="w-64 shrink-0">
+                                    <SignCard sign={item} onClick={() => navigate(`/signs/${item.id}`)} />
+                                </div>
+                            ))}
                         </div>
                     </div>
-                    <div ref={carouselRef} className="flex gap-5 overflow-x-hidden pb-2 -mx-1 px-1">
-                        {MOCK_RELATED.map((related) => (
-                            <div key={related.id} className="w-64 shrink-0">
-                                <SignCard sign={related} />
-                            </div>
-                        ))}
-                    </div>
+                )}
+
+                {/* Teclado visual — clicar numa configuração busca sinais com ela */}
+                <div className="rounded-3xl bg-white p-6">
+                    <VisualKeyboard
+                        onSelectConfig={handleSelectHandConfig}
+                        title="Buscar por configuração de mão"
+                        subtitle="Clique em uma configuração para encontrar sinais parecidos"
+                    />
                 </div>
             </section>
 

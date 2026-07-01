@@ -16,11 +16,23 @@ interface HandConfig {
 interface HandConfigPickerProps {
     value: string;
     onChange: (id: string) => void;
+    gridClassName?: string;
+    itemsPerPage?: number;
+    /** Estilo compacto (igual ao VisualKeyboard): busca/setas menores e cards menores */
+    compact?: boolean;
 }
 
-const ITEMS_PER_PAGE = 12;
+const DEFAULT_GRID = "grid grid-cols-8 gap-1.5";
+const DEFAULT_ITEMS_PER_PAGE = 12;
 
-const HandConfigPicker = ({ value, onChange }: HandConfigPickerProps) => {
+const HandConfigPicker = ({
+    value,
+    onChange,
+    gridClassName = DEFAULT_GRID,
+    itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
+    compact = false,
+}: HandConfigPickerProps) => {
+    const ITEMS_PER_PAGE = itemsPerPage;
     const [configs, setConfigs]     = useState<HandConfig[]>([]);
     const [loading, setLoading]     = useState(false);
     const [search, setSearch]       = useState("");
@@ -62,39 +74,75 @@ const HandConfigPicker = ({ value, onChange }: HandConfigPickerProps) => {
         <div className="flex flex-col gap-3">
 
             {/* Busca + navegação */}
-            <div className="flex items-center gap-2">
-                <div className="relative flex-1 mr-4">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cloud-400 pointer-events-none">
-                        <HugeiconsIcon icon={Search01Icon} size={16} />
+            {compact ? (
+                <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+                            <HugeiconsIcon icon={Search01Icon} size={16} />
+                        </span>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar..."
+                            className="w-full pl-8 pr-3 py-1.5 rounded-xl border-2 border-neutral-200 text-sm text-cloud-700 placeholder:text-neutral-400 hover:border-cloud-400 focus:border-cloud-400 focus:outline-none transition-all"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        disabled={currentPage === 1}
+                        className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                        <HugeiconsIcon icon={ChevronLeft} size={18} />
+                    </button>
+                    <span className="text-sm font-semibold text-cloud-500 min-w-10 text-center">
+                        {currentPage} / {totalPages}
                     </span>
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Buscar configuração..."
-                        className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-sm text-cloud-700 placeholder:text-neutral-500 focus:border-cloud-500 focus:outline-none transition-all"
-                    />
+                    <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        disabled={currentPage === totalPages}
+                        className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                        <HugeiconsIcon icon={ChevronRight} size={18} />
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-cloud-500 hover:border-cloud-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                    <HugeiconsIcon icon={ChevronLeft} size={16} />
-                </button>
-                <span className="text-xs font-semibold text-cloud-500 min-w-9 text-center">
-                    {currentPage}/{totalPages}
-                </span>
-                <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-cloud-500 hover:border-cloud-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                    <HugeiconsIcon icon={ChevronRight} size={16} />
-                </button>
-            </div>
+            ) : (
+                <div className="flex items-center gap-2">
+                    <div className="relative flex-1 mr-4">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cloud-400 pointer-events-none">
+                            <HugeiconsIcon icon={Search01Icon} size={16} />
+                        </span>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar configuração..."
+                            className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-sm text-cloud-700 placeholder:text-neutral-500 focus:border-cloud-500 focus:outline-none transition-all"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        disabled={currentPage === 1}
+                        className="p-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-cloud-500 hover:border-cloud-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                        <HugeiconsIcon icon={ChevronLeft} size={16} />
+                    </button>
+                    <span className="text-xs font-semibold text-cloud-500 min-w-9 text-center">
+                        {currentPage}/{totalPages}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        disabled={currentPage === totalPages}
+                        className="p-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-cloud-500 hover:border-cloud-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                        <HugeiconsIcon icon={ChevronRight} size={16} />
+                    </button>
+                </div>
+            )}
 
             {/* Grid de imagens */}
             {loading ? (
@@ -107,7 +155,7 @@ const HandConfigPicker = ({ value, onChange }: HandConfigPickerProps) => {
                     <p className="text-xs">Nenhuma configuração encontrada</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-8 gap-1.5">
+                <div className={gridClassName}>
                     {paginated.map((config) => {
                         const selected = value === config.id;
                         return (
@@ -116,7 +164,7 @@ const HandConfigPicker = ({ value, onChange }: HandConfigPickerProps) => {
                                 type="button"
                                 title={config.name}
                                 onClick={() => onChange(config.id)}
-                                className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
+                                className={`relative aspect-square ${compact ? "rounded-xl" : "rounded-2xl"} overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
                                     selected
                                         ? "border-campfire-500 ring-1 ring-campfire-300"
                                         : "border-transparent hover:border-campfire-300 hover:-translate-y-0.5"

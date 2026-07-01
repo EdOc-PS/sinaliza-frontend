@@ -57,9 +57,13 @@ const Tooltip = ({ label, children }: TooltipProps) => {
 export interface VisualKeyboardProps {
     onEdit?: (config: HandConfigTypeForm) => void;
     refreshTrigger?: number;
+    /** Modo seleção: clicar numa config chama onSelectConfig (sem editar/excluir nem card "+") */
+    onSelectConfig?: (config: HandConfigTypeForm) => void;
+    title?: string;
+    subtitle?: string;
 }
 
-export const VisualKeyboard = ({ onEdit, refreshTrigger }: VisualKeyboardProps) => {
+export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, subtitle }: VisualKeyboardProps) => {
     const { openForm } = useFAB();
 
     const [handConfigs, setHandConfigs] = useState<HandConfigTypeForm[]>([]);
@@ -100,11 +104,14 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger }: VisualKeyboardProps) 
         fetchAllHandConfigs(debouncedSearch || undefined);
     }, [fetchAllHandConfigs, debouncedSearch, refreshTrigger]);
 
-    const totalPages = Math.max(1, Math.ceil((handConfigs.length + 1) / ITEMS_PER_PAGE));
+    const selectMode = !!onSelectConfig;
+    // No modo seleção não há card "+", então a paginação considera só os itens reais
+    const totalItems = selectMode ? handConfigs.length : handConfigs.length + 1;
+    const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
     const pageStart = (currentPage - 1) * ITEMS_PER_PAGE;
     const pageEnd = currentPage * ITEMS_PER_PAGE;
     const paginatedConfigs = handConfigs.slice(pageStart, Math.min(pageEnd, handConfigs.length));
-    const showPlusCard = pageEnd > handConfigs.length;
+    const showPlusCard = !selectMode && pageEnd > handConfigs.length;
 
     const handleDeleteClick = (configId: string, configName: string) => {
         setDeleteModal({ open: true, configId, configName });
@@ -137,8 +144,8 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger }: VisualKeyboardProps) 
 
                     {/* Título */}
                     <div>
-                        <h2 className="text-lg font-baskerville text-cloud-500">Teclado visual de mãos</h2>
-                        <p className="text-sm text-neutral-500">Selecione a configuração para encontrar o sinal</p>
+                        <h2 className="text-lg font-baskerville text-cloud-500">{title ?? "Teclado visual de mãos"}</h2>
+                        <p className="text-sm text-neutral-500">{subtitle ?? "Selecione a configuração para encontrar o sinal"}</p>
                     </div>
 
                     {/* Search + navegação */}
@@ -193,41 +200,61 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger }: VisualKeyboardProps) 
                     <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
                         {paginatedConfigs.map((config) => (
                             <Tooltip key={config.name} label={config.name}>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group">
-                                            {config.imgUrl ? (
-                                                <img
-                                                    src={config.imgUrl}
-                                                    alt={config.name}
-                                                    className="w-full h-full rounded-xl object-cover"
-                                                />
-                                            ) : (
-                                                <span className="text-xs text-neutral-400 font-medium">
-                                                    {config.name[0]}
-                                                </span>
-                                            )}
-                                            <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200" />
-                                        </button>
-                                    </DropdownMenuTrigger>
+                                {selectMode ? (
+                                    <button
+                                        onClick={() => onSelectConfig?.(config)}
+                                        className="aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group w-full"
+                                    >
+                                        {config.imgUrl ? (
+                                            <img
+                                                src={config.imgUrl}
+                                                alt={config.name}
+                                                className="w-full h-full rounded-xl object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xs text-neutral-400 font-medium">
+                                                {config.name[0]}
+                                            </span>
+                                        )}
+                                        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                                    </button>
+                                ) : (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group">
+                                                {config.imgUrl ? (
+                                                    <img
+                                                        src={config.imgUrl}
+                                                        alt={config.name}
+                                                        className="w-full h-full rounded-xl object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-xs text-neutral-400 font-medium">
+                                                        {config.name[0]}
+                                                    </span>
+                                                )}
+                                                <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                                            </button>
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="center">
-                                        <DropdownMenuItem
-                                            icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
-                                            onSelect={() => onEdit?.(config)}
-                                        >
-                                            Editar
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            variant="danger"
-                                            icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
-                                            onSelect={() => handleDeleteClick(config.id!, config.name)}
-                                        >
-                                            Excluir
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        <DropdownMenuContent align="center">
+                                            <DropdownMenuItem
+                                                icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
+                                                onSelect={() => onEdit?.(config)}
+                                            >
+                                                Editar
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                variant="danger"
+                                                icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
+                                                onSelect={() => handleDeleteClick(config.id!, config.name)}
+                                            >
+                                                Excluir
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
                             </Tooltip>
                         ))}
 

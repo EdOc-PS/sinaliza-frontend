@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { FavouriteIcon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
+import { FavouriteIcon, Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
 import { FAVORITES } from "@routes/favorites";
 
+import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 
@@ -14,6 +15,11 @@ const FavoritesPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [signs, setSigns] = useState<SignCardData[]>([]);
+    const [query, setQuery] = useState("");
+
+    const filtered = query.trim()
+        ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
+        : signs;
 
     const loadFavorites = async () => {
         setLoading(true);
@@ -87,21 +93,40 @@ const FavoritesPage = () => {
                 </div>
             ) : (
                 <div className="flex flex-col gap-5">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <h2 className="font-baskerville text-xl text-cloud-500">Sinais salvos</h2>
-                        <span className="text-xs text-neutral-400">{signs.length} sinais</span>
+
+                        {/* Busca dentro dos favoritos */}
+                        <div className="w-full sm:max-w-xs">
+                            <Input
+                                icon={Search01Icon}
+                                value={query}
+                                onChange={(value) => setQuery(value)}
+                                placeholder="Buscar nos favoritos..."
+                            />
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {signs.map((sign) => (
-                            <SignCard
-                                key={sign.id}
-                                sign={sign}
-                                isFavorite
-                                onClick={() => navigate(`/signs/${sign.id}`)}
-                            />
-                        ))}
-                    </div>
+                    {filtered.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
+                            <HugeiconsIcon icon={Search01Icon} size={32} className="text-cloud-300" />
+                            <p className="text-sm font-medium text-cloud-500">Nenhum sinal encontrado</p>
+                            <p className="text-xs text-neutral-400">
+                                Nenhum favorito corresponde a "<b className="text-cloud-500">{query}</b>".
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {filtered.map((sign) => (
+                                <SignCard
+                                    key={sign.id}
+                                    sign={sign}
+                                    isFavorite
+                                    onClick={() => navigate(`/signs/${sign.id}`)}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </section>

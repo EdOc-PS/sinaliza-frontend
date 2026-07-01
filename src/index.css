@@ -143,6 +143,16 @@ button {
     animation: iconBounce 0.40s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* Animação de descida suave para dropdowns/painéis flutuantes */
+@keyframes dropdownSlide {
+    0%   { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-slide {
+    animation: dropdownSlide 0.20s ease-out both;
+}
+
 /* Customização do Sonner Toast */
 [data-sonner-toast] {
     background: #213547 !important;

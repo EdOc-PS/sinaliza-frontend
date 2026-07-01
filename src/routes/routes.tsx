@@ -17,6 +17,7 @@ import FavoritesPage from '@/pages/favorites'
 import HistoryPage from '@/pages/history'
 import ProfilePage from '@/pages/profile'
 import SignDetailPage from '@/pages/sign-detail'
+import SearchResultsPage from '@/pages/search'
 import WorkspacePage from '@/pages/workspace'
 
 // 404
@@ -62,6 +63,10 @@ const routes: RouteObject[] = [
                     {
                         path: 'workspace',
                         element: <WorkspacePage />,
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchResultsPage />,
                     },
                     {
                         path: 'glossary',
