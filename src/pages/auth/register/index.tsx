@@ -19,19 +19,13 @@ import {
 import BackButton from '@components/ui/BackButton'
 import { maskPhone } from '@lib/mask/mask'
 import { PERFIL_FORMULARIOS as perfilFormularios, type PerfilId } from '@lib/constants/profileFields'
-import type { EducatorType, Role } from '@api/requests'
+import type { Role } from '@api/requests'
 
-// Intérprete agora é EDUCATOR com educatorType = INTERPRETER
-const perfilRoleMap: Record<PerfilId, Role> = {
+// Register cria apenas contas de STUDENT e GUARDIAN.
+// Educadores (professor/intérprete) são cadastrados pelo MANAGER via EducatorForm.
+const perfilRoleMap: Partial<Record<PerfilId, Role>> = {
     student: 'STUDENT',
-    educator: 'EDUCATOR',
-    interpreter: 'EDUCATOR',
     guardian: 'GUARDIAN',
-}
-
-const perfilEducatorTypeMap: Partial<Record<PerfilId, EducatorType>> = {
-    educator: 'TEACHER',
-    interpreter: 'INTERPRETER',
 }
 
 type UserProps = {
@@ -75,18 +69,6 @@ const RegisterPage = () => {
             titulo: 'Estudante',
             descricao: 'Aprendizado continuo e diario de estudos',
             classes: 'bg-sky-100 text-sky-800',
-        },
-        {
-            id: 'educator',
-            titulo: 'Professor',
-            descricao: 'Gestao de turmas e sinais',
-            classes: 'bg-salmon-100 text-salmon-800',
-        },
-        {
-            id: 'interpreter',
-            titulo: 'Interprete',
-            descricao: 'Criação de sinais e conexao com estudantes',
-            classes: 'bg-campfire-100 text-campfire-800',
         },
         {
             id: 'guardian',
@@ -141,19 +123,19 @@ const RegisterPage = () => {
     // Função de registro
     const handleRegister = async () => {
         if (!user.perfil) return
+        const role = perfilRoleMap[user.perfil]
+        if (!role) return
         setIsLoading(true)
         try {
-            const educatorType = perfilEducatorTypeMap[user.perfil]
             const payload = {
                 name: user.nome,
                 email: user.email,
                 password: user.senha,
-                role: perfilRoleMap[user.perfil],
+                role,
                 phone: user.phone || undefined,
                 bio: user.bio || undefined,
                 dataProfile: {
                     ...user.dadosPerfil,
-                    ...(educatorType ? { educatorType } : {}),
                 },
             }
             await registerAuth(payload)

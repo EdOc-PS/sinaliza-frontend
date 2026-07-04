@@ -15,7 +15,7 @@ export type APIResponse<T = unknown> = {
 // Tipos de domínio (espelham o backend)
 // ─────────────────────────────────────────────
 
-export type Role = 'STUDENT' | 'EDUCATOR' | 'GUARDIAN' | 'ADMIN';
+export type Role = 'STUDENT' | 'EDUCATOR' | 'GUARDIAN' | 'MANAGER';
 export type EducatorType = 'TEACHER' | 'INTERPRETER';
 export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
 
@@ -88,6 +88,17 @@ export type UpdateUserPayload = {
 
 export type UpdateRolesPayload = {
   roles: Role[];
+};
+
+// Cadastro de educador feito pelo MANAGER
+export type CreateEducatorPayload = {
+  name: string;
+  email: string;
+  password: string;
+  educatorType: EducatorType;
+  phone?: string;
+  bio?: string;
+  dataProfile: DataProfile;
 };
 
 export type LoginResponse = {

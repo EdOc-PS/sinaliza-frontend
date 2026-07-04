@@ -2,7 +2,7 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
     Knowledge01Icon,
     Knowledge02Icon,
-    Settings02Icon,
+    UserMultiple02Icon,
 } from "@hugeicons/core-free-icons";
 
 interface RoleMeta {
@@ -16,7 +16,7 @@ const ROLE_META: Record<string, RoleMeta> = {
     INTERPRETER: { label: "Intérprete", icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
     STUDENT:     { label: "Aluno",      icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
     GUARDIAN:    { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
-    ADMIN:       { label: "Admin",      icon: Settings02Icon,  className: "bg-lime-100 text-lime-700" },
+    MANAGER:     { label: "Gestor",     icon: UserMultiple02Icon, className: "bg-lime-100 text-lime-700" },
 };
 
 // Educador/intérprete são a mesma role (EDUCATOR); o tipo vem de educatorType

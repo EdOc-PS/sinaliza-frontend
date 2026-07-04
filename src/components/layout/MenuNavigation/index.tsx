@@ -7,12 +7,13 @@ import { useAuth } from "@context/AuthContext";
 import {
     FavouriteIcon,
     GlobalEducationIcon,
+    Time01Icon,
     Home06Icon,
     LibrariesIcon,
     Logout01Icon,
     PencilIcon,
-    Rotate01Icon,
-    UserIcon
+    UserIcon,
+    UserMultiple02Icon
 } from "@hugeicons/core-free-icons";
 
 interface MenuItemProps {
@@ -30,7 +31,6 @@ interface TooltipProps {
     bgColor?: string;
 }
 
-// Definição de itens por role (INTERPRETER foi removido — usa EDUCATOR)
 const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; path: string }[]> = {
     STUDENT: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
@@ -44,10 +44,11 @@ const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; 
     GUARDIAN: [
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
     ],
-    ADMIN: [
+    MANAGER: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" }
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" },
+        { icon: UserMultiple02Icon, label: "Educadores", path: "/educators" }
     ]
 };
 
@@ -300,7 +301,7 @@ const MenuNavigation = () => {
                         />
 
                         <ActionItem
-                            icon={Rotate01Icon}
+                            icon={Time01Icon}
                             label="Histórico"
                             size={20}
                             sizeClass="w-10 h-10 rounded-xl"
