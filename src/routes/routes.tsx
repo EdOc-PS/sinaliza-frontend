@@ -20,6 +20,7 @@ import SignDetailPage from '@/pages/sign-detail'
 import SearchResultsPage from '@/pages/search'
 import WorkspacePage from '@/pages/workspace'
 import EducatorsPage from '@/pages/educators'
+import MembersPage from '@/pages/members'
 
 // 404
 const NotFoundPage = () => <div className="flex items-center justify-center h-screen text-2xl">Página não encontrada (404)</div>
@@ -68,6 +69,10 @@ const routes: RouteObject[] = [
                     {
                         path: 'educators',
                         element: <EducatorsPage />,
+                    },
+                    {
+                        path: 'members',
+                        element: <MembersPage />,
                     },
                     {
                         path: 'search',

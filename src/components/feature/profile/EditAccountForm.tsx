@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
     LocationUser01Icon,
@@ -8,8 +8,11 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { useAuth } from "@context/AuthContext";
+import { GetRequest } from "@requests";
+import { AUTH } from "@routes/auth";
 import { maskPhone } from "@/lib/mask/mask";
 import { PERFIL_FORMULARIOS, getPerfilId } from "@/lib/constants/profileFields";
+import type { GenericOption } from "@interfaces";
 
 import Input from "@components/ui/Input";
 import Label from "@components/ui/Label";
@@ -46,6 +49,17 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
         }
         return initial;
     });
+
+    const [schoolGrades, setSchoolGrades] = useState<GenericOption[]>([]);
+
+    const loadFormOptions = async () => {
+        const res = await GetRequest<{ schoolGrades: GenericOption[] }>(AUTH.FORM_OPTIONS());
+        if (res.success && res.object) setSchoolGrades(res.object.schoolGrades ?? []);
+    };
+
+    useEffect(() => {
+        loadFormOptions();
+    }, []);
 
     const handleDataProfileChange = (field: string, value: string) => {
         setDataProfile((prev) => ({ ...prev, [field]: value }));
@@ -169,7 +183,11 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                         icon={campo.icon}
                                         value={dataProfile[campo.id] || ""}
                                         onChange={(value) => handleDataProfileChange(campo.id, value)}
-                                        options={campo.options || []}
+                                        options={
+                                            campo.id === "grauEscolar" && schoolGrades.length
+                                                ? schoolGrades
+                                                : (campo.options || [])
+                                        }
                                     />
                                 ) : (
                                     <Input

@@ -17,6 +17,7 @@ export type APIResponse<T = unknown> = {
 
 export type Role = 'STUDENT' | 'EDUCATOR' | 'GUARDIAN' | 'MANAGER';
 export type EducatorType = 'TEACHER' | 'INTERPRETER';
+export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
 
 export type DataProfile = {

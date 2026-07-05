@@ -12,6 +12,7 @@ import {
     LibrariesIcon,
     Logout01Icon,
     PencilIcon,
+    StudentsIcon,
     UserIcon,
     UserMultiple02Icon
 } from "@hugeicons/core-free-icons";
@@ -48,7 +49,8 @@ const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; 
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
         { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" },
-        { icon: UserMultiple02Icon, label: "Educadores", path: "/educators" }
+        { icon: UserMultiple02Icon, label: "Educadores", path: "/educators" },
+        { icon: StudentsIcon, label: "Alunos e responsáveis", path: "/members" }
     ]
 };
 
