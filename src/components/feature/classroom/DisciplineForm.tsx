@@ -146,7 +146,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
 
             {/* Nome da turma */}
             <div className="flex flex-col gap-1.5">
-                <Label htmlFor="discipline-name">Nome da turma</Label>
+                <Label htmlFor="discipline-name" isRequired>Nome da turma</Label>
                 <Input
                     id="discipline-name"
                     icon={Book01Icon}
@@ -208,7 +208,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
 
             {/* Cor de identificação */}
             <div className="flex flex-col gap-2.5">
-                <Label>Cor de identificação</Label>
+                <Label isRequired>Cor de identificação</Label>
                 <div className="flex items-center gap-3">
                     {PRESET_COLORS.map(({ hex, label }) => (
                         <button

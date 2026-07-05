@@ -1,49 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-    AddCircleIcon,
-    DeleteIcon,
-    Edit02Icon,
-    Mail01Icon,
-    MoreVerticalIcon,
-    Search01Icon,
-    UserMultiple02Icon,
-} from "@hugeicons/core-free-icons";
+import { AddCircleIcon, Search01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest, DeleteRequest } from "@requests";
 import { USERS } from "@routes/users";
-import type { EducatorType } from "@api/requests";
 
 import Input from "@components/ui/Input";
+import Button from "@components/ui/Button";
 import Modal from "@components/ui/Modal";
 import Spinner from "@components/ui/Spinner";
-import { RoleBadge } from "@components/ui/RoleBadge";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { EducatorForm } from "@components/feature/educators/EducatorForm";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@components/ui/DropdownMenu";
-
-interface EducatorItem {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string | null;
-    educatorType?: EducatorType | null;
-    createdAt: string;
-}
-
-const initials = (name: string) =>
-    name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
+import { ListCardEducator, type EducatorListItem } from "@components/feature/educators/ListCardEducator";
 
 const EducatorsPage = () => {
     const [loading, setLoading] = useState(true);
-    const [educators, setEducators] = useState<EducatorItem[]>([]);
+    const [educators, setEducators] = useState<EducatorListItem[]>([]);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -60,7 +33,7 @@ const EducatorsPage = () => {
     const loadEducators = useCallback(async (query?: string) => {
         setLoading(true);
         try {
-            const response = await GetRequest<EducatorItem[]>(
+            const response = await GetRequest<EducatorListItem[]>(
                 USERS.EDUCATORS(),
                 query ? { search: query } : undefined,
             );
@@ -93,7 +66,7 @@ const EducatorsPage = () => {
         <>
             <section className="flex flex-col gap-8">
                 {/* Cabeçalho */}
-                <div className="flex flex-col gap-4 rounded-3xl bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-4 rounded-3xl bg-white p-6">
                     <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-lime-100">
                             <HugeiconsIcon icon={UserMultiple02Icon} size={26} className="text-lime-700" />
@@ -104,24 +77,20 @@ const EducatorsPage = () => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => setFormModal({ open: true })}
-                        className="flex items-center justify-center gap-2 rounded-2xl bg-cloud-500 px-5 py-3 font-bold text-white transition-colors hover:bg-cloud-600"
-                    >
-                        <HugeiconsIcon icon={AddCircleIcon} size={20} />
-                        Novo educador
-                    </button>
-                </div>
-
-                {/* Busca */}
-                <div className="max-w-md">
-                    <Input
-                        icon={Search01Icon}
-                        wrapperClassName="bg-white"
-                        value={search}
-                        onChange={setSearch}
-                        placeholder="Buscar por nome ou email..."
-                    />
+                    {/* Busca + novo educador */}
+                    <div className="flex justify-between flex-col gap-10 sm:flex-row sm:items-center">
+                        <div className="w-full">
+                            <Input
+                                icon={Search01Icon}
+                                value={search}
+                                onChange={setSearch}
+                                placeholder="Buscar por nome ou email..."
+                            />
+                        </div>
+                        <Button onClick={() => setFormModal({ open: true })} icon={AddCircleIcon} className="shrink-0">
+                            Novo educador
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Lista */}
@@ -146,48 +115,12 @@ const EducatorsPage = () => {
                         <span className="text-xs text-neutral-400">{educators.length} educador{educators.length > 1 ? "es" : ""}</span>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {educators.map((edu) => (
-                                <div key={edu.id} className="flex items-center gap-3 rounded-3xl bg-white p-4">
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-campfire-100 font-baskerville font-bold text-campfire-600">
-                                        {edu.avatar ? (
-                                            <img src={edu.avatar} alt={edu.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            initials(edu.name)
-                                        )}
-                                    </div>
-                                    <div className="flex min-w-0 flex-1 flex-col">
-                                        <span className="truncate font-medium text-cloud-600">{edu.name}</span>
-                                        <span className="flex items-center gap-1 truncate text-xs text-neutral-400">
-                                            <HugeiconsIcon icon={Mail01Icon} size={13} />
-                                            {edu.email}
-                                        </span>
-                                    </div>
-
-                                    <RoleBadge role="EDUCATOR" educatorType={edu.educatorType} />
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-cloud-100 hover:text-cloud-600">
-                                                <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
-                                                onSelect={() => setFormModal({ open: true, educatorId: edu.id })}
-                                            >
-                                                Editar
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                                variant="danger"
-                                                icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
-                                                onSelect={() => setDeleteModal({ open: true, id: edu.id, name: edu.name })}
-                                            >
-                                                Excluir
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
+                                <ListCardEducator
+                                    key={edu.id}
+                                    educator={edu}
+                                    onEdit={() => setFormModal({ open: true, educatorId: edu.id })}
+                                    onDelete={() => setDeleteModal({ open: true, id: edu.id, name: edu.name })}
+                                />
                             ))}
                         </div>
                     </div>

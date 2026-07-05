@@ -19,7 +19,7 @@ import { useAuth } from "@context/AuthContext";
 
 import Modal from "@components/ui/Modal";
 import Spinner from "@components/ui/Spinner";
-import { RoleBadge } from "@components/ui/RoleBadge";
+import { RoleBadge } from "@/components/ui/RoleBadge";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { EditAccountForm } from "@components/feature/profile/EditAccountForm";
 import { SignListItem, type SignListData } from "@components/feature/profile/SignListItem";

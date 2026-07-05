@@ -100,8 +100,9 @@ const LoginPage = () => {
                                 type="submit"
                                 className="w-full"
                                 disabled={isLoading || !emailValido}
+                                loading={isLoading}
                             >
-                                {isLoading ? 'Entrando...' : 'Entrar na minha conta'}
+                                Entrar na minha conta
                             </Button>
                         </form>
                     </div>

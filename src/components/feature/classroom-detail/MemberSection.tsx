@@ -1,6 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
-import { RoleBadge } from "@components/ui/RoleBadge";
+import { RoleBadge } from "@/components/ui/RoleBadge";
 
 export interface Member {
     roleInClass: string;

@@ -1,7 +1,10 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/config/context/AuthContext'
 import { toast } from 'sonner'
+import { GetRequest } from '@requests'
+import { AUTH } from '@routes/auth'
+import type { GenericOption } from '@interfaces'
 import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
@@ -62,6 +65,18 @@ const RegisterPage = () => {
         perfil: null,
         dadosPerfil: {},
     })
+
+    // Opções de grau escolar (param SCHOOL_GRADE) vindas do endpoint público
+    const [schoolGrades, setSchoolGrades] = useState<GenericOption[]>([])
+
+    const loadFormOptions = async () => {
+        const res = await GetRequest<{ schoolGrades: GenericOption[] }>(AUTH.FORM_OPTIONS())
+        if (res.success && res.object) setSchoolGrades(res.object.schoolGrades ?? [])
+    }
+
+    useEffect(() => {
+        loadFormOptions()
+    }, [])
 
     const perfis: Array<ProfileArrayProps> = [
         {
@@ -321,7 +336,11 @@ const RegisterPage = () => {
                                                     onChange={(value) =>
                                                         handleDataProfileChange(campo.id, value)
                                                     }
-                                                    options={campo.options || []}
+                                                    options={
+                                                        campo.id === 'grauEscolar' && schoolGrades.length
+                                                            ? schoolGrades
+                                                            : (campo.options || [])
+                                                    }
                                                 />
                                             ) : (
                                                 <Input

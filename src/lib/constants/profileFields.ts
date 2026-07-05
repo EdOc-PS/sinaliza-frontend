@@ -37,8 +37,16 @@ export const PERFIL_FORMULARIOS: Record<
             {
                 id: "grauEscolar",
                 label: "Grau escolar:",
-                placeholder: "Ex: 8º ano, ensino médio, graduação",
                 icon: Backpack01Icon,
+                kind: "select",
+                options: [
+                    { label: "Ensino Fundamental Incompleto", value: "ENSINO_FUNDAMENTAL_INCOMPLETO" },
+                    { label: "Ensino Fundamental Completo", value: "ENSINO_FUNDAMENTAL_COMPLETO" },
+                    { label: "Ensino Médio Incompleto", value: "ENSINO_MEDIO_INCOMPLETO" },
+                    { label: "Ensino Médio Completo", value: "ENSINO_MEDIO_COMPLETO" },
+                    { label: "Ensino Superior Incompleto", value: "ENSINO_SUPERIOR_INCOMPLETO" },
+                    { label: "Ensino Superior Completo", value: "ENSINO_SUPERIOR_COMPLETO" },
+                ],
             },
             {
                 id: "necessidadesEspeciais",

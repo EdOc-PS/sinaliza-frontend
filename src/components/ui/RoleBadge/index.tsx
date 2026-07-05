@@ -12,17 +12,18 @@ interface RoleMeta {
 }
 
 const ROLE_META: Record<string, RoleMeta> = {
-    EDUCATOR:    { label: "Educador",   icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
+    PROFESSOR:   { label: "Professor",  icon: Knowledge01Icon, className: "bg-salmon-100 text-salmon-700" },
     INTERPRETER: { label: "Intérprete", icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
     STUDENT:     { label: "Aluno",      icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
     GUARDIAN:    { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
     MANAGER:     { label: "Gestor",     icon: UserMultiple02Icon, className: "bg-lime-100 text-lime-700" },
 };
 
-// Educador/intérprete são a mesma role (EDUCATOR); o tipo vem de educatorType
+// A role EDUCATOR não vira um badge "Educador": vira Professor ou Intérprete,
+// conforme o educatorType (TEACHER → Professor, INTERPRETER → Intérprete).
 export const getRoleMeta = (role: string, educatorType?: "TEACHER" | "INTERPRETER" | null): RoleMeta => {
-    if (role === "EDUCATOR" && educatorType === "INTERPRETER") {
-        return ROLE_META.INTERPRETER;
+    if (role === "EDUCATOR") {
+        return educatorType === "INTERPRETER" ? ROLE_META.INTERPRETER : ROLE_META.PROFESSOR;
     }
     return ROLE_META[role] ?? { label: role, icon: Knowledge02Icon, className: "bg-cloud-100 text-cloud-500" };
 };
