@@ -20,7 +20,6 @@ export type EducatorType = 'TEACHER' | 'INTERPRETER';
 export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
 
 export type DataProfile = {
-  institute?: string;
   // STUDENT
   grauEscolar?: string;
   necessidadesEspeciais?: string;
@@ -48,7 +47,7 @@ export type User = {
   status: boolean;
   roles: Role[];
   educatorType?: EducatorType | null;
-  institute?: string | null;
+  institution?: { name: string } | null;
   dataProfile?: DataProfile | null;
   createdAt: string;
   updatedAt: string;

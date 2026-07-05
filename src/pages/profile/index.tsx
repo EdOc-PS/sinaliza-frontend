@@ -101,10 +101,10 @@ const ProfilePage = () => {
                                     <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
                                         {user.name}
                                     </h1>
-                                    {user.institute && (
+                                    {user.institution?.name && (
                                         <span className="flex items-center gap-1.5 text-sm text-neutral-400">
                                             <HugeiconsIcon icon={SchoolIcon} size={15} />
-                                            {user.institute}
+                                            {user.institution.name}
                                         </span>
                                     )}
 

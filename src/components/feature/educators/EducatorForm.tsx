@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import Button from "@components/ui/Button";
@@ -6,6 +6,7 @@ import Input from "@components/ui/Input";
 import InputText from "@components/ui/InputText";
 import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
+import Spinner from "@components/ui/Spinner";
 import ProgressBar from "@components/layout/ProgressBar";
 import BackButton from "@components/ui/BackButton";
 
@@ -17,11 +18,11 @@ import {
     SmartPhone01Icon,
 } from "@hugeicons/core-free-icons";
 
-import { PostRequest } from "@requests";
+import { GetRequest, PatchRequest, PostRequest } from "@requests";
 import { USERS } from "@routes/users";
 import { maskPhone } from "@lib/mask/mask";
 import { PERFIL_FORMULARIOS } from "@lib/constants/profileFields";
-import type { CreateEducatorPayload, EducatorType } from "@api/requests";
+import type { CreateEducatorPayload, EducatorType, User } from "@api/requests";
 
 // Só os dois tipos de educador
 type EducatorKind = "educator" | "interpreter";
@@ -32,13 +33,18 @@ const KIND_TO_EDUCATOR_TYPE: Record<EducatorKind, EducatorType> = {
 };
 
 interface EducatorFormProps {
+    educatorId?: string;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
-    const [view, setView] = useState(0);
+export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormProps) => {
+    const isEditMode = !!educatorId;
+
+    // No modo edição não há step de tipo (0) nem de senha (3): só dados (1) e perfil (2)
+    const [view, setView] = useState(isEditMode ? 1 : 0);
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(isEditMode);
 
     const [kind, setKind] = useState<EducatorKind | null>(null);
     const [name, setName] = useState("");
@@ -48,6 +54,37 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [dadosPerfil, setDadosPerfil] = useState<Record<string, string>>({});
+
+    const loadEducator = async (id: string) => {
+        setLoadingData(true);
+        try {
+            const res = await GetRequest<User>(USERS.FIND_ONE(id));
+            if (!res.success || !res.object) {
+                toast.error("Falha ao carregar educador: " + res.message);
+                return;
+            }
+            const u = res.object;
+            setKind(u.educatorType === "INTERPRETER" ? "interpreter" : "educator");
+            setName(u.name ?? "");
+            setEmail(u.email ?? "");
+            setPhone(u.phone ?? "");
+            setBio(u.bio ?? "");
+            const p = u.dataProfile ?? {};
+            setDadosPerfil({
+                department: p.department ?? "",
+                specialty: p.specialty ?? "",
+                certificate: p.certificate ?? "",
+                areaAtuacao: p.areaAtuacao ?? "",
+                proficienciaLibras: p.proficienciaLibras ?? "",
+            });
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    useEffect(() => {
+        if (educatorId) loadEducator(educatorId);
+    }, [educatorId]);
 
     const formulario = kind ? PERFIL_FORMULARIOS[kind] : null;
 
@@ -71,7 +108,10 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
         e.preventDefault();
         if (view === 0 && kind) { setView(1); return; }
         if (view === 1 && isStep1Valid) { setView(2); return; }
-        if (view === 2 && isStep2Valid()) { setView(3); return; }
+        if (view === 2 && isStep2Valid()) {
+            if (isEditMode) { handleSubmit(); } else { setView(3); }
+            return;
+        }
         if (view === 3 && isStep3Valid) { handleSubmit(); }
     };
 
@@ -79,6 +119,20 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
         if (!kind) return;
         setLoading(true);
         try {
+            if (isEditMode && educatorId) {
+                const res = await PatchRequest(USERS.UPDATE(educatorId), {
+                    name: name.trim(),
+                    email: email.trim(),
+                    phone: phone || undefined,
+                    bio: bio || undefined,
+                    dataProfile: { ...dadosPerfil },
+                });
+                if (!res.success) { toast.error("Falha ao atualizar educador: " + res.message); return; }
+                toast.success("Educador atualizado com sucesso!");
+                onSuccess();
+                return;
+            }
+
             const payload: CreateEducatorPayload = {
                 name: name.trim(),
                 email: email.trim(),
@@ -93,10 +147,7 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
             };
 
             const res = await PostRequest(USERS.CREATE_EDUCATOR(), payload);
-            if (!res.success) {
-                toast.error("Falha ao cadastrar educador: " + res.message);
-                return;
-            }
+            if (!res.success) { toast.error("Falha ao cadastrar educador: " + res.message); return; }
             toast.success("Educador cadastrado com sucesso!");
             onSuccess();
         } finally {
@@ -104,11 +155,23 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
         }
     };
 
+    if (loadingData) {
+        return (
+            <div className="flex items-center justify-center py-16">
+                <Spinner size={32} color="#6B7280" />
+            </div>
+        );
+    }
+
+    // Steps visíveis na barra de progresso (edição não tem tipo nem senha)
+    const totalSteps = isEditMode ? 2 : 4;
+    const progressStep = isEditMode ? view - 1 : view;
+
     return (
         <form onSubmit={handleStepSubmit} className="flex flex-col gap-6">
-            <ProgressBar currentStep={view} totalSteps={4} />
+            <ProgressBar currentStep={progressStep} totalSteps={totalSteps} />
 
-            {/* Step 0: escolher tipo */}
+            {/* Step 0: escolher tipo (só criação) */}
             {view === 0 && (
                 <>
                     <div className="flex flex-col gap-1">
@@ -120,19 +183,25 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
                         <button
                             type="button"
                             onClick={() => setKind("educator")}
-                            className={`flex flex-col items-start rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-salmon-100 text-salmon-800 ${kind === "educator" ? "border-current/50" : "border-transparent opacity-90"}`}
+                            className={`flex items-center justify-between gap-2 rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-salmon-100 text-salmon-800 ${kind === "educator" ? "border-current/50" : "border-transparent opacity-90"}`}
                         >
-                            <p className="text-lg font-bold">Professor</p>
-                            <p className="mt-1 text-sm font-medium opacity-90">Gestão de turmas e sinais</p>
+                            <div>
+                                <p className="text-lg font-bold">Professor</p>
+                                <p className="mt-1 text-sm font-medium opacity-90">Gestão de turmas e sinais</p>
+                            </div>
+                            <img src="/src/assets/images/educator.png" alt="" className="w-14 h-14 shrink-0" />
                         </button>
 
                         <button
                             type="button"
                             onClick={() => setKind("interpreter")}
-                            className={`flex flex-col items-start rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-campfire-100 text-campfire-800 ${kind === "interpreter" ? "border-current/50" : "border-transparent opacity-90"}`}
+                            className={`flex items-center justify-between gap-2 rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-campfire-100 text-campfire-800 ${kind === "interpreter" ? "border-current/50" : "border-transparent opacity-90"}`}
                         >
-                            <p className="text-lg font-bold">Intérprete</p>
-                            <p className="mt-1 text-sm font-medium opacity-90">Criação de sinais e apoio aos estudantes</p>
+                            <div>
+                                <p className="text-lg font-bold">Intérprete</p>
+                                <p className="mt-1 text-sm font-medium opacity-90">Criação de sinais e apoio aos estudantes</p>
+                            </div>
+                            <img src="/src/assets/images/interpreter.png" alt="" className="w-14 h-14 shrink-0" />
                         </button>
                     </div>
 
@@ -147,7 +216,7 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
             {view === 1 && (
                 <>
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Dados pessoais</h2>
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">{isEditMode ? "Editar educador" : "Dados pessoais"}</h2>
                         <p className="text-sm text-cloud-400 leading-snug">Informe nome e contato do educador.</p>
                     </div>
 
@@ -175,7 +244,11 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                        <BackButton onClick={() => setView(0)} />
+                        {isEditMode ? (
+                            <Button type="button" variant="outline" className="w-32" onClick={onClose}>Cancelar</Button>
+                        ) : (
+                            <BackButton onClick={() => setView(0)} />
+                        )}
                         <Button type="submit" className="flex-1" disabled={!isStep1Valid}>Próximo</Button>
                     </div>
                 </>
@@ -218,12 +291,20 @@ export const EducatorForm = ({ onClose, onSuccess }: EducatorFormProps) => {
 
                     <div className="flex gap-3 pt-2">
                         <BackButton onClick={() => setView(1)} />
-                        <Button type="submit" className="flex-1" disabled={!isStep2Valid()}>Próximo</Button>
+                        <Button
+                            type="submit"
+                            className="flex-1"
+                            loading={isEditMode && loading}
+                            loadingText="Salvando..."
+                            disabled={!isStep2Valid() || (isEditMode && loading)}
+                        >
+                            {isEditMode ? "Salvar alterações" : "Próximo"}
+                        </Button>
                     </div>
                 </>
             )}
 
-            {/* Step 3: senha + bio */}
+            {/* Step 3: senha + bio (só criação) */}
             {view === 3 && (
                 <>
                     <div className="flex flex-col gap-1">

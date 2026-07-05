@@ -1,39 +1,93 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AddCircleIcon, Mail01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons";
+import {
+    AddCircleIcon,
+    DeleteIcon,
+    Edit02Icon,
+    Mail01Icon,
+    MoreVerticalIcon,
+    Search01Icon,
+    UserMultiple02Icon,
+} from "@hugeicons/core-free-icons";
 
-import { GetRequest } from "@requests";
+import { GetRequest, DeleteRequest } from "@requests";
 import { USERS } from "@routes/users";
-import type { User } from "@api/requests";
+import type { EducatorType } from "@api/requests";
 
+import Input from "@components/ui/Input";
 import Modal from "@components/ui/Modal";
 import Spinner from "@components/ui/Spinner";
 import { RoleBadge } from "@components/ui/RoleBadge";
+import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { EducatorForm } from "@components/feature/educators/EducatorForm";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@components/ui/DropdownMenu";
+
+interface EducatorItem {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string | null;
+    educatorType?: EducatorType | null;
+    createdAt: string;
+}
 
 const initials = (name: string) =>
     name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
 const EducatorsPage = () => {
     const [loading, setLoading] = useState(true);
-    const [educators, setEducators] = useState<User[]>([]);
-    const [formModal, setFormModal] = useState(false);
+    const [educators, setEducators] = useState<EducatorItem[]>([]);
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    const loadEducators = useCallback(async () => {
+    const [formModal, setFormModal] = useState<{ open: boolean; educatorId?: string }>({ open: false });
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
+    const [deleting, setDeleting] = useState(false);
+
+    // Debounce da busca (350ms)
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 350);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const loadEducators = useCallback(async (query?: string) => {
         setLoading(true);
         try {
-            const response = await GetRequest<User[]>(USERS.LIST());
+            const response = await GetRequest<EducatorItem[]>(
+                USERS.EDUCATORS(),
+                query ? { search: query } : undefined,
+            );
             if (!response.success) { toast.error("Falha ao carregar educadores: " + response.message); return; }
-            setEducators((response.object ?? []).filter((u) => u.roles?.includes("EDUCATOR")));
+            setEducators(response.object ?? []);
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        loadEducators();
-    }, [loadEducators]);
+        loadEducators(debouncedSearch || undefined);
+    }, [loadEducators, debouncedSearch]);
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.id) return;
+        setDeleting(true);
+        try {
+            const res = await DeleteRequest(USERS.DELETE(deleteModal.id));
+            if (!res.success) { toast.error("Falha ao excluir educador: " + res.message); return; }
+            toast.success("Educador excluído com sucesso!");
+            setDeleteModal({ open: false });
+            loadEducators(debouncedSearch || undefined);
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     return (
         <>
@@ -51,12 +105,23 @@ const EducatorsPage = () => {
                     </div>
 
                     <button
-                        onClick={() => setFormModal(true)}
+                        onClick={() => setFormModal({ open: true })}
                         className="flex items-center justify-center gap-2 rounded-2xl bg-cloud-500 px-5 py-3 font-bold text-white transition-colors hover:bg-cloud-600"
                     >
                         <HugeiconsIcon icon={AddCircleIcon} size={20} />
                         Novo educador
                     </button>
+                </div>
+
+                {/* Busca */}
+                <div className="max-w-md">
+                    <Input
+                        icon={Search01Icon}
+                        wrapperClassName="bg-white"
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Buscar por nome ou email..."
+                    />
                 </div>
 
                 {/* Lista */}
@@ -68,8 +133,12 @@ const EducatorsPage = () => {
                     <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-cloud-300 py-20 text-center">
                         <HugeiconsIcon icon={UserMultiple02Icon} size={40} className="text-cloud-300" />
                         <div>
-                            <p className="text-sm font-medium text-cloud-500">Nenhum educador cadastrado</p>
-                            <p className="mt-1 text-xs text-neutral-400">Clique em "Novo educador" para cadastrar o primeiro.</p>
+                            <p className="text-sm font-medium text-cloud-500">
+                                {debouncedSearch ? "Nenhum educador encontrado" : "Nenhum educador cadastrado"}
+                            </p>
+                            <p className="mt-1 text-xs text-neutral-400">
+                                {debouncedSearch ? `Nada corresponde a "${debouncedSearch}".` : 'Clique em "Novo educador" para cadastrar o primeiro.'}
+                            </p>
                         </div>
                     </div>
                 ) : (
@@ -78,8 +147,12 @@ const EducatorsPage = () => {
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {educators.map((edu) => (
                                 <div key={edu.id} className="flex items-center gap-3 rounded-3xl bg-white p-4">
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-campfire-100 font-baskerville font-bold text-campfire-600">
-                                        {initials(edu.name)}
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-campfire-100 font-baskerville font-bold text-campfire-600">
+                                        {edu.avatar ? (
+                                            <img src={edu.avatar} alt={edu.name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            initials(edu.name)
+                                        )}
                                     </div>
                                     <div className="flex min-w-0 flex-1 flex-col">
                                         <span className="truncate font-medium text-cloud-600">{edu.name}</span>
@@ -88,7 +161,32 @@ const EducatorsPage = () => {
                                             {edu.email}
                                         </span>
                                     </div>
+
                                     <RoleBadge role="EDUCATOR" educatorType={edu.educatorType} />
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-cloud-100 hover:text-cloud-600">
+                                                <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
+                                                onSelect={() => setFormModal({ open: true, educatorId: edu.id })}
+                                            >
+                                                Editar
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                variant="danger"
+                                                icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
+                                                onSelect={() => setDeleteModal({ open: true, id: edu.id, name: edu.name })}
+                                            >
+                                                Excluir
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             ))}
                         </div>
@@ -96,13 +194,31 @@ const EducatorsPage = () => {
                 )}
             </section>
 
-            {/* Modal de cadastro */}
-            <Modal open={formModal} onClose={() => setFormModal(false)} size="lg">
+            {/* Modal de cadastro/edição */}
+            <Modal open={formModal.open} onClose={() => setFormModal({ open: false })} size="2xl">
                 <EducatorForm
-                    onClose={() => setFormModal(false)}
-                    onSuccess={() => { setFormModal(false); loadEducators(); }}
+                    educatorId={formModal.educatorId}
+                    onClose={() => setFormModal({ open: false })}
+                    onSuccess={() => { setFormModal({ open: false }); loadEducators(debouncedSearch || undefined); }}
                 />
             </Modal>
+
+            {/* Confirmação de exclusão */}
+            <ConfirmDeleteModal
+                open={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false })}
+                onConfirm={handleDeleteConfirm}
+                loading={deleting}
+                title={<>Excluir <span className="text-salmon-600 italic">Educador</span>?</>}
+                description={
+                    <>
+                        O educador{" "}
+                        <span className="font-semibold text-salmon-600 italic">{deleteModal.name}</span>{" "}
+                        será removido permanentemente, junto com sua conta de acesso. Esta ação não pode ser desfeita.
+                    </>
+                }
+                confirmText="Excluir educador"
+            />
         </>
     );
 };

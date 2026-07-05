@@ -6,7 +6,6 @@ import {
     HierarchyCircle02Icon,
     LocationUser01Icon,
     Mail01Icon,
-    SchoolIcon,
     StationeryIcon,
     TeacherIcon,
 } from "@hugeicons/core-free-icons";
@@ -36,13 +35,6 @@ export const PERFIL_FORMULARIOS: Record<
         descricao: "Complete as informações acadêmicas e de apoio.",
         campos: [
             {
-                id: "institute",
-                label: "Instituto:",
-                placeholder: "Nome da instituição",
-                icon: SchoolIcon,
-                noSpecialChars: true,
-            },
-            {
                 id: "grauEscolar",
                 label: "Grau escolar:",
                 placeholder: "Ex: 8º ano, ensino médio, graduação",
@@ -61,13 +53,6 @@ export const PERFIL_FORMULARIOS: Record<
         titulo: "Dados do educador",
         descricao: "Informe a atuação acadêmica principal.",
         campos: [
-            {
-                id: "institute",
-                label: "Instituto:",
-                placeholder: "Nome da instituição",
-                icon: SchoolIcon,
-                noSpecialChars: true,
-            },
             {
                 id: "department",
                 label: "Departamento:",
@@ -88,12 +73,6 @@ export const PERFIL_FORMULARIOS: Record<
         titulo: "Dados do intérprete",
         descricao: "Detalhe a formação e a área de apoio.",
         campos: [
-            {
-                id: "institute",
-                label: "Instituto:",
-                placeholder: "Nome da instituição",
-                icon: SchoolIcon,
-            },
             {
                 id: "proficienciaLibras",
                 label: "Proficiência em Libras:",
