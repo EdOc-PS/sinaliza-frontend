@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@components/ui/DropdownMenu";
+import { getInitials } from "@lib/format/initials";
 import type { EducatorType, Role } from "@api/requests";
 
 export interface EducatorListItem {
@@ -27,9 +28,6 @@ interface ListCardEducatorProps {
     onDelete: () => void;
 }
 
-const initials = (name: string) =>
-    name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
-
 export const ListCardEducator = ({ educator, onEdit, onDelete }: ListCardEducatorProps) => (
     <div className="flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24">
         {/* Avatar */}
@@ -37,7 +35,7 @@ export const ListCardEducator = ({ educator, onEdit, onDelete }: ListCardEducato
             {educator.avatar ? (
                 <img src={educator.avatar} alt={educator.name} className="h-full w-full object-cover" />
             ) : (
-                initials(educator.name)
+                getInitials(educator.name)
             )}
         </div>
 

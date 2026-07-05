@@ -222,7 +222,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="edu-name">Nome:</Label>
+                            <Label htmlFor="edu-name" isRequired>Nome:</Label>
                             <Input id="edu-name" icon={LocationUser01Icon} placeholder="Nome completo" value={name} noSpecialChars onChange={setName} autoFocus />
                             {name.trim() !== "" && !nameValid && (
                                 <p className="text-xs text-neutral-400 pl-1">O nome precisa ter pelo menos 3 caracteres.</p>
@@ -230,7 +230,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="edu-email">E-mail:</Label>
+                            <Label htmlFor="edu-email" isRequired>E-mail:</Label>
                             <Input id="edu-email" icon={MailOpenLoveIcon} placeholder="educador@email.com" value={email} onChange={setEmail} />
                             {email.trim() !== "" && !emailValid && (
                                 <p className="text-xs text-neutral-400 pl-1">Digite um e-mail válido.</p>
@@ -265,7 +265,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     <div className="flex flex-col gap-4">
                         {formulario.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-1.5">
-                                <Label htmlFor={campo.id}>{campo.label}</Label>
+                                <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
                                 {campo.kind === "select" ? (
                                     <Select
                                         id={campo.id}
@@ -314,7 +314,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="edu-password">Senha:</Label>
+                            <Label htmlFor="edu-password" isRequired>Senha:</Label>
                             <Input id="edu-password" icon={CirclePasswordIcon} type="password" placeholder="Mínimo 6 caracteres" value={password} onChange={setPassword} />
                             {password.trim() !== "" && !passwordValid && (
                                 <p className="text-xs text-neutral-400 pl-1">A senha precisa ter pelo menos 6 caracteres.</p>
@@ -322,7 +322,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="edu-confirm">Confirmar senha:</Label>
+                            <Label htmlFor="edu-confirm" isRequired>Confirmar senha:</Label>
                             <Input id="edu-confirm" icon={CirclePasswordIcon} type="password" placeholder="Repita a senha" value={confirmPassword} onChange={setConfirmPassword} />
                             {confirmPassword.trim() !== "" && !passwordsMatch && (
                                 <p className="text-xs text-neutral-400 pl-1">As senhas não coincidem.</p>

@@ -2,6 +2,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Mail01Icon } from "@hugeicons/core-free-icons";
 
 import { RoleBadge } from "@components/ui/RoleBadge";
+import { getInitials } from "@lib/format/initials";
 import type { ApprovalStatus, EducatorType, Role } from "@api/requests";
 
 export interface MemberListItem {
@@ -21,9 +22,6 @@ const STATUS_META: Record<ApprovalStatus, { label: string; className: string }> 
     REJECTED: { label: "Recusado", className: "bg-salmon-100 text-salmon-700" },
 };
 
-const initials = (name: string) =>
-    name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
-
 interface ListCardMemberProps {
     member: MemberListItem;
 }
@@ -38,7 +36,7 @@ export const ListCardMember = ({ member }: ListCardMemberProps) => {
                 {member.avatar ? (
                     <img src={member.avatar} alt={member.name} className="h-full w-full object-cover" />
                 ) : (
-                    initials(member.name)
+                    getInitials(member.name)
                 )}
             </div>
 

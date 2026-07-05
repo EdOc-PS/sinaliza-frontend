@@ -93,7 +93,7 @@ export const HandConfigForm = ({ handConfig, onClose, onSuccess }: HandConfigFor
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <Label htmlFor="hand-config-img" isRequired={!isEditMode} isOptional={isEditMode}>
+                <Label htmlFor="hand-config-img" isRequired>
                     Imagem da mão
                 </Label>
                 <InputImage

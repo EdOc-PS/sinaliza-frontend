@@ -4,6 +4,34 @@ export function getYouTubeId(url: string): string | null {
     return match ? match[1] : null;
 }
 
+// Heurística: valida se o link é um vídeo do YouTube (domínio oficial + id de 11 chars).
+// Aceita youtube.com/watch?v=, youtu.be/, youtube.com/embed/ e youtube.com/shorts/,
+// opcionalmente com www./m. e protocolo http(s).
+export function isValidYouTubeUrl(url: string): boolean {
+    const trimmed = url.trim();
+    if (!trimmed) return false;
+
+    try {
+        const parsed = new URL(trimmed.includes("://") ? trimmed : `https://${trimmed}`);
+        const host = parsed.hostname.replace(/^www\.|^m\./, "");
+
+        if (host === "youtu.be") {
+            return /^\/[\w-]{11}$/.test(parsed.pathname);
+        }
+
+        if (host === "youtube.com") {
+            if (parsed.pathname === "/watch") {
+                return /^[\w-]{11}$/.test(parsed.searchParams.get("v") ?? "");
+            }
+            return /^\/(embed|shorts)\/[\w-]{11}$/.test(parsed.pathname);
+        }
+
+        return false;
+    } catch {
+        return false;
+    }
+}
+
 // Thumbnail estática de um vídeo do YouTube
 export function getYouTubeThumbnail(url: string): string | null {
     const id = getYouTubeId(url);

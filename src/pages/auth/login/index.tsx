@@ -7,6 +7,7 @@ import Button from '@components/ui/Button'
 import { CirclePasswordIcon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
 import { toast } from 'sonner'
 import { useAuth } from '@/config/context/AuthContext'
+import { isPendingApproval } from '@lib/auth/approval'
 
 interface AuthProps {
     email: string
@@ -28,7 +29,11 @@ const LoginPage = () => {
         e?.preventDefault();
         setIsLoading(true)
         try {
-            await login({ email: auth.email, password: auth.password })
+            const loggedUser = await login({ email: auth.email, password: auth.password })
+            if (isPendingApproval(loggedUser)) {
+                navigate('/pending')
+                return
+            }
             toast.success('Login realizado com sucesso!')
             navigate('/classrooms')
         } catch (error: any) {

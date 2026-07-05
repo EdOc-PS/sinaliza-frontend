@@ -27,6 +27,7 @@ import {
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
 import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests";
+import { isValidYouTubeUrl } from "@lib/youtube/youtube";
 
 interface SignOptions {
     grammaticalClasses: GenericOption[];
@@ -155,14 +156,25 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
     const nameValid = name.trim().length >= 3;
 
+    // Step 0: informações principais (sem tags)
     const isStep0Valid =
         nameValid &&
         !!grammaticalClass &&
         !!disciplineId &&
-        !!handConfigId &&
-        tags.length > 0;
+        !!handConfigId;
 
-    const isStep2Valid = isEditMode || !!videoFile || !!anotherUrl.trim();
+    // Step 2: tags (obrigatório pelo menos uma)
+    const isTagsValid = tags.length > 0;
+
+    // Step 4: mídia — vídeo OU url do YouTube (bloqueio mútuo entre os dois)
+    const urlFilled = anotherUrl.trim() !== "";
+    const urlIsYouTube = urlFilled && isValidYouTubeUrl(anotherUrl);
+    const videoDisabled = urlFilled;
+    const urlDisabled = !!videoFile;
+
+    const hasMedia = !!videoFile || !!initialVideoUrl || urlFilled;
+    // URL preenchida precisa ser um link válido do YouTube
+    const isMediaValid = hasMedia && (!urlFilled || urlIsYouTube);
 
     useEffect(() => { 
         loadAll(); 
@@ -178,7 +190,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <ProgressBar currentStep={view} totalSteps={3} />
+            <ProgressBar currentStep={view} totalSteps={5} />
 
             {/* Step 0: Informações principais */}
             {view === 0 && (
@@ -193,7 +205,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="sign-name">Nome</Label>
+                        <Label htmlFor="sign-name" isRequired>Nome</Label>
                         <Input
                             id="sign-name"
                             icon={SignLanguageCIcon}
@@ -216,7 +228,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                     {/* Classe gramatical / Disciplina */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="grammatical-class">Classe gramatical</Label>
+                            <Label htmlFor="grammatical-class" isRequired>Classe gramatical</Label>
                             <Select
                                 id="grammatical-class"
                                 icon={TextSelectIcon}
@@ -229,7 +241,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="discipline">Disciplina</Label>
+                            <Label htmlFor="discipline" isRequired>Disciplina</Label>
                             <Select
                                 id="discipline"
                                 icon={LayersIcon}
@@ -244,19 +256,8 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
                     {/* Config. de mão (teclado visual) */}
                     <div className="flex flex-col gap-1.5">
-                        <Label>Config. de mão</Label>
+                        <Label isRequired>Config. de mão</Label>
                         <HandConfigPicker value={handConfigId} onChange={setHandConfigId} />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="tag-input">Tags / sinais relacionados</Label>
-                        <InputCheck
-                            id="tag-input"
-                            icon={TagsIcon}
-                            placeholder="Adicionar tag e pressionar Enter..."
-                            tags={tags}
-                            onChange={setTags}
-                        />
                     </div>
 
                     <div className="flex gap-3 pt-1 justify-end">
@@ -332,28 +333,55 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                 </>
             )}
 
-            {/* Step 2: Mídia */}
+            {/* Step 2: Tags */}
             {view === 2 && (
                 <>
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Mídia do sinal</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Adicione o vídeo (ou um link) e uma imagem ilustrativa.</p>
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Tags do sinal</h2>
+                        <p className="text-sm text-cloud-400 leading-snug">
+                            Adicione palavras-chave e sinais relacionados. Elas ajudam alunos e educadores a
+                            encontrar este sinal na busca e a conectá-lo a temas parecidos.
+                        </p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <Label isOptional={isEditMode}>Vídeo</Label>
-                        <InputVideo initialPreview={initialVideoUrl} onChange={setVideoFile} />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="another-url" isOptional>URL alternativa (YouTube, etc.)</Label>
-                        <Input
-                            id="another-url"
-                            icon={LinkSquare02Icon}
-                            placeholder="https://youtube.com/..."
-                            value={anotherUrl}
-                            onChange={setAnotherUrl}
+                        <Label htmlFor="tag-input" isRequired>Tags / sinais relacionados</Label>
+                        <InputCheck
+                            id="tag-input"
+                            icon={TagsIcon}
+                            placeholder="Adicionar tag e pressionar Enter..."
+                            tags={tags}
+                            onChange={setTags}
                         />
+                        <p className="text-xs text-cloud-400 pl-1">
+                            Ex: saudação, cumprimento, cotidiano. Digite e pressione Enter para cada tag.
+                        </p>
+                    </div>
+
+                    <div className="flex gap-3 pt-1">
+                        <BackButton onClick={() => setView(1)} />
+                        <Button
+                            type="button"
+                            variant="cloud"
+                            className="flex-1"
+                            disabled={!isTagsValid}
+                            onClick={() => setView(3)}
+                        >
+                            Próximo
+                        </Button>
+                    </div>
+                </>
+            )}
+
+            {/* Step 3: Imagem (penúltimo) */}
+            {view === 3 && (
+                <>
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Imagem ilustrativa</h2>
+                        <p className="text-sm text-cloud-400 leading-snug">
+                            Envie uma imagem de referência do sinal (opcional). Ela aparece como capa e ajuda
+                            na identificação rápida antes de assistir ao vídeo.
+                        </p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -366,12 +394,85 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                     </div>
 
                     <div className="flex gap-3 pt-1">
-                        <BackButton onClick={() => setView(1)} />
+                        <BackButton onClick={() => setView(2)} />
+                        <Button
+                            type="button"
+                            variant="cloud"
+                            className="flex-1"
+                            onClick={() => setView(4)}
+                        >
+                            Próximo
+                        </Button>
+                    </div>
+                </>
+            )}
+
+            {/* Step 4: Vídeo ou URL (último) */}
+            {view === 4 && (
+                <>
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Vídeo do sinal</h2>
+                        <p className="text-sm text-cloud-400 leading-snug">
+                            Envie um <b>vídeo</b> do sinal <b>ou</b> informe um <b>link</b> (YouTube, etc.).
+                            É obrigatório escolher uma das opções — ao preencher uma, a outra fica bloqueada.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <Label isRequired={!urlDisabled} isOptional={urlDisabled}>Enviar vídeo</Label>
+                        <InputVideo
+                            initialPreview={initialVideoUrl}
+                            disabled={videoDisabled}
+                            onChange={setVideoFile}
+                        />
+                        {videoDisabled && (
+                            <p className="text-xs text-neutral-400 pl-1">
+                                Bloqueado porque você informou uma URL. Limpe a URL para enviar um vídeo.
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <span className="h-px flex-1 bg-cloud-200" />
+                        <span className="text-xs font-medium text-cloud-400">ou</span>
+                        <span className="h-px flex-1 bg-cloud-200" />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="another-url" isRequired={!urlDisabled} isOptional={urlDisabled}>
+                            URL do YouTube
+                        </Label>
+                        <Input
+                            id="another-url"
+                            icon={LinkSquare02Icon}
+                            placeholder="https://youtube.com/watch?v=..."
+                            value={anotherUrl}
+                            onChange={setAnotherUrl}
+                            disabled={urlDisabled}
+                            wrapperClassName={urlDisabled ? "opacity-50" : ""}
+                        />
+                        {urlDisabled ? (
+                            <p className="text-xs text-neutral-400 pl-1">
+                                Bloqueado porque você enviou um vídeo. Remova o vídeo para usar uma URL.
+                            </p>
+                        ) : urlFilled && !urlIsYouTube ? (
+                            <p className="text-xs text-salmon-500 pl-1">
+                                Informe um link válido do YouTube (youtube.com/watch, youtu.be, shorts ou embed).
+                            </p>
+                        ) : (
+                            <p className="text-xs text-cloud-400 pl-1">
+                                Apenas links do YouTube são aceitos.
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="flex gap-3 pt-1">
+                        <BackButton onClick={() => setView(3)} />
                         <Button
                             type="submit"
                             variant="cloud"
                             className="flex-1"
-                            disabled={!isStep2Valid}
+                            disabled={!isMediaValid}
                             loading={loading}
                             loadingText={isEditMode ? "Salvando..." : "Criando sinal..."}
                         >

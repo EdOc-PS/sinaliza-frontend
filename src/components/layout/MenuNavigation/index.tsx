@@ -14,7 +14,8 @@ import {
     PencilIcon,
     StudentsIcon,
     UserIcon,
-    UserMultiple02Icon
+    UserMultiple02Icon,
+    User03Icon
 } from "@hugeicons/core-free-icons";
 
 interface MenuItemProps {
@@ -314,7 +315,7 @@ const MenuNavigation = () => {
                     </div>
 
                     <ActionItem
-                        icon={UserIcon}
+                        icon={User03Icon}
                         label="Perfil"
                         onClick={handleProfileClick}
                         isActive={isPathActive("/profile")}

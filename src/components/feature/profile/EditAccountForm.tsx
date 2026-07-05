@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
     LocationUser01Icon,
@@ -8,11 +8,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { useAuth } from "@context/AuthContext";
-import { GetRequest } from "@requests";
-import { AUTH } from "@routes/auth";
 import { maskPhone } from "@/lib/mask/mask";
 import { PERFIL_FORMULARIOS, getPerfilId } from "@/lib/constants/profileFields";
-import type { GenericOption } from "@interfaces";
 
 import Input from "@components/ui/Input";
 import Label from "@components/ui/Label";
@@ -49,17 +46,6 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
         }
         return initial;
     });
-
-    const [schoolGrades, setSchoolGrades] = useState<GenericOption[]>([]);
-
-    const loadFormOptions = async () => {
-        const res = await GetRequest<{ schoolGrades: GenericOption[] }>(AUTH.FORM_OPTIONS());
-        if (res.success && res.object) setSchoolGrades(res.object.schoolGrades ?? []);
-    };
-
-    useEffect(() => {
-        loadFormOptions();
-    }, []);
 
     const handleDataProfileChange = (field: string, value: string) => {
         setDataProfile((prev) => ({ ...prev, [field]: value }));
@@ -108,7 +94,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
 
                     <div className="space-y-4">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="name">Seu nome:</Label>
+                            <Label htmlFor="name" isRequired>Seu nome:</Label>
                             <Input
                                 id="name"
                                 icon={LocationUser01Icon}
@@ -125,7 +111,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="email">E-mail:</Label>
+                            <Label htmlFor="email" isRequired>E-mail:</Label>
                             <Input
                                 id="email"
                                 icon={MailOpenLoveIcon}
@@ -176,18 +162,14 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                     <div className="space-y-4">
                         {formularioPerfil.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-2">
-                                <Label htmlFor={campo.id} isOptional>{campo.label}</Label>
+                                <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
                                 {campo.kind === "select" ? (
                                     <Select
                                         id={campo.id}
                                         icon={campo.icon}
                                         value={dataProfile[campo.id] || ""}
                                         onChange={(value) => handleDataProfileChange(campo.id, value)}
-                                        options={
-                                            campo.id === "grauEscolar" && schoolGrades.length
-                                                ? schoolGrades
-                                                : (campo.options || [])
-                                        }
+                                        options={campo.options || []}
                                     />
                                 ) : (
                                     <Input

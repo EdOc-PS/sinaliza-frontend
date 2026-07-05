@@ -21,9 +21,8 @@ import SearchResultsPage from '@/pages/search'
 import WorkspacePage from '@/pages/workspace'
 import EducatorsPage from '@/pages/educators'
 import MembersPage from '@/pages/members'
-
-// 404
-const NotFoundPage = () => <div className="flex items-center justify-center h-screen text-2xl">Página não encontrada (404)</div>
+import PendingPage from '@/pages/pending'
+import NotFoundPage from '@/pages/not-found'
 
 const routes: RouteObject[] = [
     {
@@ -42,6 +41,10 @@ const routes: RouteObject[] = [
                 element: <RegisterPage />,
             },
         ],
+    },
+    {
+        path: '/pending',
+        element: <PendingPage />,
     },
     {
         path: '/',

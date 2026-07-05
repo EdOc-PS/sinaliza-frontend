@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, StudentsIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Search01Icon, UserGroup03Icon, UserGroupIcon, StudentsIcon} from "@hugeicons/core-free-icons";
 
 import { GetRequest, PatchRequest } from "@requests";
 import { USERS } from "@routes/users";
@@ -72,7 +72,7 @@ const MembersPage = () => {
             <div className="flex flex-col gap-4 rounded-3xl bg-white p-6">
                 <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100">
-                        <HugeiconsIcon icon={UserGroupIcon} size={26} className="text-sky-600" />
+                        <HugeiconsIcon icon={StudentsIcon} size={26} className="text-sky-600" />
                     </div>
                     <div>
                         <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Alunos e responsáveis</h1>
@@ -92,7 +92,7 @@ const MembersPage = () => {
                     </div>
                     <div className="sm:w-52">
                         <Select
-                            icon={StudentsIcon}
+                            icon={UserGroup03Icon}
                             options={ROLE_OPTIONS}
                             value={role}
                             onChange={(v) => setRole(v as Role)}
@@ -130,7 +130,12 @@ const MembersPage = () => {
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
-                    <span className="text-xs text-neutral-400">{others.length} {role === "STUDENT" ? "aluno(s)" : "responsável(is)"}</span>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-neutral-400">{others.length} {role === "STUDENT" ? "aluno(s)" : "responsável(is)"}</span>
+                        <span className="text-xs text-neutral-400">
+                            Acesso rápido pelas iniciais para facilitar a identificação das pessoas.
+                        </span>
+                    </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {others.map((member) => (
                             <ListCardMember key={member.id} member={member} />

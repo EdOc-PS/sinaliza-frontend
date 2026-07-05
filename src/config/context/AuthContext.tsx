@@ -21,7 +21,7 @@ const TOKEN_KEY = '@token'
 type AuthContextValue = {
     user: User | null
     initialized: boolean
-    login: (credentials: LoginPayload) => Promise<void>
+    login: (credentials: LoginPayload) => Promise<User>
     register: (data: RegisterPayload) => Promise<void>
     updateUser: (data: UpdateUserPayload) => Promise<void>
     logout: () => void
@@ -80,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { access_token, user } = response.object
         localStorage.setItem(TOKEN_KEY, access_token)
         setUser(user)
+        return user
     }
 
     // Cria uma nova conta (não autentica automaticamente)

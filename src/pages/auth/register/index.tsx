@@ -1,10 +1,7 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/config/context/AuthContext'
 import { toast } from 'sonner'
-import { GetRequest } from '@requests'
-import { AUTH } from '@routes/auth'
-import type { GenericOption } from '@interfaces'
 import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
@@ -65,18 +62,6 @@ const RegisterPage = () => {
         perfil: null,
         dadosPerfil: {},
     })
-
-    // Opções de grau escolar (param SCHOOL_GRADE) vindas do endpoint público
-    const [schoolGrades, setSchoolGrades] = useState<GenericOption[]>([])
-
-    const loadFormOptions = async () => {
-        const res = await GetRequest<{ schoolGrades: GenericOption[] }>(AUTH.FORM_OPTIONS())
-        if (res.success && res.object) setSchoolGrades(res.object.schoolGrades ?? [])
-    }
-
-    useEffect(() => {
-        loadFormOptions()
-    }, [])
 
     const perfis: Array<ProfileArrayProps> = [
         {
@@ -198,7 +183,7 @@ const RegisterPage = () => {
 
                                 <div className="space-y-4">
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="nome">Seu nome:</Label>
+                                        <Label htmlFor="nome" isRequired>Seu nome:</Label>
                                         <Input
                                             id="nome"
                                             icon={LocationUser01Icon}
@@ -215,7 +200,7 @@ const RegisterPage = () => {
                                     </div>
 
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="email">E-mail:</Label>
+                                        <Label htmlFor="email" isRequired>E-mail:</Label>
                                         <Input
                                             id="email"
                                             icon={MailOpenLoveIcon}
@@ -327,7 +312,7 @@ const RegisterPage = () => {
                                 <div className="space-y-4">
                                     {formularioSelecionado?.campos.map((campo) => (
                                         <div key={campo.id} className="flex flex-col gap-2">
-                                            <Label htmlFor={campo.id}>{campo.label}</Label>
+                                            <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
                                             {campo.kind === 'select' ? (
                                                 <Select
                                                     id={campo.id}
@@ -336,11 +321,7 @@ const RegisterPage = () => {
                                                     onChange={(value) =>
                                                         handleDataProfileChange(campo.id, value)
                                                     }
-                                                    options={
-                                                        campo.id === 'grauEscolar' && schoolGrades.length
-                                                            ? schoolGrades
-                                                            : (campo.options || [])
-                                                    }
+                                                    options={campo.options || []}
                                                 />
                                             ) : (
                                                 <Input
@@ -425,7 +406,7 @@ const RegisterPage = () => {
 
                                 <div className="space-y-4">
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="senha">Senha:</Label>
+                                        <Label htmlFor="senha" isRequired>Senha:</Label>
                                         <Input
                                             id="senha"
                                             icon={CirclePasswordIcon}
@@ -442,7 +423,7 @@ const RegisterPage = () => {
                                     </div>
 
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="confirmarSenha">Confirmar Senha:</Label>
+                                        <Label htmlFor="confirmarSenha" isRequired>Confirmar Senha:</Label>
                                         <Input
                                             id="confirmarSenha"
                                             icon={CirclePasswordIcon}

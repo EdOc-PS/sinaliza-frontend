@@ -65,6 +65,16 @@ const SignDetailPage = () => {
     const [deleting, setDeleting] = useState(false);
 
     const carouselRef = useRef<HTMLDivElement>(null);
+    const [canPrev, setCanPrev] = useState(false);
+    const [canNext, setCanNext] = useState(false);
+
+    const updateScrollButtons = () => {
+        const el = carouselRef.current;
+        if (!el) return;
+        // margem de 4px para evitar falsos positivos por arredondamento
+        setCanPrev(el.scrollLeft > 4);
+        setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    };
 
     const scrollCarousel = (direction: "prev" | "next") => {
         const el = carouselRef.current;
@@ -140,6 +150,13 @@ const SignDetailPage = () => {
     useEffect(() => {
         loadSign();
     }, [id]);
+
+    // Recalcula as setas do carrossel quando os relacionados carregam e ao redimensionar
+    useEffect(() => {
+        updateScrollButtons();
+        window.addEventListener("resize", updateScrollButtons);
+        return () => window.removeEventListener("resize", updateScrollButtons);
+    }, [related]);
 
     if (loading) {
         return (
@@ -328,20 +345,26 @@ const SignDetailPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => scrollCarousel("prev")}
-                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                    disabled={!canPrev}
+                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-neutral-200 transition-all"
                                 >
                                     <HugeiconsIcon icon={ChevronLeft} size={18} />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => scrollCarousel("next")}
-                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                    disabled={!canNext}
+                                    className="p-1.5 rounded-xl border-2 border-neutral-200 text-cloud-700 hover:border-cloud-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-neutral-200 transition-all"
                                 >
                                     <HugeiconsIcon icon={ChevronRight} size={18} />
                                 </button>
                             </div>
                         </div>
-                        <div ref={carouselRef} className="flex gap-5 overflow-x-hidden pb-2 -mx-1 px-1">
+                        <div
+                            ref={carouselRef}
+                            onScroll={updateScrollButtons}
+                            className="flex gap-5 overflow-x-hidden pb-2 -mx-1 px-1"
+                        >
                             {related.map((item) => (
                                 <div key={item.id} className="w-64 shrink-0">
                                     <SignCard sign={item} onClick={() => navigate(`/signs/${item.id}`)} />

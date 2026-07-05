@@ -6,12 +6,13 @@ import { toast } from "sonner";
 interface InputVideoProps {
     initialPreview?: string;
     description?: string;
+    disabled?: boolean;
     onChange: (file: File | null) => void;
 }
 
 const ACCEPTED = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
 
-const InputVideo = ({ initialPreview, description, onChange }: InputVideoProps) => {
+const InputVideo = ({ initialPreview, description, disabled = false, onChange }: InputVideoProps) => {
     const [file, setFile]         = useState<File | null>(null);
     const [preview, setPreview]   = useState<string | undefined>(initialPreview);
     const [dragging, setDragging] = useState(false);
@@ -61,16 +62,18 @@ const InputVideo = ({ initialPreview, description, onChange }: InputVideoProps) 
                 </div>
             ) : (
                 <div
-                    onClick={() => inputRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                    onClick={() => { if (!disabled) inputRef.current?.click(); }}
+                    onDragOver={(e) => { if (disabled) return; e.preventDefault(); setDragging(true); }}
                     onDragLeave={() => setDragging(false)}
-                    onDrop={handleDrop}
+                    onDrop={(e) => { if (disabled) { e.preventDefault(); return; } handleDrop(e); }}
                     className={`
-                        w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer
+                        w-full py-8 rounded-2xl border-2 border-dashed
                         flex flex-col items-center justify-center gap-2 transition-all
-                        ${dragging
-                            ? "border-salmon-400 bg-salmon-100"
-                            : "border-cloud-400/30 bg-cloud-100 hover:border-salmon-400 hover:bg-salmon-100"
+                        ${disabled
+                            ? "border-cloud-400/20 bg-cloud-100/50 opacity-50 cursor-not-allowed"
+                            : dragging
+                                ? "border-salmon-400 bg-salmon-100 cursor-pointer"
+                                : "border-cloud-400/30 bg-cloud-100 hover:border-salmon-400 hover:bg-salmon-100 cursor-pointer"
                         }
                     `}
                 >

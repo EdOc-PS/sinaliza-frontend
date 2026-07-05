@@ -23,13 +23,11 @@ import { RoleBadge } from "@/components/ui/RoleBadge";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { EditAccountForm } from "@components/feature/profile/EditAccountForm";
 import { SignListItem, type SignListData } from "@components/feature/profile/SignListItem";
+import { getInitials } from "@lib/format/initials";
 
 interface HistorySign extends SignListData {
     accessedAt: string;
 }
-
-const initials = (name: string) =>
-    name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -90,7 +88,7 @@ const ProfilePage = () => {
                         {/* Avatar */}
                         <div className="absolute right-6 top-0 h-24 w-24 -translate-y-1/2 shrink-0 sm:right-8 sm:h-28 sm:w-28">
                             <div className="flex h-full w-full items-center justify-center rounded-3xl border-4 border-white bg-campfire-100 font-baskerville text-3xl font-bold text-campfire-600 shadow-sm">
-                                {initials(user.name)}
+                                {getInitials(user.name)}
                             </div>
                         </div>
 
