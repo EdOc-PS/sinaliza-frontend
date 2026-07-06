@@ -33,26 +33,28 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                 {pending.map((member) => {
                     const busy = processingId === member.id;
                     return (
-                        <div key={member.id} className="flex items-center gap-3 rounded-2xl bg-white p-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-bold text-sky-600">
-                                {member.avatar ? (
-                                    <img src={member.avatar} alt={member.name} className="h-full w-full object-cover" />
-                                ) : (
-                                    getInitials(member.name)
-                                )}
-                            </div>
-
-                            <div className="flex min-w-0 flex-1 flex-col">
-                                <div className="flex items-center gap-2">
-                                    <span className="truncate font-medium text-cloud-600">{member.name}</span>
-                                    {member.roles.map((role) => (
-                                        <RoleBadge key={role} role={role} educatorType={member.educatorType} />
-                                    ))}
+                        <div key={member.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
+                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-bold text-sky-600">
+                                    {member.avatar ? (
+                                        <img src={member.avatar} alt={member.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                        getInitials(member.name)
+                                    )}
                                 </div>
-                                <span className="flex items-center gap-1 truncate text-xs text-neutral-400">
-                                    <HugeiconsIcon icon={Mail01Icon} size={13} />
-                                    {member.email}
-                                </span>
+
+                                <div className="flex min-w-0 flex-1 flex-col">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="truncate font-medium text-cloud-600">{member.name}</span>
+                                        {member.roles.map((role) => (
+                                            <RoleBadge key={role} role={role} educatorType={member.educatorType} />
+                                        ))}
+                                    </div>
+                                    <span className="flex items-center gap-1 truncate text-xs text-neutral-400">
+                                        <HugeiconsIcon icon={Mail01Icon} size={13} />
+                                        {member.email}
+                                    </span>
+                                </div>
                             </div>
 
                             <div className="flex shrink-0 items-center gap-2">
@@ -60,7 +62,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                     type="button"
                                     disabled={busy}
                                     onClick={() => onReject(member)}
-                                    className="flex items-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50"
+                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
                                 >
                                     <HugeiconsIcon icon={Cancel01Icon} size={16} />
                                     Recusar
@@ -69,7 +71,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                     type="button"
                                     disabled={busy}
                                     onClick={() => onApprove(member)}
-                                    className="flex items-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50"
+                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
                                 >
                                     <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
                                     Aprovar

@@ -57,9 +57,9 @@ export const ListCardEducator = ({ educator, onEdit, onDelete }: ListCardEducato
         </div>
 
         {/* Ações */}
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <button className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-cloud-100 hover:text-cloud-600">
+                <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-cloud-100 hover:text-cloud-600">
                     <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
                 </button>
             </DropdownMenuTrigger>

@@ -153,6 +153,15 @@ button {
     animation: dropdownSlide 0.20s ease-out both;
 }
 
+/* Esconde a scrollbar mantendo o scroll (ex: tabs horizontais no mobile) */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 /* Customização do Sonner Toast */
 [data-sonner-toast] {
     background: #213547 !important;

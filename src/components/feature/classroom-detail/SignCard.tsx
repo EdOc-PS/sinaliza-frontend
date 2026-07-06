@@ -231,9 +231,9 @@ export const SignCard = ({
 
                     {/* Menu de 3 pontos */}
                     <div onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
-                                <button className="mt-0.5 p-1.5 rounded-xl hover:bg-cloud-100 transition-colors focus:outline-none text-neutral-400 hover:text-cloud-600">
+                                <button type="button" className="mt-0.5 p-1.5 rounded-xl hover:bg-cloud-100 transition-colors focus:outline-none text-neutral-400 hover:text-cloud-600">
                                     <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
                                 </button>
                             </DropdownMenuTrigger>

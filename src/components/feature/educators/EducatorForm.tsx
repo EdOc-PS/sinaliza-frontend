@@ -98,7 +98,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
     const isStep1Valid = nameValid && emailValid;
 
     const isStep2Valid = () =>
-        !!formulario && formulario.campos.every((campo) => dadosPerfil[campo.id]?.trim() !== "" && dadosPerfil[campo.id] !== undefined);
+        !!formulario && formulario.campos.every((campo) => campo.optional || (dadosPerfil[campo.id]?.trim() ?? "") !== "");
 
     const passwordValid = password.length >= 6;
     const passwordsMatch = password === confirmPassword;
@@ -112,7 +112,8 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             if (isEditMode) { handleSubmit(); } else { setView(3); }
             return;
         }
-        if (view === 3 && isStep3Valid) { handleSubmit(); }
+        if (view === 3) { setView(4); return; }
+        if (view === 4 && isStep3Valid) { handleSubmit(); }
     };
 
     const handleSubmit = async () => {
@@ -163,8 +164,8 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
         );
     }
 
-    // Steps visíveis na barra de progresso (edição não tem tipo nem senha)
-    const totalSteps = isEditMode ? 2 : 4;
+    // Steps visíveis na barra de progresso (edição não tem tipo, bio nem senha)
+    const totalSteps = isEditMode ? 2 : 5;
     const progressStep = isEditMode ? view - 1 : view;
 
     return (
@@ -265,7 +266,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     <div className="flex flex-col gap-4">
                         {formulario.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-1.5">
-                                <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
+                                <Label htmlFor={campo.id} isRequired={!campo.optional} isOptional={campo.optional}>{campo.label}</Label>
                                 {campo.kind === "select" ? (
                                     <Select
                                         id={campo.id}
@@ -304,8 +305,28 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                 </>
             )}
 
-            {/* Step 3: senha + bio (só criação) */}
+            {/* Step 3: biografia (só criação) */}
             {view === 3 && (
+                <>
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Biografia</h2>
+                        <p className="text-sm text-cloud-400 leading-snug">Conte um pouco sobre o educador. Este passo é opcional.</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="edu-bio" isOptional>Biografia:</Label>
+                        <InputText id="edu-bio" icon={PenTool03Icon} placeholder="Breve descrição do educador (opcional)." value={bio} onChange={setBio} />
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                        <BackButton onClick={() => setView(2)} />
+                        <Button type="submit" className="flex-1">Próximo</Button>
+                    </div>
+                </>
+            )}
+
+            {/* Step 4: senha (só criação) */}
+            {view === 4 && (
                 <>
                     <div className="flex flex-col gap-1">
                         <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Senha de acesso</h2>
@@ -328,15 +349,10 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                                 <p className="text-xs text-neutral-400 pl-1">As senhas não coincidem.</p>
                             )}
                         </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="edu-bio" isOptional>Biografia:</Label>
-                            <InputText id="edu-bio" icon={PenTool03Icon} placeholder="Breve descrição do educador (opcional)." value={bio} onChange={setBio} />
-                        </div>
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                        <BackButton onClick={() => setView(2)} />
+                        <BackButton onClick={() => setView(3)} />
                         <Button type="submit" className="flex-1" loading={loading} loadingText="Cadastrando..." disabled={!isStep3Valid || loading}>
                             Cadastrar educador
                         </Button>

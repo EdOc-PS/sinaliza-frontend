@@ -328,7 +328,7 @@ const ClassroomDetailPage = () => {
                                 {/* Alunos */}
                                 <MemberSection
                                     title="Alunos"
-                                    members={members.filter((m) => ["STUDENT", "GUARDIAN"].includes(m.roleInClass))}
+                                    members={members.filter((m) => ["STUDENT", "GUARDIAN", "FAMILY"].includes(m.roleInClass))}
                                 />
 
                                 {!canManage && (

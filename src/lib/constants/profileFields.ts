@@ -23,6 +23,7 @@ export type CampoFormulario = {
     kind?: "input" | "select";
     options?: Array<{ label: string; value: string }>;
     noSpecialChars?: boolean;
+    optional?: boolean;
 };
 
 // Campos específicos de cada perfil — usados no cadastro e na edição de conta
@@ -54,6 +55,7 @@ export const PERFIL_FORMULARIOS: Record<
                 placeholder: "Descreva se houver alguma",
                 icon: HealtcareIcon,
                 noSpecialChars: true,
+                optional: true,
             },
         ],
     },

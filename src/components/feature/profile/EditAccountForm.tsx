@@ -162,7 +162,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                     <div className="space-y-4">
                         {formularioPerfil.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-2">
-                                <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
+                                <Label htmlFor={campo.id} isRequired={!campo.optional} isOptional={campo.optional}>{campo.label}</Label>
                                 {campo.kind === "select" ? (
                                     <Select
                                         id={campo.id}

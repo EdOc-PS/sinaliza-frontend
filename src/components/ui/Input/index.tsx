@@ -51,7 +51,7 @@ const Input = ({ className = "", wrapperClassName = "", onChange, icon, type, no
                 }
             `}</style>
 
-            <div className={`flex items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ${wrapperClassName}`}>
+            <div className={`flex w-full items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ${wrapperClassName}`}>
                 {icon && (
                     <div className="rounded-2xl bg-cloud-300/80 p-2">
                         <HugeiconsIcon

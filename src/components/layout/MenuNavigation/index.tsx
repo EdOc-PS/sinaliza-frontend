@@ -13,7 +13,6 @@ import {
     Logout01Icon,
     PencilIcon,
     StudentsIcon,
-    UserIcon,
     UserMultiple02Icon,
     User03Icon
 } from "@hugeicons/core-free-icons";
@@ -21,6 +20,7 @@ import {
 interface MenuItemProps {
     icon: typeof Home06Icon;
     label: string;
+    shortLabel?: string;
     onClick?: () => void;
     isDesktop?: boolean;
     isActive?: boolean;
@@ -33,7 +33,9 @@ interface TooltipProps {
     bgColor?: string;
 }
 
-const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; path: string }[]> = {
+type MenuEntry = { icon: typeof Home06Icon; label: string; path: string; shortLabel?: string };
+
+const menuItemsByRole: Record<string, MenuEntry[]> = {
     STUDENT: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
@@ -41,7 +43,7 @@ const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; 
     EDUCATOR: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" }
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" }
     ],
     GUARDIAN: [
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
@@ -49,9 +51,9 @@ const menuItemsByRole: Record<string, { icon: typeof Home06Icon; label: string; 
     MANAGER: [
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace" },
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
         { icon: UserMultiple02Icon, label: "Educadores", path: "/educators" },
-        { icon: StudentsIcon, label: "Alunos e responsáveis", path: "/members" }
+        { icon: StudentsIcon, label: "Alunos e responsáveis", path: "/members", shortLabel: "Alunos" }
     ]
 };
 
@@ -101,7 +103,7 @@ const Tooltip = ({ label, isDesktop = false, children, bgColor = "bg-cloud-700" 
 };
 
 // Componente de MenuItem que recebe ícone, label e função de clique
-const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }: MenuItemProps) => {
+const MenuItem = ({ icon, label, shortLabel, onClick, isDesktop = false, isActive = false }: MenuItemProps) => {
     const [bouncing, setBouncing] = useState(false);
 
     const handleClick = () => {
@@ -115,7 +117,7 @@ const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }:
         return (
             <button
                 onClick={handleClick}
-                className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 min-w-14 focus:outline-none"
+                className="flex flex-col items-center justify-center gap-0.5 px-2 py-1 min-w-0 focus:outline-none"
             >
                 <span className={`flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100" : ""}`}>
                     <span className={bouncing ? "icon-bounce" : ""}>
@@ -127,10 +129,10 @@ const MenuItem = ({ icon, label, onClick, isDesktop = false, isActive = false }:
                     </span>
                 </span>
                 <span
-                    className={`text-[10px] font-bold leading-none transition-all duration-300 overflow-hidden ${isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
+                    className={`text-[10px] font-bold leading-none whitespace-nowrap transition-all duration-300 overflow-hidden ${isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
                         }`}
                 >
-                    {label}
+                    {shortLabel ?? label}
                 </span>
             </button>
         );
@@ -247,28 +249,20 @@ const MenuNavigation = () => {
 
     return (
         <>
-            {/* Mobile: menu horizontal inferior (< 992px) */}
-            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-between gap-4 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+            {/* Mobile: menu horizontal inferior (< 992px) — perfil/favoritos/histórico ficam no MobileHeader */}
+            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-center py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
                 <div className="bg-white rounded-2xl flex w-full max-w-md justify-around p-0.5">
                     {menuItems.map((item, index) => (
                         <MenuItem
                             key={index}
                             icon={item.icon}
                             label={item.label}
+                            shortLabel={item.shortLabel}
                             onClick={() => navigate(item.path)}
                             isDesktop={false}
                             isActive={isPathActive(item.path)}
                         />
                     ))}
-                </div>
-
-                {/* Perfil Mobile */}
-                <div className="flex gap-2">
-                    <Tooltip label="Perfil" isDesktop={false}>
-                        <button onClick={handleProfileClick} className="flex bg-white items-center justify-center w-11 h-11 rounded-xl hover:bg-cloud-200 transition-colors">
-                            <HugeiconsIcon icon={UserIcon} size={24} className="text-cloud-500" />
-                        </button>
-                    </Tooltip>
                 </div>
             </nav>
 

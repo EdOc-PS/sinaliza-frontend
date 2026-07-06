@@ -219,9 +219,9 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                                         <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200" />
                                     </button>
                                 ) : (
-                                    <DropdownMenu>
+                                    <DropdownMenu modal={false}>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group">
+                                            <button type="button" className="w-full aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group">
                                                 {config.imgUrl ? (
                                                     <img
                                                         src={config.imgUrl}

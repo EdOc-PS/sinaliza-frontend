@@ -96,11 +96,11 @@ const RegisterPage = () => {
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email.trim())
     const isView0Valid = nomeValido && emailValido
 
-    // View 2: Dados do perfil (todos os campos obrigatórios)
+    // View 2: Dados do perfil (campos obrigatórios; opcionais são ignorados)
     const isView2Valid = () => {
         if (!formularioSelecionado) return false
         return formularioSelecionado.campos.every(
-            (campo) => user.dadosPerfil[campo.id]?.trim() !== ''
+            (campo) => campo.optional || (user.dadosPerfil[campo.id]?.trim() ?? '') !== ''
         )
     }
 
@@ -312,7 +312,7 @@ const RegisterPage = () => {
                                 <div className="space-y-4">
                                     {formularioSelecionado?.campos.map((campo) => (
                                         <div key={campo.id} className="flex flex-col gap-2">
-                                            <Label htmlFor={campo.id} isRequired>{campo.label}</Label>
+                                            <Label htmlFor={campo.id} isRequired={!campo.optional} isOptional={campo.optional}>{campo.label}</Label>
                                             {campo.kind === 'select' ? (
                                                 <Select
                                                     id={campo.id}
@@ -457,9 +457,9 @@ const RegisterPage = () => {
                         {/* Step 5: Sucesso */}
                         {view === 5 && (
                             <>
-                                <div className="space-y-8 text-center flex flex-col items-center">
+                                <div className="space-y-6 text-center flex flex-col items-center">
                                     <p className="text-2xl sm:text-3xl text-cloud-500 font-baskerville">
-                                        Bem-vindo ao Sinaliza
+                                        Cadastro enviado!
                                     </p>
 
 
@@ -467,8 +467,13 @@ const RegisterPage = () => {
                                         <img src="/src/assets/images/approve.png" alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
                                     </div>
                                     <p className='text-neutral-500 font-medium text-sm sm:text-base'>
-                                        Sua conta foi criada com sucesso. Agora você faz parte de uma comunidade comprometida com a inclusão
+                                        Sua conta foi criada e enviada para <b className="text-cloud-500">análise</b>. Um educador da instituição
+                                        precisa aprovar seu acesso antes do primeiro login. Assim que for liberado, você poderá entrar normalmente.
                                     </p>
+
+                                    <div className="flex items-center gap-2 rounded-2xl bg-sunflower-100 px-4 py-2.5 text-sm font-medium text-sunflower-700">
+                                        Perfil pendente de aprovação
+                                    </div>
                                 </div>
 
 

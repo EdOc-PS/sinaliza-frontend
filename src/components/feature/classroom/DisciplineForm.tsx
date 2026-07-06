@@ -179,7 +179,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
             </div>
 
             {/* Ano e Nível escolar */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="flex flex-col gap-1.5">
                     <Label htmlFor="school-year" isOptional>Ano letivo</Label>
                     <Input
@@ -192,7 +192,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                     />
                 </div>
 
-                <div className="flex flex-col gap-1.5 col-span-2">
+                <div className="flex flex-col gap-1.5 sm:col-span-2">
                     <Label htmlFor="school-level" isOptional>Nível escolar</Label>
                     <Select
                         id="school-level"
