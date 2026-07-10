@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Cancel02Icon, Image01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
+import { validateUpload } from "@lib/upload/fileSecurity";
 
 interface InputImageProps {
     initialPreview?: string;
@@ -9,22 +10,23 @@ interface InputImageProps {
     onChange: (file: File | null) => void;
 }
 
-const ACCEPTED = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
-
 const InputImage = ({ initialPreview, description, onChange }: InputImageProps) => {
     const [file, setFile]       = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(initialPreview ?? null);
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleFile = (selected: File) => {
-        if (!ACCEPTED.includes(selected.type)) {
-            toast.error("Formato inválido. Use PNG, JPG ou WEBP.");
+    const handleFile = async (selected: File) => {
+        const result = await validateUpload(selected, "image");
+        if (!result.ok || !result.file) {
+            toast.error(result.error ?? "Arquivo inválido.");
+            if (inputRef.current) inputRef.current.value = "";
             return;
         }
-        setFile(selected);
-        setPreview(URL.createObjectURL(selected));
-        onChange(selected);
+        const safe = result.file;
+        setFile(safe);
+        setPreview(URL.createObjectURL(safe));
+        onChange(safe);
     };
 
     const handleRemove = () => {

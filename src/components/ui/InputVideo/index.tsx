@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Cancel02Icon, Video01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
+import { validateUpload } from "@lib/upload/fileSecurity";
 
 interface InputVideoProps {
     initialPreview?: string;
@@ -10,22 +11,22 @@ interface InputVideoProps {
     onChange: (file: File | null) => void;
 }
 
-const ACCEPTED = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
-
 const InputVideo = ({ initialPreview, description, disabled = false, onChange }: InputVideoProps) => {
     const [file, setFile]         = useState<File | null>(null);
     const [preview, setPreview]   = useState<string | undefined>(initialPreview);
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleFile = (selected: File) => {
-        if (!ACCEPTED.includes(selected.type)) {
-            toast.error("Formato inválido. Use MP4, WebM ou MOV.");
+    const handleFile = async (selected: File) => {
+        const result = await validateUpload(selected, "video");
+        if (!result.ok || !result.file) {
+            toast.error(result.error ?? "Arquivo inválido.");
+            if (inputRef.current) inputRef.current.value = "";
             return;
         }
-        setFile(selected);
+        setFile(result.file);
         setPreview(undefined);
-        onChange(selected);
+        onChange(result.file);
     };
 
     const handleRemove = () => {
