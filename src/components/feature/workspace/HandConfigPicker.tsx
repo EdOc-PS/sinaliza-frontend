@@ -20,6 +20,8 @@ interface HandConfigPickerProps {
     itemsPerPage?: number;
     /** Estilo compacto (igual ao VisualKeyboard): busca/setas menores e cards menores */
     compact?: boolean;
+    /** Permite desmarcar clicando na configuração já selecionada */
+    allowDeselect?: boolean;
 }
 
 const DEFAULT_GRID = "grid grid-cols-8 gap-1.5";
@@ -31,6 +33,7 @@ const HandConfigPicker = ({
     gridClassName = DEFAULT_GRID,
     itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
     compact = false,
+    allowDeselect = false,
 }: HandConfigPickerProps) => {
     const ITEMS_PER_PAGE = itemsPerPage;
     const [configs, setConfigs]     = useState<HandConfig[]>([]);
@@ -163,7 +166,7 @@ const HandConfigPicker = ({
                                 key={config.id}
                                 type="button"
                                 title={config.name}
-                                onClick={() => onChange(config.id)}
+                                onClick={() => onChange(allowDeselect && selected ? "" : config.id)}
                                 className={`relative aspect-square ${compact ? "rounded-xl" : "rounded-2xl"} overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
                                     selected
                                         ? "border-campfire-500 ring-1 ring-campfire-300"

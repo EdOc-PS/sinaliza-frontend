@@ -97,6 +97,7 @@ export type CreateEducatorPayload = {
   email: string;
   password: string;
   educatorType: EducatorType;
+  isManager?: boolean;
   phone?: string;
   bio?: string;
   dataProfile: DataProfile;

@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
+import InputCheckbox from "@components/ui/InputCheckbox";
 import InputText from "@components/ui/InputText";
 import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
@@ -16,13 +17,14 @@ import {
     MailOpenLoveIcon,
     PenTool03Icon,
     SmartPhone01Icon,
+    StarAward01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { GetRequest, PatchRequest, PostRequest } from "@requests";
 import { USERS } from "@routes/users";
 import { maskPhone } from "@lib/mask/mask";
 import { PERFIL_FORMULARIOS } from "@lib/constants/profileFields";
-import type { CreateEducatorPayload, EducatorType, User } from "@api/requests";
+import type { CreateEducatorPayload, EducatorType, Role, User } from "@api/requests";
 
 // Só os dois tipos de educador
 type EducatorKind = "educator" | "interpreter";
@@ -41,12 +43,14 @@ interface EducatorFormProps {
 export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormProps) => {
     const isEditMode = !!educatorId;
 
-    // No modo edição não há step de tipo (0) nem de senha (3): só dados (1) e perfil (2)
-    const [view, setView] = useState(isEditMode ? 1 : 0);
+    // Edição: tipo (0), dados (1) e perfil (2). Criação inclui ainda bio (3) e senha (4).
+    const [view, setView] = useState(0);
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(isEditMode);
 
     const [kind, setKind] = useState<EducatorKind | null>(null);
+    const [isManager, setIsManager] = useState(false);
+    const [currentRoles, setCurrentRoles] = useState<Role[]>([]);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
@@ -65,6 +69,8 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             }
             const u = res.object;
             setKind(u.educatorType === "INTERPRETER" ? "interpreter" : "educator");
+            setIsManager((u.roles ?? []).includes("MANAGER"));
+            setCurrentRoles(u.roles ?? []);
             setName(u.name ?? "");
             setEmail(u.email ?? "");
             setPhone(u.phone ?? "");
@@ -126,9 +132,23 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     email: email.trim(),
                     phone: phone || undefined,
                     bio: bio || undefined,
-                    dataProfile: { ...dadosPerfil },
+                    dataProfile: {
+                        ...dadosPerfil,
+                        educatorType: KIND_TO_EDUCATOR_TYPE[kind],
+                    },
                 });
                 if (!res.success) { toast.error("Falha ao atualizar educador: " + res.message); return; }
+
+                // Sincroniza o perfil de gestor (MANAGER) se o checkbox mudou
+                const hasManager = currentRoles.includes("MANAGER");
+                if (hasManager !== isManager) {
+                    const roles: Role[] = isManager
+                        ? [...currentRoles, "MANAGER"]
+                        : currentRoles.filter((r) => r !== "MANAGER");
+                    const rolesRes = await PatchRequest(USERS.UPDATE_ROLES(educatorId), { roles });
+                    if (!rolesRes.success) { toast.error("Falha ao atualizar perfil de gestor: " + rolesRes.message); return; }
+                }
+
                 toast.success("Educador atualizado com sucesso!");
                 onSuccess();
                 return;
@@ -139,6 +159,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                 email: email.trim(),
                 password,
                 educatorType: KIND_TO_EDUCATOR_TYPE[kind],
+                isManager: isManager || undefined,
                 phone: phone || undefined,
                 bio: bio || undefined,
                 dataProfile: {
@@ -164,20 +185,43 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
         );
     }
 
-    // Steps visíveis na barra de progresso (edição não tem tipo, bio nem senha)
-    const totalSteps = isEditMode ? 2 : 5;
-    const progressStep = isEditMode ? view - 1 : view;
+    // Steps visíveis na barra de progresso (edição não tem bio nem senha)
+    const totalSteps = isEditMode ? 3 : 5;
+
+    // Em edição: salvar direto de qualquer step, desde que tudo esteja válido
+    const isFormValid = !!kind && isStep1Valid && isStep2Valid();
+    const editSaveButton = isEditMode && view !== 2 && (
+        <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            disabled={!isFormValid || loading}
+            loading={loading}
+            loadingText="Salvando..."
+            onClick={handleSubmit}
+        >
+            Salvar alterações
+        </Button>
+    );
 
     return (
         <form onSubmit={handleStepSubmit} className="flex flex-col gap-6">
-            <ProgressBar currentStep={progressStep} totalSteps={totalSteps} />
+            <ProgressBar
+                currentStep={view}
+                totalSteps={totalSteps}
+                onStepClick={isEditMode ? setView : undefined}
+            />
 
-            {/* Step 0: escolher tipo (só criação) */}
+            {/* Step 0: escolher tipo */}
             {view === 0 && (
                 <>
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Cadastrar educador</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Selecione o tipo de educador que deseja cadastrar.</p>
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
+                            {isEditMode ? "Editar educador" : "Cadastrar educador"}
+                        </h2>
+                        <p className="text-sm text-cloud-400 leading-snug">
+                            {isEditMode ? "Ajuste o tipo e as permissões do educador." : "Selecione o tipo de educador que deseja cadastrar."}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -206,8 +250,19 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                         </button>
                     </div>
 
+                    {/* Acesso de gestor — ocupa a linha inteira */}
+                    <InputCheckbox
+                        id="edu-manager"
+                        icon={StarAward01Icon}
+                        checked={isManager}
+                        onChange={setIsManager}
+                        title="Conceder acesso de gestor"
+                        description="Pode cadastrar educadores e gerenciar membros."
+                    />
+
                     <div className="flex gap-3 pt-2">
                         <Button type="button" variant="outline" className="flex-1" onClick={onClose}>Cancelar</Button>
+                        {editSaveButton}
                         <Button type="submit" className="flex-1" disabled={!kind}>Próximo</Button>
                     </div>
                 </>
@@ -217,7 +272,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             {view === 1 && (
                 <>
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">{isEditMode ? "Editar educador" : "Dados pessoais"}</h2>
+                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Dados pessoais</h2>
                         <p className="text-sm text-cloud-400 leading-snug">Informe nome e contato do educador.</p>
                     </div>
 
@@ -245,11 +300,8 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                        {isEditMode ? (
-                            <Button type="button" variant="outline" className="w-32" onClick={onClose}>Cancelar</Button>
-                        ) : (
-                            <BackButton onClick={() => setView(0)} />
-                        )}
+                        <BackButton onClick={() => setView(0)} />
+                        {editSaveButton}
                         <Button type="submit" className="flex-1" disabled={!isStep1Valid}>Próximo</Button>
                     </div>
                 </>

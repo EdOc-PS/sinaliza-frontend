@@ -130,15 +130,6 @@ export const FAB = () => {
                 )}
 
                 <div className="flex items-center gap-2.5">
-                    {/* Texto "Acesso rápido" ao lado do botão (some quando o menu abre) */}
-                    <span
-                        className={`rounded-3xl bg-white px-4 py-2 text-sm font-semibold text-cloud-600 shadow-lg shadow-neutral-200/60 border-2 border-neutral-200 whitespace-nowrap transition-all duration-200 ${
-                            open ? "opacity-0 translate-x-2 pointer-events-none" : "opacity-100 translate-x-0"
-                        }`}
-                    >
-                        Acesso rápido
-                    </span>
-
                     <button
                         onClick={handleFABClick}
                         className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-cloud-500 shadow-lg shadow-cloud-500/40 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none"

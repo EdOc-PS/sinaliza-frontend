@@ -2,7 +2,7 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
     Knowledge01Icon,
     Knowledge02Icon,
-    UserMultiple02Icon,
+    StarAward01Icon,
 } from "@hugeicons/core-free-icons";
 
 interface RoleMeta {
@@ -18,7 +18,7 @@ const ROLE_META: Record<string, RoleMeta> = {
     GUARDIAN:    { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
     FAMILY:      { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
     ASSISTANT:   { label: "Assistente", icon: Knowledge02Icon, className: "bg-cloud-100 text-cloud-600" },
-    MANAGER:     { label: "Gestor",     icon: UserMultiple02Icon, className: "bg-lime-100 text-lime-700" },
+    MANAGER:     { label: "Gestor",     icon: StarAward01Icon, className: "bg-lime-100 text-lime-700" },
 };
 
 // A role EDUCATOR não vira um badge "Educador": vira Professor ou Intérprete,

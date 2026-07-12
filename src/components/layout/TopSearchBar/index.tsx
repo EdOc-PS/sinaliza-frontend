@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
+import { Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
 
 import Input from "@components/ui/Input";
 import Select from "@components/ui/Select";
@@ -81,26 +81,15 @@ const TopSearchBar = () => {
                 <div className="dropdown-slide absolute left-0 right-0 top-full z-40 mt-2 flex flex-col gap-4 rounded-3xl border-2 border-cloud-400/10 bg-white p-4 shadow-xl">
                     {/* Teclado de configuração de mão */}
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between px-1">
-                            <span className="flex items-center gap-2 text-sm font-semibold text-cloud-500">
-                                <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                                Configuração de mão
-                            </span>
-                            {handConfigId && (
-                                <button
-                                    type="button"
-                                    onClick={() => setHandConfigId("")}
-                                    className="flex items-center gap-1 text-xs font-medium text-cloud-400 transition-colors hover:text-cloud-600"
-                                >
-                                    <HugeiconsIcon icon={Cancel01Icon} size={14} />
-                                    Limpar
-                                </button>
-                            )}
-                        </div>
+                        <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
+                            <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
+                            Configuração de mão
+                        </span>
                         <HandConfigPicker
                             value={handConfigId}
                             onChange={setHandConfigId}
                             compact
+                            allowDeselect
                             gridClassName="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-1.5"
                             itemsPerPage={24}
                         />

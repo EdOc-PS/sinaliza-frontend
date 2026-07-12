@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 
 export interface Member {
@@ -11,9 +11,13 @@ export interface Member {
 interface MemberSectionProps {
     title: string;
     members: Member[];
+    /** Quando definido, mostra um botão de remover em cada participante (exceto os bloqueados) */
+    onRemove?: (member: Member) => void;
+    /** IDs de usuários que não podem ser removidos (ex: professor da disciplina) */
+    lockedUserIds?: string[];
 }
 
-export const MemberSection = ({ title, members }: MemberSectionProps) => (
+export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: MemberSectionProps) => (
     <div className="flex flex-col gap-3">
         <div className="px-1">
             <h3 className="font-baskerville text-lg text-cloud-600">{title}</h3>
@@ -46,6 +50,18 @@ export const MemberSection = ({ title, members }: MemberSectionProps) => (
 
                             {/* Role badge */}
                             <RoleBadge role={m.roleInClass} educatorType={m.user.educatorType} />
+
+                            {/* Remover (apenas educador, exceto usuários bloqueados) */}
+                            {onRemove && !lockedUserIds.includes(m.user.id) && (
+                                <button
+                                    type="button"
+                                    onClick={() => onRemove(m)}
+                                    title="Remover da disciplina"
+                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-salmon-100 hover:text-salmon-600"
+                                >
+                                    <HugeiconsIcon icon={Delete02Icon} size={18} />
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>

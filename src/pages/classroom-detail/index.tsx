@@ -12,6 +12,7 @@ import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
+import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
@@ -25,6 +26,8 @@ import {
     Logout03Icon,
     Settings02Icon,
     SignLanguageCIcon,
+    SquareLock02Icon,
+    UserAdd01Icon,
     UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import NavTabs from "@components/ui/NavTabs";
@@ -34,6 +37,7 @@ interface DisciplineDetail {
     name: string;
     description?: string;
     colorBackground?: string;
+    classCode?: string;
     schoolYear?: number;
     schoolLevelLabel?: string;
     userCount: number;
@@ -60,6 +64,9 @@ const ClassroomDetailPage = () => {
     const [deletingSignId, setDeletingSignId] = useState<string | null>(null);
     const [leaveModal, setLeaveModal] = useState(false);
     const [leaving, setLeaving] = useState(false);
+    const [addMemberModal, setAddMemberModal] = useState(false);
+    const [removeMemberModal, setRemoveMemberModal] = useState<{ open: boolean; member?: Member }>({ open: false });
+    const [removingMember, setRemovingMember] = useState(false);
 
     const handleDeleteSign = async () => {
         if (!deleteSignModal.signId) return;
@@ -127,6 +134,20 @@ const ClassroomDetailPage = () => {
             navigate("/classrooms");
         } finally {
             setLeaving(false);
+        }
+    };
+
+    const handleRemoveMember = async () => {
+        if (!id || !removeMemberModal.member) return;
+        setRemovingMember(true);
+        try {
+            const res = await DeleteRequest(DISCIPLINES.REMOVE_MEMBER(id, removeMemberModal.member.user.id));
+            if (!res.success) { toast.error("Falha ao remover participante: " + res.message); return; }
+            toast.success("Participante removido da disciplina");
+            setRemoveMemberModal({ open: false });
+            loadMembers();
+        } finally {
+            setRemovingMember(false);
         }
     };
 
@@ -213,6 +234,12 @@ const ClassroomDetailPage = () => {
                                 <HugeiconsIcon icon={UserGroupIcon} size={16} className="text-white/60" />
                                 <span><b className="text-white">{discipline.userCount}</b> alunos</span>
                             </div>
+                            {discipline.classCode && (
+                                <span className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white">
+                                    <HugeiconsIcon icon={SquareLock02Icon} size={14} className="text-white/70" />
+                                    Código: <span className="font-mono tracking-wider">{discipline.classCode}</span>
+                                </span>
+                            )}
                             <span className="text-white/60 text-xs">
                                 Prof. {discipline.teacher.name}
                                 {discipline.schoolYear ? ` · ${discipline.schoolYear}` : ""}
@@ -315,6 +342,17 @@ const ClassroomDetailPage = () => {
                             </div>
                         ) : (
                             <>
+                                {/* Ação: adicionar participante (apenas educador) */}
+                                {canManage && (
+                                    <button
+                                        onClick={() => setAddMemberModal(true)}
+                                        className="flex items-center justify-center gap-2 self-start rounded-2xl bg-cloud-500 hover:bg-cloud-600 transition-colors px-4 py-2.5 text-sm font-semibold text-white"
+                                    >
+                                        <HugeiconsIcon icon={UserAdd01Icon} size={18} />
+                                        Adicionar participante
+                                    </button>
+                                )}
+
                                 {/* Educadores */}
                                 <MemberSection
                                     title="Educadores"
@@ -323,12 +361,15 @@ const ClassroomDetailPage = () => {
                                         { roleInClass: "EDUCATOR", createdAt: "", user: { id: discipline.teacher.id, name: discipline.teacher.name, avatar: discipline.teacher.avatar, role: "EDUCATOR", educatorType: discipline.teacher.educatorType } },
                                         ...members.filter((m) => ["EDUCATOR", "INTERPRETER"].includes(m.roleInClass) && m.user.id !== discipline.teacher.id),
                                     ]}
+                                    onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
+                                    lockedUserIds={[discipline.teacher.id]}
                                 />
 
                                 {/* Alunos */}
                                 <MemberSection
                                     title="Alunos"
                                     members={members.filter((m) => ["STUDENT", "GUARDIAN", "FAMILY"].includes(m.roleInClass))}
+                                    onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                 />
 
                                 {!canManage && (
@@ -379,6 +420,32 @@ const ClassroomDetailPage = () => {
                     </>
                 }
                 confirmText="Excluir sinal"
+            />
+
+            {/* Modal de adicionar participante */}
+            <Modal open={addMemberModal} onClose={() => setAddMemberModal(false)} size="2xl">
+                <AddMemberForm
+                    disciplineId={discipline.id}
+                    onClose={() => setAddMemberModal(false)}
+                    onSuccess={() => { setAddMemberModal(false); loadMembers(); load(); }}
+                />
+            </Modal>
+
+            {/* Modal de confirmar remoção de participante */}
+            <ConfirmDeleteModal
+                open={removeMemberModal.open}
+                onClose={() => setRemoveMemberModal({ open: false })}
+                onConfirm={handleRemoveMember}
+                loading={removingMember}
+                title={<>Remover <span className="text-salmon-600 italic">Participante</span>?</>}
+                description={
+                    <>
+                        <span className="font-semibold text-salmon-600 italic">{removeMemberModal.member?.user.name}</span>{" "}
+                        deixará de ter acesso a esta disciplina. É possível adicioná-lo novamente depois.
+                    </>
+                }
+                confirmText="Remover participante"
+                loadingText="Removendo..."
             />
 
             {/* Modal de confirmar saída da disciplina */}

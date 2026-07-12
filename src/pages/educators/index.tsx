@@ -69,25 +69,16 @@ const EducatorsPage = () => {
             <section className="flex flex-col gap-8">
                 {/* Cabeçalho */}
                 <div className="flex flex-col gap-4 rounded-3xl bg-white p-6">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-lime-100">
-                            <HugeiconsIcon icon={UserMultiple02Icon} size={26} className="text-lime-700" />
-                        </div>
-                        <div>
-                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Educadores</h1>
-                            <p className="text-sm text-neutral-500">Cadastre e gerencie professores e intérpretes</p>
-                        </div>
-                    </div>
-
-                    {/* Busca + novo educador */}
-                    <div className="flex justify-between flex-col gap-10 sm:flex-row sm:items-center">
-                        <div className="w-full">
-                            <Input
-                                icon={Search01Icon}
-                                value={search}
-                                onChange={setSearch}
-                                placeholder="Buscar por nome ou email..."
-                            />
+                    {/* Título + novo educador */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-lime-100">
+                                <HugeiconsIcon icon={UserMultiple02Icon} size={26} className="text-lime-700" />
+                            </div>
+                            <div>
+                                <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Educadores</h1>
+                                <p className="text-sm text-neutral-500">Cadastre e gerencie professores e intérpretes</p>
+                            </div>
                         </div>
                         <ActionButton
                             variant="cloud"
@@ -95,9 +86,17 @@ const EducatorsPage = () => {
                             title="Novo educador"
                             description="Cadastre um professor ou intérprete"
                             onClick={() => setFormModal({ open: true })}
-                            className="flex-1"
+                            className="w-full sm:w-80 shrink-0"
                         />
                     </div>
+
+                    {/* Busca */}
+                    <Input
+                        icon={Search01Icon}
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Buscar por nome ou email..."
+                    />
                 </div>
 
                 {/* Lista */}

@@ -44,8 +44,8 @@ export const CategoryForm = ({ onClose, onSuccess }: CategoryFormProps) => {
             <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Nova categoria</h2>
                 <p className="text-sm text-cloud-400 leading-snug">
-                    Categorias organizam os sinais (ex: Verbo, Animal, Saudação). O código interno é gerado
-                    automaticamente a partir do nome.
+                    Categorias agrupam os sinais por tipo (ex: Verbo, Animal, Saudação), deixando a busca e a
+                    organização mais fáceis para alunos e educadores.
                 </p>
             </div>
 

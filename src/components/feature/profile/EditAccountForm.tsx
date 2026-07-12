@@ -52,6 +52,8 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
     };
 
     const totalSteps = formularioPerfil ? 3 : 2;
+    // Sem formulário de perfil, a bio ocupa o step 1
+    const bioView = formularioPerfil ? 2 : 1;
 
     const nameValid = name.trim().length >= 3;
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -76,9 +78,25 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
         }
     };
 
+    // Último step (bio) já tem o salvar como ação principal
+    const lastStep = totalSteps - 1;
+    const saveButton = view !== lastStep && (
+        <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            disabled={!isView0Valid || loading}
+            loading={loading}
+            loadingText="Salvando..."
+            onClick={handleSave}
+        >
+            Salvar alterações
+        </Button>
+    );
+
     return (
         <div className="space-y-6">
-            <ProgressBar currentStep={view} totalSteps={totalSteps} />
+            <ProgressBar currentStep={view} totalSteps={totalSteps} onStepClick={setView} />
 
             {/* Step 0: Dados pessoais */}
             {view === 0 && (
@@ -137,10 +155,17 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                        <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>
+                        <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button type="button" variant="cloud" className="w-3/5" disabled={!isView0Valid} onClick={() => setView(1)}>
+                        {saveButton}
+                        <Button
+                            type="button"
+                            variant="cloud"
+                            className="flex-1"
+                            disabled={!isView0Valid}
+                            onClick={() => setView(formularioPerfil ? 1 : bioView)}
+                        >
                             Próximo
                         </Button>
                     </div>
@@ -188,26 +213,16 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
 
                     <div className="flex gap-3 pt-2">
                         <BackButton onClick={() => setView(0)} />
-                        {formularioPerfil ? (
-                            <Button type="button" variant="cloud" className="flex-1" onClick={() => setView(2)}>
-                                Próximo
-                            </Button>
-                        ) : (
-                            <Button
-                                className="flex-1"
-                                onClick={handleSave}
-                                loading={loading}
-                                loadingText="Salvando..."
-                            >
-                                Salvar alterações
-                            </Button>
-                        )}
+                        {saveButton}
+                        <Button type="button" variant="cloud" className="flex-1" onClick={() => setView(2)}>
+                            Próximo
+                        </Button>
                     </div>
                 </>
             )}
 
-            {/* Step 2: Bio */}
-            {view === 2 && (
+            {/* Último step: Bio */}
+            {view === bioView && (
                 <>
                     <div className="flex flex-col gap-1">
                         <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
@@ -230,9 +245,10 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                        <BackButton onClick={() => setView(0)} />
+                        <BackButton onClick={() => setView(formularioPerfil ? 1 : 0)} />
                         <Button
                             className="flex-1"
+                            disabled={!isView0Valid || loading}
                             onClick={handleSave}
                             loading={loading}
                             loadingText="Salvando..."
