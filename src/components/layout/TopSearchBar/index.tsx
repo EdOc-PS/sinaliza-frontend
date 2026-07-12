@@ -6,12 +6,9 @@ import { Cancel01Icon, Search01Icon, SignLanguageCIcon } from "@hugeicons/core-f
 import Input from "@components/ui/Input";
 import Select from "@components/ui/Select";
 import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
-import { GRAMMATICAL_META } from "@lib/constants/grammaticalClass";
-
-const grammaticalOptions = [
-    { value: "", label: "Todas as classes gramaticais" },
-    ...Object.entries(GRAMMATICAL_META).map(([value, meta]) => ({ value, label: meta.label })),
-];
+import { GetRequest } from "@requests";
+import { CATEGORIES } from "@routes/categories";
+import type { CategorySlim } from "@lib/constants/category";
 
 const TopSearchBar = () => {
     const navigate = useNavigate();
@@ -20,7 +17,18 @@ const TopSearchBar = () => {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
-    const [grammaticalClass, setGrammaticalClass] = useState("");
+    const [categoryId, setCategoryId] = useState("");
+    const [categories, setCategories] = useState<CategorySlim[]>([]);
+
+    const categoryOptions = [
+        { value: "", label: "Todas as categorias" },
+        ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ];
+
+    const loadCategories = async () => {
+        const res = await GetRequest<CategorySlim[]>(CATEGORIES.LIST());
+        if (res.success && res.object) setCategories(res.object);
+    };
 
     // Fecha o dropdown ao clicar fora
     useEffect(() => {
@@ -33,16 +41,20 @@ const TopSearchBar = () => {
         return () => document.removeEventListener("mousedown", handleOutsideClick);
     }, []);
 
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
     const submit = () => {
         const params = new URLSearchParams();
         if (search.trim()) params.set("search", search.trim());
         if (handConfigId) params.set("handConfigId", handConfigId);
-        if (grammaticalClass) params.set("grammaticalClass", grammaticalClass);
+        if (categoryId) params.set("categoryId", categoryId);
         setOpen(false);
         navigate(`/search?${params.toString()}`);
     };
 
-    const activeFilters = (handConfigId ? 1 : 0) + (grammaticalClass ? 1 : 0);
+    const activeFilters = (handConfigId ? 1 : 0) + (categoryId ? 1 : 0);
 
     return (
         <div ref={rootRef} className="relative">
@@ -94,13 +106,13 @@ const TopSearchBar = () => {
                         />
                     </div>
 
-                    {/* Classe gramatical */}
+                    {/* Categoria */}
                     <Select
                         icon={SignLanguageCIcon}
-                        options={grammaticalOptions}
-                        value={grammaticalClass}
-                        onChange={setGrammaticalClass}
-                        placeholder="Classe gramatical"
+                        options={categoryOptions}
+                        value={categoryId}
+                        onChange={setCategoryId}
+                        placeholder="Categoria"
                     />
 
                     {/* Botão buscar */}

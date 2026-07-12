@@ -72,7 +72,7 @@ const Select = ({
                     <span className={selectedOption ? "text-neutral-900" : "text-neutral-500"}>
                         {selectedOption?.label ?? placeholder}
                     </span>
-                    <HugeiconsIcon icon={ChevronDown} className="shrink-0 text-cloud-500" size={22} />
+                    <HugeiconsIcon icon={ChevronDown} className={`shrink-0 text-cloud-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`} size={22} />
                 </button>
             </div>
 

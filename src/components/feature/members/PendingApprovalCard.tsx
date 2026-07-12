@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckmarkCircle02Icon, Cancel01Icon, Mail01Icon, UserTime03Icon } from "@hugeicons/core-free-icons";
+import { Tick04Icon, Cancel02Icon, Mail01Icon, UserTime03Icon } from "@hugeicons/core-free-icons";
 
 import { RoleBadge } from "@components/ui/RoleBadge";
 import { getInitials } from "@lib/format/initials";
@@ -64,7 +64,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                     onClick={() => onReject(member)}
                                     className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
                                 >
-                                    <HugeiconsIcon icon={Cancel01Icon} size={16} />
+                                    <HugeiconsIcon icon={Cancel02Icon} size={22} />
                                     Recusar
                                 </button>
                                 <button
@@ -73,7 +73,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                     onClick={() => onApprove(member)}
                                     className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
                                 >
-                                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
+                                    <HugeiconsIcon icon={Tick04Icon} size={22}/>
                                     Aprovar
                                 </button>
                             </div>

@@ -17,7 +17,7 @@ import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/wor
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
 import { EmptyImage } from "@components/feature/sign-detail/EmptyImage";
 import { getYouTubeEmbedUrl, getYouTubeId } from "@/lib/youtube/youtube";
-import { GRAMMATICAL_META } from "@lib/constants/grammaticalClass";
+import { getCategoryBadgeClass, type CategorySlim } from "@lib/constants/category";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -35,7 +35,7 @@ import {
 interface SignDetail {
     id: string;
     name: string;
-    grammaticalClass: string;
+    category?: CategorySlim | null;
     handConfigId: string;
     videoUrl?: string | null;
     anotherUrl?: string | null;
@@ -46,7 +46,7 @@ interface SignDetail {
     tags: string[];
     creatorId: string;
     handConfig?: { id: string; name: string; imgUrl?: string | null } | null;
-    discipline?: { id: string; name: string } | null;
+    disciplines?: { id: string; name: string }[] | null;
 }
 
 const SignDetailPage = () => {
@@ -178,7 +178,7 @@ const SignDetailPage = () => {
     }
 
     const canManage = !!user?.roles?.includes("EDUCATOR") && sign.creatorId === user?.id;
-    const grammatical = GRAMMATICAL_META[sign.grammaticalClass] ?? GRAMMATICAL_META.OTHER;
+    const categoryClass = getCategoryBadgeClass(sign.category?.value);
     const youTubeId = sign.anotherUrl ? getYouTubeId(sign.anotherUrl) : null;
 
     return (
@@ -251,12 +251,16 @@ const SignDetailPage = () => {
                             <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
                                 {sign.name}
                             </h1>
-                            <span className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${grammatical.className}`}>
-                                {grammatical.label}
-                            </span>
+                            {sign.category && (
+                                <span className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${categoryClass}`}>
+                                    {sign.category.name}
+                                </span>
+                            )}
                         </div>
-                        {sign.discipline && (
-                            <span className="text-xs text-neutral-400">{sign.discipline.name}</span>
+                        {sign.disciplines && sign.disciplines.length > 0 && (
+                            <span className="text-xs text-neutral-400">
+                                {sign.disciplines.map((d) => d.name).join(" · ")}
+                            </span>
                         )}
                     </div>
 

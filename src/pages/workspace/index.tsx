@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { HandPointingRight02Icon } from "@hugeicons/core-free-icons";
 
 import { useFAB } from "@context/FABContext";
 
 import Modal from "@components/ui/Modal";
+import ActionButton from "@components/ui/ActionButton";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
+import { CategorySection } from "@components/feature/workspace/CategorySection";
+
+import createSignalImg from "@/assets/images/app/create-signal.png";
+import createHandImg from "@/assets/images/app/create-hand.png";
 
 const WorkspacePage = () => {
     const { registerRefresh } = useFAB();
@@ -60,34 +63,24 @@ const WorkspacePage = () => {
                     {/* Cards de ação */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         {/* Criar novo sinal — ocupa mais espaço */}
-                        <button
+                        <ActionButton
+                            variant="cloud"
+                            image={createSignalImg}
+                            title="Criar novo sinal"
+                            description="Publique um sinal no repositório global"
                             onClick={() => setSignModal(true)}
-                            className="group flex flex-[1.5] items-center gap-4 rounded-2xl bg-cloud-500 px-5 py-4 text-left transition-all hover:bg-cloud-600 cursor-pointer"
-                        >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                                <img src="src/assets/images/app/create-signal.png" alt="" className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-white">Criar novo sinal</p>
-                                <p className="text-sm text-white/60 truncate">Publique um sinal no repositório global</p>
-                            </div>
-                            <HugeiconsIcon icon={HandPointingRight02Icon} size={20} className="text-white/50 group-hover:text-white/80 transition-colors shrink-0" />
-                        </button>
+                            className="flex-[1.5]"
+                        />
 
                         {/* Nova configuração de mão */}
-                        <button
+                        <ActionButton
+                            variant="lime"
+                            image={createHandImg}
+                            title="Nova configuração de mão"
+                            description="Adicione ao teclado visual"
                             onClick={() => setHandModal(true)}
-                            className="group flex flex-1 items-center gap-4 rounded-2xl bg-lime-100 px-5 py-4 text-left transition-all hover:bg-lime-200 cursor-pointer"
-                        >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lime-200">
-                                <img src="src/assets/images/app/create-hand.png" alt="" className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-lime-700">Nova configuração de mão</p>
-                                <p className="text-sm text-lime-600 truncate">Adicione ao teclado visual</p>
-                            </div>
-                            <HugeiconsIcon icon={HandPointingRight02Icon} size={20} className="text-lime-400 group-hover:text-lime-600 transition-colors shrink-0" />
-                        </button>
+                            className="flex-1"
+                        />
                     </div>
                 </div>
 
@@ -97,6 +90,9 @@ const WorkspacePage = () => {
                         refreshTrigger={refreshTrigger}
                     />
                 </div>
+
+                {/* Categorias — CRUD para o educador */}
+                <CategorySection />
             </section>
 
             {/* Modal criar sinal */}

@@ -1,14 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AddCircleIcon, Search01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons";
+import { Search01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest, DeleteRequest } from "@requests";
 import { USERS } from "@routes/users";
 
 import Input from "@components/ui/Input";
-import Button from "@components/ui/Button";
+import ActionButton from "@components/ui/ActionButton";
 import Modal from "@components/ui/Modal";
+
+import createEducatorImg from "@/assets/images/app/create-educator.webp";
 import Spinner from "@components/ui/Spinner";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { EducatorForm } from "@components/feature/educators/EducatorForm";
@@ -87,9 +89,14 @@ const EducatorsPage = () => {
                                 placeholder="Buscar por nome ou email..."
                             />
                         </div>
-                        <Button onClick={() => setFormModal({ open: true })} icon={AddCircleIcon} className="shrink-0">
-                            Novo educador
-                        </Button>
+                        <ActionButton
+                            variant="cloud"
+                            image={createEducatorImg}
+                            title="Novo educador"
+                            description="Cadastre um professor ou intérprete"
+                            onClick={() => setFormModal({ open: true })}
+                            className="flex-1"
+                        />
                     </div>
                 </div>
 

@@ -10,6 +10,7 @@ import InputVideo from "@components/ui/InputVideo";
 import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
 import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
+import MultiSelect from "@components/ui/MultiSelect";
 import ProgressBar from "@components/layout/ProgressBar";
 import InputCheck from "@/components/ui/InputCheck";
 import BackButton from "@components/ui/BackButton";
@@ -30,7 +31,7 @@ import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests
 import { isValidYouTubeUrl } from "@lib/youtube/youtube";
 
 interface SignOptions {
-    grammaticalClasses: GenericOption[];
+    categories: GenericOption[];
     disciplines: GenericOption[];
 }
 
@@ -43,9 +44,9 @@ interface SignFormProps {
 interface SignDetail {
     id: string;
     name: string;
-    grammaticalClass: string;
+    category?: { id: string; name: string; value: string } | null;
     handConfigId: string;
-    disciplineId?: string | null;
+    disciplines?: { id: string; name: string }[] | null;
     tags: string[];
     examplePt?: string | null;
     exampleLibras?: string | null;
@@ -60,8 +61,8 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     const [view, setView] = useState(0);
 
     const [name, setName]                         = useState("");
-    const [grammaticalClass, setGrammaticalClass] = useState("");
-    const [disciplineId, setDisciplineId]         = useState("");
+    const [categoryId, setCategoryId]             = useState("");
+    const [disciplineIds, setDisciplineIds]       = useState<string[]>([]);
     const [handConfigId, setHandConfigId]         = useState("");
     const [tags, setTags]                         = useState<string[]>([]);
     const [examplePt, setExamplePt]               = useState("");
@@ -76,7 +77,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     const [loading, setLoading]                       = useState(false);
     const [loadingData, setLoadingData]               = useState(false);
     const [loadingOptions, setLoadingOptions]         = useState(false);
-    const [grammaticalOptions, setGrammaticalOptions] = useState<GenericOption[]>([]);
+    const [categoryOptions, setCategoryOptions]       = useState<GenericOption[]>([]);
     const [disciplineOptions, setDisciplineOptions]   = useState<GenericOption[]>([]);
 
     const loadAll = async () => {
@@ -91,7 +92,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             const [optionsRes, signRes] = await Promise.all(requests);
 
             if (optionsRes.success && optionsRes.object) {
-                setGrammaticalOptions(optionsRes.object.grammaticalClasses ?? []);
+                setCategoryOptions(optionsRes.object.categories ?? []);
                 setDisciplineOptions(optionsRes.object.disciplines ?? []);
             }
 
@@ -103,9 +104,9 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                 }
                 const s: SignDetail = signRes.object;
                 setName(s.name);
-                setGrammaticalClass(s.grammaticalClass);
+                setCategoryId(s.category?.id ?? "");
                 setHandConfigId(s.handConfigId);
-                setDisciplineId(s.disciplineId ?? "");
+                setDisciplineIds((s.disciplines ?? []).map((d) => d.id));
                 setTags(s.tags ?? []);
                 setExamplePt(s.examplePt ?? "");
                 setExampleLibras(s.exampleLibras ?? "");
@@ -125,10 +126,15 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
         const formData = new FormData();
         formData.append("name", name.trim());
-        formData.append("grammaticalClass", grammaticalClass);
+        formData.append("categoryId", categoryId);
         formData.append("handConfigId", handConfigId);
 
-        if (disciplineId) formData.append("disciplineId", disciplineId);
+        // Disciplinas (m2m). Em edição, sempre envia (mesmo vazio) para permitir remover todas.
+        if (disciplineIds.length > 0) {
+            formData.append("disciplineIds", disciplineIds.join(","));
+        } else if (isEditMode) {
+            formData.append("disciplineIds", "");
+        }
         if (videoFile) formData.append("video", videoFile);
         if (anotherUrl.trim()) formData.append("anotherUrl", anotherUrl.trim());
         if (imageFile) formData.append("image", imageFile);
@@ -159,8 +165,8 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     // Step 0: informações principais (sem tags)
     const isStep0Valid =
         nameValid &&
-        !!grammaticalClass &&
-        !!disciplineId &&
+        !!categoryId &&
+        disciplineIds.length > 0 &&
         !!handConfigId;
 
     // Step 2: tags (obrigatório pelo menos uma)
@@ -176,8 +182,25 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     // URL preenchida precisa ser um link válido do YouTube
     const isMediaValid = hasMedia && (!urlFilled || urlIsYouTube);
 
-    useEffect(() => { 
-        loadAll(); 
+    // Em edição: permite salvar de qualquer step, desde que tudo esteja válido
+    const isFormValid = isStep0Valid && isTagsValid && isMediaValid;
+
+    // Botão de salvar direto (só na edição, exceto no último step que já tem o submit final)
+    const editSaveButton = isEditMode && view !== 4 && (
+        <Button
+            type="submit"
+            variant="outline"
+            className="flex-1"
+            disabled={!isFormValid}
+            loading={loading}
+            loadingText="Salvando..."
+        >
+            Salvar alterações
+        </Button>
+    );
+
+    useEffect(() => {
+        loadAll();
     }, [signId]);
 
     if (loadingData) {
@@ -190,7 +213,11 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <ProgressBar currentStep={view} totalSteps={5} />
+            <ProgressBar
+                currentStep={view}
+                totalSteps={5}
+                onStepClick={isEditMode ? setView : undefined}
+            />
 
             {/* Step 0: Informações principais */}
             {view === 0 && (
@@ -225,33 +252,32 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                         )}
                     </div>
 
-                    {/* Classe gramatical / Disciplina */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="grammatical-class" isRequired>Classe gramatical</Label>
-                            <Select
-                                id="grammatical-class"
-                                icon={TextSelectIcon}
-                                placeholder={loadingOptions ? "Carregando..." : "Selecione"}
-                                options={grammaticalOptions}
-                                value={grammaticalClass}
-                                onChange={setGrammaticalClass}
-                                disabled={loadingOptions}
-                            />
-                        </div>
+                    {/* Categoria */}
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="category" isRequired>Categoria</Label>
+                        <Select
+                            id="category"
+                            icon={TextSelectIcon}
+                            placeholder={loadingOptions ? "Carregando..." : "Selecione"}
+                            options={categoryOptions}
+                            value={categoryId}
+                            onChange={setCategoryId}
+                            disabled={loadingOptions}
+                        />
+                    </div>
 
-                        <div className="flex flex-col gap-1.5">
-                            <Label htmlFor="discipline" isRequired>Disciplina</Label>
-                            <Select
-                                id="discipline"
-                                icon={LayersIcon}
-                                placeholder={loadingOptions ? "Carregando..." : "Selecione"}
-                                options={disciplineOptions}
-                                value={disciplineId}
-                                onChange={setDisciplineId}
-                                disabled={loadingOptions}
-                            />
-                        </div>
+                    {/* Disciplinas (múltiplas) — ocupa a linha inteira */}
+                    <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="disciplines" isRequired>Disciplinas</Label>
+                        <MultiSelect
+                            id="disciplines"
+                            icon={LayersIcon}
+                            placeholder={loadingOptions ? "Carregando..." : "Selecione uma ou mais disciplinas"}
+                            options={disciplineOptions}
+                            value={disciplineIds}
+                            onChange={setDisciplineIds}
+                            disabled={loadingOptions}
+                        />
                     </div>
 
                     {/* Config. de mão (teclado visual) */}
@@ -260,14 +286,15 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                         <HandConfigPicker value={handConfigId} onChange={setHandConfigId} />
                     </div>
 
-                    <div className="flex gap-3 pt-1 justify-end">
-                        <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>
+                    <div className="flex gap-3 pt-1">
+                        <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
                             Cancelar
                         </Button>
+                        {editSaveButton}
                         <Button
                             type="button"
                             variant="cloud"
-                            className="w-3/5"
+                            className="flex-1"
                             disabled={!isStep0Valid}
                             onClick={() => setView(1)}
                         >
@@ -321,6 +348,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
                     <div className="flex gap-3 pt-1">
                         <BackButton onClick={() => setView(0)} />
+                        {editSaveButton}
                         <Button
                             type="button"
                             variant="cloud"
@@ -360,6 +388,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
                     <div className="flex gap-3 pt-1">
                         <BackButton onClick={() => setView(1)} />
+                        {editSaveButton}
                         <Button
                             type="button"
                             variant="cloud"
@@ -395,6 +424,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
                     <div className="flex gap-3 pt-1">
                         <BackButton onClick={() => setView(2)} />
+                        {editSaveButton}
                         <Button
                             type="button"
                             variant="cloud"

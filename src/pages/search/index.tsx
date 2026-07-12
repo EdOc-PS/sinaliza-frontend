@@ -16,7 +16,7 @@ const SearchResultsPage = () => {
 
     const search = params.get("search") ?? "";
     const handConfigId = params.get("handConfigId") ?? "";
-    const grammaticalClass = params.get("grammaticalClass") ?? "";
+    const categoryId = params.get("categoryId") ?? "";
 
     const [loading, setLoading] = useState(false);
     const [signs, setSigns] = useState<SignCardData[]>([]);
@@ -27,7 +27,7 @@ const SearchResultsPage = () => {
             const query: Record<string, string> = {};
             if (search) query.search = search;
             if (handConfigId) query.handConfigId = handConfigId;
-            if (grammaticalClass) query.grammaticalClass = grammaticalClass;
+            if (categoryId) query.categoryId = categoryId;
 
             const res = await GetRequest<SignCardData[]>(SEARCH.SIGNS(), query);
             if (!res.success) { toast.error("Falha na busca: " + res.message); return; }
@@ -35,7 +35,7 @@ const SearchResultsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [search, handConfigId, grammaticalClass]);
+    }, [search, handConfigId, categoryId]);
 
     useEffect(() => {
         runSearch();

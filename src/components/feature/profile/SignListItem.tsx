@@ -1,13 +1,13 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SignLanguageCIcon } from "@hugeicons/core-free-icons";
 
-import { GRAMMATICAL_META } from "@lib/constants/grammaticalClass";
+import { type CategorySlim } from "@lib/constants/category";
 import { getYouTubeThumbnail } from "@lib/youtube/youtube";
 
 export interface SignListData {
     id: string;
     name: string;
-    grammaticalClass: string;
+    category?: CategorySlim | null;
     videoUrl: string | null;
     anotherUrl: string | null;
 }
@@ -20,7 +20,6 @@ interface SignListItemProps {
 
 // Linha compacta de sinal — usada nas listas de "últimos acessados" e "últimas curtidas"
 export const SignListItem = ({ sign, onClick, meta }: SignListItemProps) => {
-    const grammatical = GRAMMATICAL_META[sign.grammaticalClass] ?? GRAMMATICAL_META.OTHER;
     const thumbnail = !sign.videoUrl && sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null;
 
     return (
@@ -41,10 +40,10 @@ export const SignListItem = ({ sign, onClick, meta }: SignListItemProps) => {
                 )}
             </div>
 
-            {/* Nome + classe gramatical */}
+            {/* Nome + categoria */}
             <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-cloud-600">{sign.name}</p>
-                <p className="truncate text-xs text-neutral-400">{grammatical.label}</p>
+                {sign.category && <p className="truncate text-xs text-neutral-400">{sign.category.name}</p>}
             </div>
 
             {/* Meta (ex: horário) */}

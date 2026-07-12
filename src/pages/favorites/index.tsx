@@ -67,7 +67,7 @@ const FavoritesPage = () => {
                                 <HugeiconsIcon icon={SignLanguageCIcon} size={18} className="text-salmon-500" />
                                 <span>
                                     <b className="text-cloud-600">
-                                        {new Set(signs.map((s) => s.grammaticalClass)).size}
+                                        {new Set(signs.map((s) => s.category?.value).filter(Boolean)).size}
                                     </b> categorias
                                 </span>
                             </div>

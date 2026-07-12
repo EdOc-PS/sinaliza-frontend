@@ -22,13 +22,13 @@ import Modal from "@components/ui/Modal";
 import { DeleteRequest, PostRequest } from "@requests";
 import { FAVORITES } from "@routes/favorites";
 import { getYouTubeEmbedUrl, getYouTubeId, getYouTubeThumbnail } from "@lib/youtube/youtube";
-import { GRAMMATICAL_META } from "@lib/constants/grammaticalClass";
+import { getCategoryBadgeClass, type CategorySlim } from "@lib/constants/category";
 import { formatDuration } from "@lib/format/duration";
 
 export interface SignCardData {
     id: string;
     name: string;
-    grammaticalClass: string;
+    category?: CategorySlim | null;
     videoUrl: string | null;
     anotherUrl: string | null;
     createdAt: string;
@@ -79,7 +79,7 @@ export const SignCard = ({
     const [favLoading, setFavLoading] = useState(false);
     const [videoModal, setVideoModal] = useState(false);
 
-    const grammatical = GRAMMATICAL_META[sign.grammaticalClass] ?? GRAMMATICAL_META.OTHER;
+    const categoryClass = getCategoryBadgeClass(sign.category?.value);
     const youtubeId = sign.anotherUrl ? getYouTubeId(sign.anotherUrl) : null;
     const youtubeThumbnail = !sign.videoUrl && sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null;
     const hasVideo = !!sign.videoUrl || !!youtubeId;
@@ -224,9 +224,11 @@ export const SignCard = ({
                         <h3 className="font-baskerville text-base font-bold text-cloud-600 leading-snug truncate">
                             {sign.name}
                         </h3>
-                        <span className={`w-fit rounded-lg px-2 py-0.5 text-[11px] font-semibold ${grammatical.className}`}>
-                            {grammatical.label}
-                        </span>
+                        {sign.category && (
+                            <span className={`w-fit rounded-lg px-2 py-0.5 text-[11px] font-semibold ${categoryClass}`}>
+                                {sign.category.name}
+                            </span>
+                        )}
                     </div>
 
                     {/* Menu de 3 pontos */}
