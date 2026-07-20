@@ -18,6 +18,7 @@ import HistoryPage from '@/pages/history'
 import ProfilePage from '@/pages/profile'
 import SignDetailPage from '@/pages/sign-detail'
 import SearchResultsPage from '@/pages/search'
+import GlossaryPage from '@/pages/glossary'
 import WorkspacePage from '@/pages/workspace'
 import EducatorsPage from '@/pages/educators'
 import MembersPage from '@/pages/members'
@@ -83,7 +84,7 @@ const routes: RouteObject[] = [
                     },
                     {
                         path: 'glossary',
-                        element: <ClassroomsPage />,
+                        element: <GlossaryPage />,
                     },
                     {
                         path: 'favorites',

@@ -81,7 +81,7 @@ function cellPosition(
     };
 }
 
-function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisShape[] } {
+function generateItems(seed: string, pool: (typeof BookIcon)[]): { icons: MemphisIcon[]; shapes: MemphisShape[] } {
     const rng = createRng(seed);
 
     // Ícones: grade 4×2, usa 7 células
@@ -94,7 +94,7 @@ function generateItems(seed: string): { icons: MemphisIcon[]; shapes: MemphisSha
     const icons: MemphisIcon[] = iconCells.map(cellIdx => {
         const { x, y } = cellPosition(cellIdx, ICON_COLS, ICON_ROWS, 6, rng);
         return {
-            icon: ICON_POOL[Math.floor(rng() * ICON_POOL.length)],
+            icon: pool[Math.floor(rng() * pool.length)],
             x, y,
             size: rngBetween(rng, 14, 36),
             rotate: rngBetween(rng, -50, 50),
@@ -127,10 +127,12 @@ interface CardMemphisBackgroundProps {
     seed: string;
     color: string;
     rounded?: string;
+    /** Pool de ícones do confete. Repita um ícone para dar mais peso a ele (ex: corações em Favoritos). */
+    icons?: (typeof BookIcon)[];
 }
 
-export const CardMemphisBackground = ({ seed, color, rounded = "rounded-t-3xl" }: CardMemphisBackgroundProps) => {
-    const { icons, shapes } = generateItems(seed);
+export const CardMemphisBackground = ({ seed, color, rounded = "rounded-t-3xl", icons: iconPool = ICON_POOL }: CardMemphisBackgroundProps) => {
+    const { icons, shapes } = generateItems(seed, iconPool);
 
     return (
         <div

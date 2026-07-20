@@ -17,7 +17,11 @@ import { HISTORY } from "@routes/history";
 
 import Spinner from "@components/ui/Spinner";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
+import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
+
+// Confete de relógios/tempo
+const HISTORY_ICONS = [Clock01Icon, Clock01Icon, Clock01Icon, Rotate01Icon, Calendar03Icon, ViewIcon];
 
 interface HistorySign extends SignCardData {
     accessedAt: string;
@@ -119,37 +123,38 @@ const HistoryPage = () => {
     return (
         <section className="flex flex-col gap-8">
             {/* Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-sky-100">
+            <div className="relative overflow-hidden rounded-3xl">
+                <CardMemphisBackground seed="history" color="#56B2D4" rounded="rounded-3xl" icons={HISTORY_ICONS} />
                 <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
                     {/* Ícone */}
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-400/20 ">
-                        <HugeiconsIcon icon={Rotate01Icon} size={28} className="text-sky-600" />
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 ">
+                        <HugeiconsIcon icon={Rotate01Icon} size={28} className="text-white" />
                     </div>
 
                     {/* Título + descrição */}
                     <div>
-                        <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
+                        <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-white">
                             Histórico de sinais
                         </h1>
-                        <p className="mt-1.5 max-w-lg text-sm text-cloud-400">
+                        <p className="mt-1.5 max-w-lg text-sm text-white/85">
                             Tudo o que você acessou recentemente. Volte rapidamente aos sinais com que esteve trabalhando.
                         </p>
                     </div>
 
                     {/* Meta */}
                     {!loading && signs.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-cloud-500">
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-white/90">
                             <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={ViewIcon} size={18} className="text-sky-500" />
-                                <span><b className="text-cloud-600">{signs.length}</b> interações</span>
+                                <HugeiconsIcon icon={ViewIcon} size={18} className="text-white" />
+                                <span><b className="text-white">{signs.length}</b> interações</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={Calendar03Icon} size={18} className="text-sky-500" />
-                                <span><b className="text-cloud-600">{distinctDays}</b> {distinctDays === 1 ? "dia" : "dias"}</span>
+                                <HugeiconsIcon icon={Calendar03Icon} size={18} className="text-white" />
+                                <span><b className="text-white">{distinctDays}</b> {distinctDays === 1 ? "dia" : "dias"}</span>
                             </div>
                             {lastAccess && (
                                 <div className="flex items-center gap-1.5">
-                                    <HugeiconsIcon icon={Clock01Icon} size={18} className="text-sky-500" />
+                                    <HugeiconsIcon icon={Clock01Icon} size={18} className="text-white" />
                                     <span>Última: {relativeTime(lastAccess)}</span>
                                 </div>
                             )}

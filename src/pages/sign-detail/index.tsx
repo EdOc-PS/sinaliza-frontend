@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-import { DeleteRequest, GetRequest, PostRequest } from "@requests";
+import { DeleteRequest, GetRequest, PatchRequest, PostRequest } from "@requests";
 import { SIGNS } from "@routes/signs";
 import { FAVORITES } from "@routes/favorites";
 import { HISTORY } from "@routes/history";
@@ -12,6 +12,7 @@ import { useAuth } from "@context/AuthContext";
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
+import ConfirmModal from "@components/layout/ConfirmModal";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
@@ -26,10 +27,13 @@ import {
     DeleteIcon,
     Edit02Icon,
     FavouriteIcon,
+    GlobalEducationIcon,
     HandPointingLeft02Icon,
+    Medal06Icon,
     RotateRight01Icon,
     SignLanguageCIcon,
     SpeechIcon,
+    Time01Icon,
 } from "@hugeicons/core-free-icons";
 
 interface SignDetail {
@@ -45,6 +49,7 @@ interface SignDetail {
     movementDescription?: string | null;
     tags: string[];
     creatorId: string;
+    globalStatus?: "PRIVATE" | "PENDING" | "PUBLIC" | "REJECTED";
     handConfig?: { id: string; name: string; imgUrl?: string | null } | null;
     disciplines?: { id: string; name: string }[] | null;
 }
@@ -63,6 +68,8 @@ const SignDetailPage = () => {
     const [editModal, setEditModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [promoteModal, setPromoteModal] = useState(false);
+    const [promoting, setPromoting] = useState(false);
 
     const carouselRef = useRef<HTMLDivElement>(null);
     const [canPrev, setCanPrev] = useState(false);
@@ -131,6 +138,20 @@ const SignDetailPage = () => {
             toast.success(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos");
         } finally {
             setFavLoading(false);
+        }
+    };
+
+    const handlePromote = async () => {
+        if (!id) return;
+        setPromoting(true);
+        try {
+            const res = await PatchRequest(SIGNS.PROMOTE(id), {});
+            if (!res.success) { toast.error(res.message); return; }
+            toast.success("Sinal enviado para aprovação do gestor!");
+            setPromoteModal(false);
+            loadSign();
+        } finally {
+            setPromoting(false);
         }
     };
 
@@ -256,6 +277,18 @@ const SignDetailPage = () => {
                                     {sign.category.name}
                                 </span>
                             )}
+                            {sign.globalStatus === "PUBLIC" && (
+                                <span className="flex items-center gap-1 rounded-lg bg-lime-100 px-2.5 py-1 text-xs font-semibold text-lime-700">
+                                    <HugeiconsIcon icon={GlobalEducationIcon} size={14} />
+                                    Público
+                                </span>
+                            )}
+                            {sign.globalStatus === "PENDING" && (
+                                <span className="flex items-center gap-1 rounded-lg bg-sunflower-100 px-2.5 py-1 text-xs font-semibold text-sunflower-700">
+                                    <HugeiconsIcon icon={Time01Icon} size={14} />
+                                    Aguardando aprovação
+                                </span>
+                            )}
                         </div>
                         {sign.disciplines && sign.disciplines.length > 0 && (
                             <span className="text-xs text-neutral-400">
@@ -292,6 +325,15 @@ const SignDetailPage = () => {
                                     <HugeiconsIcon icon={Edit02Icon} size={18} />
                                     Editar
                                 </button>
+                                {(sign.globalStatus === "PRIVATE" || sign.globalStatus === "REJECTED") && (
+                                    <button
+                                        onClick={() => setPromoteModal(true)}
+                                        className="flex items-center gap-2 rounded-2xl bg-campfire-100 hover:bg-campfire-200 transition-colors px-3.5 py-2 text-sm font-medium text-campfire-600"
+                                    >
+                                        <HugeiconsIcon icon={Medal06Icon} size={18} />
+                                        Promover
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => setDeleteModal(true)}
                                     className="flex items-center gap-2 rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-3.5 py-2 text-sm font-medium text-salmon-600"
@@ -396,6 +438,24 @@ const SignDetailPage = () => {
                     onSuccess={() => { setEditModal(false); loadSign(); }}
                 />
             </Modal>
+
+            {/* Modal de confirmar promoção */}
+            <ConfirmModal
+                open={promoteModal}
+                onClose={() => setPromoteModal(false)}
+                onConfirm={handlePromote}
+                loading={promoting}
+                title={<>Promover <span className="text-campfire-600 italic">Sinal</span>?</>}
+                description={
+                    <>
+                        O sinal{" "}
+                        <span className="font-semibold text-campfire-600 italic">{sign.name}</span>{" "}
+                        se tornará <b>público</b> no glossário global após a aprovação de um gestor. Ele
+                        continuará disponível normalmente nas disciplinas.
+                    </>
+                }
+                confirmText="Enviar para aprovação"
+            />
 
             {/* Modal de confirmar exclusão */}
             <ConfirmDeleteModal

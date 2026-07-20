@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-import { DeleteRequest, GetRequest } from "@requests";
+import { DeleteRequest, GetRequest, PatchRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
 import { SIGNS } from "@routes/signs";
 import { useAuth } from "@context/AuthContext";
@@ -10,6 +10,7 @@ import { useAuth } from "@context/AuthContext";
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
+import ConfirmModal from "@components/layout/ConfirmModal";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
@@ -65,6 +66,8 @@ const ClassroomDetailPage = () => {
     const [leaveModal, setLeaveModal] = useState(false);
     const [leaving, setLeaving] = useState(false);
     const [addMemberModal, setAddMemberModal] = useState(false);
+    const [promoteModal, setPromoteModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
+    const [promoting, setPromoting] = useState(false);
     const [removeMemberModal, setRemoveMemberModal] = useState<{ open: boolean; member?: Member }>({ open: false });
     const [removingMember, setRemovingMember] = useState(false);
 
@@ -134,6 +137,19 @@ const ClassroomDetailPage = () => {
             navigate("/classrooms");
         } finally {
             setLeaving(false);
+        }
+    };
+
+    const handlePromoteSign = async () => {
+        if (!promoteModal.signId) return;
+        setPromoting(true);
+        try {
+            const res = await PatchRequest(SIGNS.PROMOTE(promoteModal.signId), {});
+            if (!res.success) { toast.error(res.message); return; }
+            toast.success("Sinal enviado para aprovação do gestor!");
+            setPromoteModal({ open: false });
+        } finally {
+            setPromoting(false);
         }
     };
 
@@ -287,6 +303,7 @@ const ClassroomDetailPage = () => {
                                         onClick={() => navigate(`/signs/${sign.id}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
                                     />
                                 ))}
                             </div>
@@ -326,6 +343,7 @@ const ClassroomDetailPage = () => {
                                         onClick={() => navigate(`/signs/${sign.id}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
                                     />
                                 ))}
                             </div>
@@ -420,6 +438,24 @@ const ClassroomDetailPage = () => {
                     </>
                 }
                 confirmText="Excluir sinal"
+            />
+
+            {/* Modal de confirmar promoção de sinal */}
+            <ConfirmModal
+                open={promoteModal.open}
+                onClose={() => setPromoteModal({ open: false })}
+                onConfirm={handlePromoteSign}
+                loading={promoting}
+                title={<>Promover <span className="text-campfire-600 italic">Sinal</span>?</>}
+                description={
+                    <>
+                        O sinal{" "}
+                        <span className="font-semibold text-campfire-600 italic">{promoteModal.name}</span>{" "}
+                        se tornará <b>público</b> no glossário global após a aprovação de um gestor. Ele
+                        continuará disponível normalmente nas disciplinas.
+                    </>
+                }
+                confirmText="Enviar para aprovação"
             />
 
             {/* Modal de adicionar participante */}

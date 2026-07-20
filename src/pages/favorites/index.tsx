@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { FavouriteIcon, Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
+import { FavouriteIcon, Search01Icon, SignLanguageCIcon, StarIcon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
 import { FAVORITES } from "@routes/favorites";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
+import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
+
+// Confete majoritariamente de corações
+const FAVORITE_ICONS = [FavouriteIcon, FavouriteIcon, FavouriteIcon, FavouriteIcon, FavouriteIcon, StarIcon];
 
 const FavoritesPage = () => {
     const navigate = useNavigate();
@@ -39,34 +43,35 @@ const FavoritesPage = () => {
     return (
         <section className="flex flex-col gap-8">
             {/* Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-salmon-100">
+            <div className="relative overflow-hidden rounded-3xl">
+                <CardMemphisBackground seed="favorites" color="#EEA2A2" rounded="rounded-3xl" icons={FAVORITE_ICONS} />
                 <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
                     {/* Ícone */}
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-salmon-400/20 ">
-                        <HugeiconsIcon icon={FavouriteIcon} size={28} className="text-salmon-600" />
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 ">
+                        <HugeiconsIcon icon={FavouriteIcon} size={28} className="text-white" />
                     </div>
 
                     {/* Título + descrição */}
                     <div>
-                        <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
+                        <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-white">
                             Meus favoritos
                         </h1>
-                        <p className="mt-1.5 max-w-lg text-sm text-cloud-400">
+                        <p className="mt-1.5 max-w-lg text-sm text-white/85">
                             Os sinais que você salvou para acessar rapidamente. Reúna aqui os sinais que mais usa em sala de aula.
                         </p>
                     </div>
 
                     {/* Meta */}
                     {!loading && (
-                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-cloud-500">
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-white/90">
                             <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={FavouriteIcon} size={18} className="text-salmon-500" />
-                                <span><b className="text-cloud-600">{signs.length}</b> sinais favoritados</span>
+                                <HugeiconsIcon icon={FavouriteIcon} size={18} className="text-white" />
+                                <span><b className="text-white">{signs.length}</b> sinais favoritados</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={SignLanguageCIcon} size={18} className="text-salmon-500" />
+                                <HugeiconsIcon icon={SignLanguageCIcon} size={18} className="text-white" />
                                 <span>
-                                    <b className="text-cloud-600">
+                                    <b className="text-white">
                                         {new Set(signs.map((s) => s.category?.value).filter(Boolean)).size}
                                     </b> categorias
                                 </span>

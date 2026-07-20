@@ -46,6 +46,7 @@ const menuItemsByRole: Record<string, MenuEntry[]> = {
         { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" }
     ],
     GUARDIAN: [
+        { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
     ],
     MANAGER: [

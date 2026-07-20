@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useFAB } from "@context/FABContext";
+import { useAuth } from "@context/AuthContext";
 
 import Modal from "@components/ui/Modal";
 import ActionButton from "@components/ui/ActionButton";
@@ -8,12 +9,16 @@ import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { CategorySection } from "@components/feature/workspace/CategorySection";
+import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 
 import createSignalImg from "@/assets/images/app/create-signal.png";
 import createHandImg from "@/assets/images/app/create-hand.png";
 
 const WorkspacePage = () => {
     const { registerRefresh } = useFAB();
+    const { user } = useAuth();
+    const isManager = !!user?.roles?.includes("MANAGER");
+    const isEducator = !!user?.roles?.includes("EDUCATOR");
 
     const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
     const [editModal, setEditModal] = useState<boolean>(false);
@@ -90,6 +95,9 @@ const WorkspacePage = () => {
                         refreshTrigger={refreshTrigger}
                     />
                 </div>
+
+                {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}
+                {(isManager || isEducator) && <PromotionSection canReview={isManager} />}
 
                 {/* Categorias — CRUD para o educador */}
                 <CategorySection />
