@@ -9,6 +9,7 @@ import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { CategorySection } from "@components/feature/workspace/CategorySection";
+import { GlossaryDisciplineSection } from "@components/feature/workspace/GlossaryDisciplineSection";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 
 import createSignalImg from "@/assets/images/app/create-signal.png";
@@ -101,6 +102,9 @@ const WorkspacePage = () => {
 
                 {/* Categorias — CRUD para o educador */}
                 <CategorySection />
+
+                {/* Disciplinas do glossário — CRUD apenas para o gestor */}
+                {isManager && <GlossaryDisciplineSection />}
             </section>
 
             {/* Modal criar sinal */}

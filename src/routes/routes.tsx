@@ -3,6 +3,7 @@ import type { RouteObject } from 'react-router-dom'
 
 // Publico
 import Home from '@pages/home'
+import PublicGlossaryPage from '@pages/public-glossary'
 
 // Auth
 import LoginPage from '@pages/auth/login'
@@ -29,6 +30,11 @@ const routes: RouteObject[] = [
     {
         path: '/',
         element: <Home />,
+    },
+    {
+        // Repositório público — glossário aberto, sem autenticação
+        path: '/public-glossary',
+        element: <PublicGlossaryPage />,
     },
     {
         path: '/auth',

@@ -52,6 +52,8 @@ interface SignCardProps {
     onDelete?: () => void;
     onPromote?: () => void;
     actions?: SignCardAction[];
+    /** Glossário público (sem login): esconde o menu de ações e o clique abre o vídeo */
+    publicMode?: boolean;
 }
 
 // Delay do hover (desktop) e do long-press (mobile) para iniciar a reprodução
@@ -68,6 +70,7 @@ export const SignCard = ({
     onDelete,
     onPromote,
     actions,
+    publicMode = false,
 }: SignCardProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const hoverTimer = useRef<number | null>(null);
@@ -133,6 +136,9 @@ export const SignCard = ({
 
     useEffect(() => clearTimers, []);
 
+    // No glossário público não há tela de detalhe — o clique abre direto o vídeo
+    const handleCardClick = publicMode ? () => setVideoModal(true) : onClick;
+
     return (
         <>
             <div
@@ -146,7 +152,7 @@ export const SignCard = ({
                 {/* Thumbnail */}
                 <div
                     className="relative aspect-video bg-cloud-500 rounded-2xl overflow-hidden cursor-pointer"
-                    onClick={onClick}
+                    onClick={handleCardClick}
                 >
                     {/* Vídeo do R2 — frame inicial serve de thumbnail, toca no hover/long-press */}
                     {sign.videoUrl ? (
@@ -219,7 +225,7 @@ export const SignCard = ({
                 <div className="flex items-start justify-between gap-2 pt-2.5 px-1">
                     <div
                         className="flex flex-col gap-1 cursor-pointer flex-1 min-w-0"
-                        onClick={onClick}
+                        onClick={handleCardClick}
                     >
                         <h3 className="font-baskerville text-base font-bold text-cloud-600 leading-snug truncate">
                             {sign.name}
@@ -231,8 +237,8 @@ export const SignCard = ({
                         )}
                     </div>
 
-                    {/* Menu de 3 pontos */}
-                    <div onClick={(e) => e.stopPropagation()}>
+                    {/* Menu de 3 pontos — oculto no glossário público (ações exigem login) */}
+                    <div onClick={(e) => e.stopPropagation()} className={publicMode ? "hidden" : ""}>
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                                 <button type="button" className="mt-0.5 p-1.5 rounded-xl hover:bg-cloud-100 transition-colors focus:outline-none text-neutral-400 hover:text-cloud-600">

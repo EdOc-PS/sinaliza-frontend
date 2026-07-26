@@ -162,6 +162,87 @@ button {
     display: none;
 }
 
+/* ─────────────────────────────────────────────
+   Animações da landing page
+   ───────────────────────────────────────────── */
+
+/* Reveal ao entrar na viewport (controlado pelo hook useScrollReveal).
+   O estado oculto só é aplicado quando o hook marca `.reveal-active` no <html> —
+   assim, sem JS (ou se o IntersectionObserver não entregar callbacks, como em
+   crawlers e webviews), o conteúdo aparece normalmente em vez de ficar invisível. */
+.reveal-active .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    will-change: opacity, transform;
+}
+
+.reveal-active .reveal,
+.reveal-active .reveal.is-visible {
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-active .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Entrada do hero (sem depender de scroll) */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Flutuação contínua — sol, nuvens e cards decorativos */
+@keyframes floatY {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-14px); }
+}
+
+.float-slow {
+    animation: floatY 6s ease-in-out infinite alternate;
+}
+
+.float-medium {
+    animation: floatY 4.5s ease-in-out infinite alternate;
+}
+
+.float-fast {
+    animation: floatY 3.2s ease-in-out infinite alternate;
+}
+
+/* Seta "role para baixo" do hero */
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(8px); }
+}
+
+.bounce-down {
+    animation: bounceDown 1.8s ease-in-out infinite;
+}
+
+/* Respeita usuários que pedem menos movimento (acessibilidade) */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-active .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .fade-up,
+    .float-slow,
+    .float-medium,
+    .float-fast,
+    .bounce-down,
+    .wave-auth-1,
+    .wave-auth-2 {
+        animation: none;
+    }
+}
+
 /* Customização do Sonner Toast */
 [data-sonner-toast] {
     background: #213547 !important;

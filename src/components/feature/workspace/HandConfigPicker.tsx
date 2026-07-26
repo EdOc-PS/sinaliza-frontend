@@ -7,7 +7,7 @@ import { GetRequest } from "@requests";
 import { HAND_CONFIG } from "@routes/handConfigs";
 import Spinner from "@components/ui/Spinner";
 
-interface HandConfig {
+export interface HandConfig {
     id: string;
     name: string;
     imgUrl?: string;
@@ -22,6 +22,11 @@ interface HandConfigPickerProps {
     compact?: boolean;
     /** Permite desmarcar clicando na configuração já selecionada */
     allowDeselect?: boolean;
+    /**
+     * Configurações já carregadas pelo pai. Quando informado, o componente não busca
+     * na API — necessário no glossário público, cujo endpoint de mãos exige autenticação.
+     */
+    configs?: HandConfig[];
 }
 
 const DEFAULT_GRID = "grid grid-cols-8 gap-1.5";
@@ -34,9 +39,11 @@ const HandConfigPicker = ({
     itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
     compact = false,
     allowDeselect = false,
+    configs: providedConfigs,
 }: HandConfigPickerProps) => {
     const ITEMS_PER_PAGE = itemsPerPage;
-    const [configs, setConfigs]     = useState<HandConfig[]>([]);
+    const isControlled = providedConfigs !== undefined;
+    const [fetchedConfigs, setFetchedConfigs] = useState<HandConfig[]>([]);
     const [loading, setLoading]     = useState(false);
     const [search, setSearch]       = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -56,7 +63,7 @@ const HandConfigPicker = ({
                 query ? { search: query } : undefined
             );
             if (!response.success) toast.error("Falha ao obter configurações de mão: " + response.message);
-            setConfigs(response.object || []);
+            setFetchedConfigs(response.object || []);
             setCurrentPage(1);
         } finally {
             setLoading(false);
@@ -64,8 +71,20 @@ const HandConfigPicker = ({
     }, []);
 
     useEffect(() => {
+        if (isControlled) return;
         fetchConfigs(debouncedSearch || undefined);
-    }, [fetchConfigs, debouncedSearch]);
+    }, [isControlled, fetchConfigs, debouncedSearch]);
+
+    // Com configs vindas do pai, a busca é filtrada localmente
+    const configs = isControlled
+        ? providedConfigs!.filter((c) =>
+            !debouncedSearch.trim() || c.name.toLowerCase().includes(debouncedSearch.trim().toLowerCase()))
+        : fetchedConfigs;
+
+    // Volta para a primeira página quando o filtro local muda o conjunto
+    useEffect(() => {
+        if (isControlled) setCurrentPage(1);
+    }, [isControlled, debouncedSearch]);
 
     const totalPages = Math.max(1, Math.ceil(configs.length / ITEMS_PER_PAGE));
     const pageStart  = (currentPage - 1) * ITEMS_PER_PAGE;

@@ -1,6 +1,17 @@
 import { useEffect, useRef } from 'react'
 
-const AuthBackground = () => {
+interface AuthBackgroundProps {
+    /**
+     * `fixed` (padrão) — cobre a viewport inteira, usado nas telas de auth.
+     * `contained` — fica absoluto dentro do container pai (usado no hero da landing,
+     * onde as seções brancas abaixo não devem cobrir as ondas).
+     */
+    variant?: 'fixed' | 'contained'
+    /** Sol e nuvens flutuantes (estilo landing) */
+    decorations?: boolean
+}
+
+const AuthBackground = ({ variant = 'fixed', decorations = false }: AuthBackgroundProps) => {
     const w1Ref = useRef<HTMLDivElement>(null)
     const w2Ref = useRef<HTMLDivElement>(null)
     const w3Ref = useRef<HTMLDivElement>(null)
@@ -19,13 +30,25 @@ const AuthBackground = () => {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const positionClass = variant === 'fixed' ? 'fixed inset-0 -z-10' : 'absolute inset-0 z-0'
+
     return (
-        <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className={`${positionClass} overflow-hidden`} aria-hidden="true">
             <div
                 className="absolute inset-0"
                 style={{ background: 'linear-gradient(to bottom, #F5F9FC 65%, #ffffff 35%)' }}
             />
-           
+
+            {/* Sol e nuvens — só na landing */}
+            {decorations && (
+                <>
+                    <div className="float-slow absolute right-[8%] top-[10%] h-16 w-16 rounded-full bg-sunflower-300/70 blur-[2px] sm:h-24 sm:w-24" />
+                    <div className="float-medium absolute right-[16%] top-[18%] h-8 w-24 rounded-full bg-white/80 sm:h-10 sm:w-36" />
+                    <div className="float-fast absolute left-[10%] top-[14%] h-6 w-20 rounded-full bg-white/70 sm:h-8 sm:w-28" />
+                    <div className="float-medium absolute left-[24%] top-[26%] h-5 w-14 rounded-full bg-white/50 sm:h-6 sm:w-20" />
+                </>
+            )}
+
             <div
                 className="absolute pointer-events-none"
                 style={{ bottom: '25%', left: '-5%', width: '110%', height: '260px' }}

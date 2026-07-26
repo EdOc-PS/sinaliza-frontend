@@ -14,7 +14,9 @@ import {
 import { GetRequest } from "@requests";
 import { GLOSSARY } from "@routes/signs";
 import { CATEGORIES } from "@routes/categories";
+import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { CategorySlim } from "@lib/constants/category";
+import { getGlossaryDisciplineColor, type GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
@@ -30,27 +32,34 @@ const GlossaryPage = () => {
     const [loading, setLoading] = useState(true);
     const [signs, setSigns] = useState<SignCardData[]>([]);
     const [categories, setCategories] = useState<CategorySlim[]>([]);
+    const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
     const [query, setQuery] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
+    const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
 
     const filtered = query.trim()
         ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
         : signs;
 
-    // Categorias para os chips de filtro (carregadas uma vez)
-    const loadCategories = async () => {
-        const res = await GetRequest<CategorySlim[]>(CATEGORIES.LIST());
-        if (res.success && res.object) setCategories(res.object);
+    // Categorias e disciplinas para os filtros (carregadas uma vez)
+    const loadFilters = async () => {
+        const [catRes, discRes] = await Promise.all([
+            GetRequest<CategorySlim[]>(CATEGORIES.LIST()),
+            GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST()),
+        ]);
+        if (catRes.success && catRes.object) setCategories(catRes.object);
+        if (discRes.success && discRes.object) setDisciplines(discRes.object);
     };
 
-    // Sinais públicos — filtro por categoria e configuração de mão no servidor
+    // Sinais públicos — filtro por categoria, configuração de mão e disciplina no servidor
     const loadGlossary = async () => {
         setLoading(true);
         try {
             const params: Record<string, string> = {};
             if (categoryId) params.categoryId = categoryId;
             if (handConfigId) params.handConfigId = handConfigId;
+            if (glossaryDisciplineId) params.glossaryDisciplineId = glossaryDisciplineId;
 
             const res = await GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined);
             if (!res.success) { toast.error("Falha ao carregar o glossário: " + res.message); return; }
@@ -61,14 +70,14 @@ const GlossaryPage = () => {
     };
 
     useEffect(() => {
-        loadCategories();
+        loadFilters();
     }, []);
 
     useEffect(() => {
         loadGlossary();
-    }, [categoryId, handConfigId]);
+    }, [categoryId, handConfigId, glossaryDisciplineId]);
 
-    const hasFilters = !!categoryId || !!handConfigId || !!query.trim();
+    const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
 
     return (
         <section className="flex flex-col gap-8">
@@ -96,6 +105,39 @@ const GlossaryPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Disciplinas do glossário — cards clicáveis que filtram os sinais */}
+            {disciplines.length > 0 && (
+                <div className="flex flex-col gap-3">
+                    <h2 className="font-baskerville text-xl text-cloud-500">Disciplinas</h2>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                        {disciplines.map((disc) => {
+                            const active = glossaryDisciplineId === disc.id;
+                            return (
+                                <button
+                                    key={disc.id}
+                                    type="button"
+                                    onClick={() => setGlossaryDisciplineId(active ? "" : disc.id)}
+                                    className={`relative h-28 overflow-hidden rounded-3xl border-2 text-left transition-all hover:-translate-y-0.5 ${
+                                        active ? "border-campfire-500 ring-2 ring-campfire-300" : "border-transparent"
+                                    }`}
+                                >
+                                    <CardMemphisBackground
+                                        seed={disc.id}
+                                        color={getGlossaryDisciplineColor(disc.id)}
+                                        rounded="rounded-3xl"
+                                        icons={GLOSSARY_ICONS}
+                                    />
+                                    <div className="relative z-10 flex h-full flex-col justify-end p-3">
+                                        <span className="truncate font-bold text-white">{disc.name}</span>
+                                        <span className="text-xs text-white/80">{disc._count?.signs ?? 0} sinais</span>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Filtros */}
             <div className="flex flex-col gap-5 rounded-3xl bg-white p-5 sm:p-6">

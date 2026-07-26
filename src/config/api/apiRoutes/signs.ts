@@ -10,7 +10,8 @@ export const SIGNS = {
     REVIEW_PROMOTION: (id: string) => `sign/${id}/promotion`,
 }
 
-// Glossário global — endpoint público (sem autenticação)
+// Glossário global — endpoints públicos (sem autenticação)
 export const GLOSSARY = {
-    LIST: () => `glossary`,
+    LIST:    () => `glossary`,
+    FILTERS: () => `glossary/filters`,
 }

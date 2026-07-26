@@ -10,7 +10,7 @@ import { useAuth } from "@context/AuthContext";
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
-import ConfirmModal from "@components/layout/ConfirmModal";
+import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
@@ -140,11 +140,11 @@ const ClassroomDetailPage = () => {
         }
     };
 
-    const handlePromoteSign = async () => {
+    const handlePromoteSign = async (glossaryDisciplineIds: string[]) => {
         if (!promoteModal.signId) return;
         setPromoting(true);
         try {
-            const res = await PatchRequest(SIGNS.PROMOTE(promoteModal.signId), {});
+            const res = await PatchRequest(SIGNS.PROMOTE(promoteModal.signId), { glossaryDisciplineIds });
             if (!res.success) { toast.error(res.message); return; }
             toast.success("Sinal enviado para aprovação do gestor!");
             setPromoteModal({ open: false });
@@ -441,21 +441,12 @@ const ClassroomDetailPage = () => {
             />
 
             {/* Modal de confirmar promoção de sinal */}
-            <ConfirmModal
+            <PromoteSignModal
                 open={promoteModal.open}
                 onClose={() => setPromoteModal({ open: false })}
                 onConfirm={handlePromoteSign}
                 loading={promoting}
-                title={<>Promover <span className="text-campfire-600 italic">Sinal</span>?</>}
-                description={
-                    <>
-                        O sinal{" "}
-                        <span className="font-semibold text-campfire-600 italic">{promoteModal.name}</span>{" "}
-                        se tornará <b>público</b> no glossário global após a aprovação de um gestor. Ele
-                        continuará disponível normalmente nas disciplinas.
-                    </>
-                }
-                confirmText="Enviar para aprovação"
+                signName={promoteModal.name}
             />
 
             {/* Modal de adicionar participante */}
