@@ -11,11 +11,13 @@ import InputText from '@components/ui/InputText'
 import ProgressBar from '@/components/layout/ProgressBar'
 import {
     CirclePasswordIcon,
+    Home01Icon,
     LocationUser01Icon,
     MailOpenLoveIcon,
     PenTool03Icon,
     SmartPhone01Icon,
 } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import BackButton from '@components/ui/BackButton'
 import { maskPhone } from '@lib/mask/mask'
 import { PERFIL_FORMULARIOS as perfilFormularios, type PerfilId } from '@lib/constants/profileFields'
@@ -158,7 +160,7 @@ const RegisterPage = () => {
                 {/* Logo */}
                 <div className='flex items-center'>
                     <img src="/src/assets/images/logo/logo-simples.png" alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
-                    <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
+                    <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
                 </div>
 
                 {/* Formulário de Registro */}
@@ -489,7 +491,15 @@ const RegisterPage = () => {
                 </form>
 
                 {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-1 flex items-center gap-4 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-4 md:absolute md:right-4 md:top-4 md:mt-0">
+                <div className="mt-1 flex items-center gap-3 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-3 md:absolute md:right-4 md:top-4 md:mt-0">
+                    {/* Volta para a landing page */}
+                    <button
+                        onClick={() => navigate('/')}
+                        title="Ir para a página inicial"
+                        className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-cloud-400 transition-colors duration-300 hover:bg-cloud-100 hover:text-cloud-600"
+                    >
+                        <HugeiconsIcon icon={Home01Icon} size={20} />
+                    </button>
                     <p className="text-cloud-500 font-medium">Já tem uma conta?</p>
                     <button
                         onClick={() => navigate('/auth/login')}

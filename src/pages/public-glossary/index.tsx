@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+    ArrowLeft01Icon,
     BooksIcon,
+    FilterIcon,
     GlobalEducationIcon,
     GlobeIcon,
     MortarboardIcon,
@@ -14,13 +16,14 @@ import {
 import { GetRequest } from "@requests";
 import { GLOSSARY } from "@routes/signs";
 import type { CategorySlim } from "@lib/constants/category";
-import { getGlossaryDisciplineColor, type GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
+import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 import useScrollReveal from "@lib/hooks/useScrollReveal";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
 import HandConfigPicker, { type HandConfig } from "@components/feature/workspace/HandConfigPicker";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
+import { GlossaryDisciplineCard } from "@components/feature/glossary/GlossaryDisciplineCard";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
 import LandingHeader from "@components/feature/landing/LandingHeader";
 import LandingFooter from "@components/feature/landing/LandingFooter";
@@ -90,11 +93,20 @@ const PublicGlossaryPage = () => {
     const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
 
     return (
-        <div className="min-h-screen bg-white">
-            <LandingHeader />
+        <div className="min-h-screen bg-cloud-100">
+            <LandingHeader background="bg-cloud-100" />
 
-            <main className="mx-auto max-w-7xl px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8">
                 <section className="flex flex-col gap-8">
+                    {/* Voltar para a landing page */}
+                    <button
+                        onClick={() => navigate("/")}
+                        className="flex w-fit cursor-pointer items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-cloud-500 transition-colors duration-300 ease-out hover:bg-white hover:text-campfire-600"
+                    >
+                        <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
+                        Voltar ao início
+                    </button>
+
                     {/* Banner */}
                     <div className="relative overflow-hidden rounded-3xl">
                         <CardMemphisBackground seed="glossary" color="#BACA57" rounded="rounded-3xl" icons={GLOSSARY_ICONS} />
@@ -120,44 +132,23 @@ const PublicGlossaryPage = () => {
                         </div>
                     </div>
 
-                    {/* Disciplinas do glossário */}
-                    {disciplines.length > 0 && (
-                        <div className="flex flex-col gap-3">
-                            <h2 className="font-baskerville text-xl text-cloud-500">Disciplinas</h2>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                                {disciplines.map((disc) => {
-                                    const active = glossaryDisciplineId === disc.id;
-                                    return (
-                                        <button
-                                            key={disc.id}
-                                            type="button"
-                                            onClick={() => setGlossaryDisciplineId(active ? "" : disc.id)}
-                                            className={`relative h-28 overflow-hidden rounded-3xl border-2 text-left transition-all hover:-translate-y-0.5 ${
-                                                active ? "border-campfire-500 ring-2 ring-campfire-300" : "border-transparent"
-                                            }`}
-                                        >
-                                            <CardMemphisBackground
-                                                seed={disc.id}
-                                                color={getGlossaryDisciplineColor(disc.id)}
-                                                rounded="rounded-3xl"
-                                                icons={GLOSSARY_ICONS}
-                                            />
-                                            <div className="relative z-10 flex h-full flex-col justify-end p-3">
-                                                <span className="truncate font-bold text-white">{disc.name}</span>
-                                                <span className="text-xs text-white/80">{disc._count?.signs ?? 0} sinais</span>
-                                            </div>
-                                        </button>
-                                    );
-                                })}
+                    {/* Filtros */}
+                    <div className="flex flex-col gap-5 rounded-3xl bg-white p-5 sm:p-6">
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-campfire-100">
+                                <HugeiconsIcon icon={FilterIcon} size={20} className="text-campfire-600" />
+                            </div>
+                            <div>
+                                <h2 className="font-baskerville text-lg font-bold text-cloud-600">Buscar sinais</h2>
+                                <p className="text-sm text-neutral-500">
+                                    Combine busca por palavra, categoria, configuração de mão e disciplina.
+                                </p>
                             </div>
                         </div>
-                    )}
 
-                    {/* Filtros */}
-                    <div className="flex flex-col gap-5 rounded-3xl bg-cloud-100 p-5 sm:p-6">
                         <Input
                             icon={Search01Icon}
-                            wrapperClassName="bg-white"
+                            wrapperClassName="bg-cloud-100"
                             value={query}
                             onChange={setQuery}
                             placeholder="Buscar no repositório..."
@@ -174,7 +165,7 @@ const PublicGlossaryPage = () => {
                                         className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
                                             categoryId === ""
                                                 ? "bg-campfire-100 text-campfire-600"
-                                                : "bg-white text-cloud-500 hover:bg-cloud-200"
+                                                : "bg-cloud-100 text-cloud-500 hover:bg-cloud-200"
                                         }`}
                                     >
                                         Todas
@@ -187,7 +178,7 @@ const PublicGlossaryPage = () => {
                                             className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
                                                 categoryId === c.id
                                                     ? "bg-campfire-100 text-campfire-600"
-                                                    : "bg-white text-cloud-500 hover:bg-cloud-200"
+                                                    : "bg-cloud-100 text-cloud-500 hover:bg-cloud-200"
                                             }`}
                                         >
                                             {c.name}
@@ -215,6 +206,29 @@ const PublicGlossaryPage = () => {
                                 />
                             </div>
                         )}
+
+                        {/* Disciplinas do glossário */}
+                        {disciplines.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                                <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
+                                    <HugeiconsIcon icon={MortarboardIcon} size={18} />
+                                    Disciplinas
+                                </span>
+                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                                    {disciplines.map((disc) => (
+                                        <GlossaryDisciplineCard
+                                            key={disc.id}
+                                            discipline={disc}
+                                            selected={glossaryDisciplineId === disc.id}
+                                            onToggle={() =>
+                                                setGlossaryDisciplineId(glossaryDisciplineId === disc.id ? "" : disc.id)
+                                            }
+                                            icons={GLOSSARY_ICONS}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Conteúdo */}
@@ -237,31 +251,13 @@ const PublicGlossaryPage = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                             {filtered.map((sign) => (
                                 <SignCard key={sign.id} sign={sign} publicMode />
                             ))}
                         </div>
                     )}
 
-                    {/* Convite para criar conta */}
-                    <div className="reveal mt-4 flex flex-col items-start gap-5 rounded-3xl bg-cloud-500 p-7 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h2 className="font-baskerville text-xl font-bold text-white sm:text-2xl">
-                                Quer favoritar e acompanhar seu progresso?
-                            </h2>
-                            <p className="mt-1.5 max-w-lg text-sm text-white/70">
-                                Crie uma conta gratuita para salvar sinais, ver seu histórico e acessar as
-                                disciplinas da sua instituição.
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => navigate("/auth/register")}
-                            className="shrink-0 rounded-3xl bg-white px-6 py-3.5 font-bold text-cloud-500 transition-all hover:-translate-y-0.5 hover:bg-cloud-100"
-                        >
-                            Criar conta grátis
-                        </button>
-                    </div>
                 </section>
             </main>
 

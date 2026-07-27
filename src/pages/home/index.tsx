@@ -12,7 +12,6 @@ import LandingRepositoryPreview from '@components/feature/landing/LandingReposit
 import LandingHowItWorks from '@components/feature/landing/LandingHowItWorks'
 import LandingFeatures from '@components/feature/landing/LandingFeatures'
 import LandingAbout from '@components/feature/landing/LandingAbout'
-import LandingCTA from '@components/feature/landing/LandingCTA'
 import LandingFooter from '@components/feature/landing/LandingFooter'
 
 function Home() {
@@ -30,20 +29,18 @@ function Home() {
         loadPublicSigns()
     }, [])
 
-    const categoryCount = new Set(signs.map((s) => s.category?.value).filter(Boolean)).size
-
     return (
         <div className="min-h-screen bg-white">
-            <LandingHeader showAnchors />
+            {/* Header em bg-cloud-100 emenda sem costura com o topo do hero */}
+            <LandingHeader showAnchors background="bg-cloud-100" />
 
             <main>
-                <LandingHero signCount={signs.length} categoryCount={categoryCount} />
+                <LandingHero />
                 <LandingAudience />
                 <LandingRepositoryPreview signs={signs} total={signs.length} />
                 <LandingHowItWorks />
                 <LandingFeatures />
                 <LandingAbout />
-                <LandingCTA />
             </main>
 
             <LandingFooter />

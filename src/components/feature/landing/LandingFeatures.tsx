@@ -73,16 +73,14 @@ export const LandingFeatures = () => (
 
             <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {features.map((feature, i) => (
-                    <div
-                        key={feature.title}
-                        className="reveal rounded-3xl border-2 border-cloud-200 p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-cloud-300"
-                        style={{ transitionDelay: `${(i % 3) * 90}ms` }}
-                    >
-                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${feature.iconClass}`}>
-                            <HugeiconsIcon icon={feature.icon} size={24} />
+                    <div key={feature.title} className="reveal" style={{ transitionDelay: `${(i % 3) * 90}ms` }}>
+                        <div className="h-full rounded-3xl border-2 border-cloud-200 p-6 transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-cloud-300">
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${feature.iconClass}`}>
+                                <HugeiconsIcon icon={feature.icon} size={24} />
+                            </div>
+                            <h3 className="mt-4 font-bold text-cloud-600">{feature.title}</h3>
+                            <p className="mt-1.5 text-sm leading-relaxed text-cloud-400">{feature.description}</p>
                         </div>
-                        <h3 className="mt-4 font-bold text-cloud-600">{feature.title}</h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-cloud-400">{feature.description}</p>
                     </div>
                 ))}
             </div>

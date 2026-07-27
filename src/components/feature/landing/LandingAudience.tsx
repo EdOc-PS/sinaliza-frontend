@@ -1,18 +1,14 @@
-import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import {
-    HandPrayerIcon,
-    Home01Icon,
-    MortarboardIcon,
-    UserMultiple02Icon,
-} from "@hugeicons/core-free-icons";
+import interpreterImg from "@/assets/images/interpreter.png";
+import studentImg from "@/assets/images/student.png";
+import educatorImg from "@/assets/images/educator.png";
+import guardianImg from "@/assets/images/guardian.png";
 
 interface Audience {
     tag: string;
     title: string;
     description: string;
-    icon: IconSvgElement;
+    image: string;
     cardClass: string;
-    iconClass: string;
 }
 
 const audiences: Audience[] = [
@@ -20,37 +16,35 @@ const audiences: Audience[] = [
         tag: "Criador de conteúdo",
         title: "Intérprete",
         description: "Cadastra sinais, sobe vídeos e descrições, organiza o repositório e garante a qualidade do conteúdo em Libras.",
-        icon: HandPrayerIcon,
+        image: interpreterImg,
         cardClass: "bg-lime-100",
-        iconClass: "bg-lime-400 text-white",
     },
     {
         tag: "Aprendiz",
         title: "Aluno",
         description: "Acessa o repositório de sinais, assiste aos vídeos, favorita os que mais usa e aprende no próprio ritmo.",
-        icon: MortarboardIcon,
+        image: studentImg,
         cardClass: "bg-sky-100",
-        iconClass: "bg-sky-400 text-white",
     },
     {
-        tag: "Gestor",
+        tag: "Gestor do conteúdo",
         title: "Professor",
         description: "Gerencia turmas, cadastra sinais na disciplina, valida conteúdos e acompanha o percurso de aprendizado.",
-        icon: UserMultiple02Icon,
+        image: educatorImg,
         cardClass: "bg-campfire-100",
-        iconClass: "bg-campfire-400 text-white",
     },
     {
         tag: "Apoio",
         title: "Familiar",
         description: "Acompanha a evolução do aluno, acessa os sinais das disciplinas e participa do processo de inclusão.",
-        icon: Home01Icon,
+        image: guardianImg,
         cardClass: "bg-salmon-100",
-        iconClass: "bg-salmon-400 text-white",
     },
 ];
 
-// "Para quem é" — os 4 perfis da plataforma
+// "Para quem é" — os 4 perfis da plataforma.
+// O `.reveal` fica no wrapper: se o delay do stagger ficasse no mesmo elemento do
+// hover, ele atrasaria a transição do hover e o movimento pareceria travado.
 export const LandingAudience = () => (
     <section id="para-quem" className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -71,23 +65,21 @@ export const LandingAudience = () => (
             {/* Cards */}
             <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {audiences.map((item, i) => (
-                    <div
-                        key={item.title}
-                        className={`reveal flex flex-col gap-4 rounded-3xl p-6 transition-transform duration-300 hover:-translate-y-1.5 ${item.cardClass}`}
-                        style={{ transitionDelay: `${i * 90}ms` }}
-                    >
-                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.iconClass}`}>
-                            <HugeiconsIcon icon={item.icon} size={24} />
-                        </div>
+                    <div key={item.title} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
+                        <div
+                            className={`flex h-full flex-col gap-4 rounded-3xl p-6 transition-transform duration-300 ease-out hover:-translate-y-1.5 ${item.cardClass}`}
+                        >
+                            <img src={item.image} alt="" className="h-14 w-14 shrink-0 object-contain" />
 
-                        <div>
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-cloud-400">
-                                {item.tag}
-                            </span>
-                            <h3 className="font-baskerville text-xl font-bold text-cloud-600">{item.title}</h3>
-                        </div>
+                            <div>
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-cloud-400">
+                                    {item.tag}
+                                </span>
+                                <h3 className="font-baskerville text-xl font-bold text-cloud-600">{item.title}</h3>
+                            </div>
 
-                        <p className="text-sm leading-relaxed text-cloud-500/80">{item.description}</p>
+                            <p className="text-sm leading-relaxed text-cloud-500/80">{item.description}</p>
+                        </div>
                     </div>
                 ))}
             </div>

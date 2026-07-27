@@ -4,7 +4,8 @@ import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
-import { CirclePasswordIcon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
+import { CirclePasswordIcon, Home01Icon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/config/context/AuthContext'
 import { isPendingApproval } from '@lib/auth/approval'
@@ -50,7 +51,7 @@ const LoginPage = () => {
                 {/* Logo */}
                 <div className='flex items-center'>
                     <img src="/src/assets/images/logo/logo-simples.png" alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
-                    <h1 className='text-2xl sm:text-3xl font-bold text-cloud-500'>sinaliza</h1>
+                    <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
                 </div>
 
                 {/* Formulário de Login */}
@@ -114,13 +115,21 @@ const LoginPage = () => {
                 </div>
 
                 {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-4 flex items-center gap-4 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-4 md:absolute md:right-4 md:top-4 md:mt-0">
+                <div className="mt-4 flex items-center gap-3 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-3 md:absolute md:right-4 md:top-4 md:mt-0">
+                    {/* Volta para a landing page */}
+                    <button
+                        onClick={() => navigate('/')}
+                        title="Ir para a página inicial"
+                        className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-cloud-400 transition-colors duration-300 hover:bg-cloud-100 hover:text-cloud-600"
+                    >
+                        <HugeiconsIcon icon={Home01Icon} size={20} />
+                    </button>
                     <p className="text-cloud-500 font-medium">Não tem uma conta?</p>
                     <button
                         onClick={() => navigate('/auth/register')}
                         className="cursor-pointer rounded-2xl bg-lime-500 px-5 py-3 font-bold text-cloud-100 transition-all duration-300 hover:bg-lime-500/90"
                     >
-                        Crie uma
+                        Solicitar entrada
                     </button>
                 </div>
             </div>

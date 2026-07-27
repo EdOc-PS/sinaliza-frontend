@@ -2,10 +2,17 @@ import type { ButtonHTMLAttributes } from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import Spinner from "../Spinner";
 
-type ButtonVariant = "cloud" | "lime" | "sky" | "campfire" | "salmon" | "outline" | "error";
+type ButtonVariant =
+    | "cloud" | "lime" | "sky" | "campfire" | "salmon" | "outline" | "error"
+    // Variantes para uso sobre fundo escuro (ex: CTA da landing)
+    | "white" | "outlineWhite";
+
+type ButtonSize = "sm" | "md";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;
+    /** `md` (padrão) para formulários e CTAs; `sm` para barras compactas como o header */
+    size?: ButtonSize;
     loading?: boolean;
     loadingText?: string;
     icon?: IconSvgElement;
@@ -19,13 +26,22 @@ const variantStyles: Record<ButtonVariant, string> = {
     sky:      "bg-sky-500 text-sky-100 hover:bg-sky-500/90",
     campfire: "bg-campfire-500 text-campfire-100 hover:bg-campfire-500/90",
     salmon:   "bg-salmon-500 text-white hover:bg-salmon-500/90",
-    outline:  "border-2 border-cloud-500 bg-transparent text-cloud-500 hover:bg-cloud-100",
+    // Preenche no hover: o antigo hover:bg-cloud-100 era invisível sobre fundo claro
+    outline:  "border-2 border-cloud-500 bg-transparent text-cloud-500 hover:bg-cloud-500 hover:text-cloud-100",
     error:    "bg-error-600 text-white hover:bg-error-600/90",
+    white:        "bg-white text-cloud-500 hover:bg-cloud-100",
+    outlineWhite: "border-2 border-white/40 bg-transparent text-white hover:border-white/70 hover:bg-white/10",
+};
+
+const sizeStyles: Record<ButtonSize, string> = {
+    sm: "h-12 px-5 text-sm rounded-2xl",
+    md: "h-16 px-6 text-base rounded-3xl",
 };
 
 const Button = ({
     className = "",
     variant = "cloud",
+    size = "md",
     type = "button",
     loading = false,
     loadingText,
@@ -44,10 +60,10 @@ const Button = ({
             type={type}
             disabled={isDisabled}
             className={`
-                cursor-pointer flex h-16 items-center gap-2 rounded-3xl px-6 text-base font-bold
+                cursor-pointer flex items-center gap-2 font-bold
                 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60
                 ${loading ? "justify-between" : "justify-center"}
-                ${variantStyles[variant]} ${className}
+                ${sizeStyles[size]} ${variantStyles[variant]} ${className}
             `}
             {...props}
         >

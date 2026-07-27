@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     BooksIcon,
+    FilterIcon,
     GlobalEducationIcon,
     GlobeIcon,
     MortarboardIcon,
@@ -16,12 +17,13 @@ import { GLOSSARY } from "@routes/signs";
 import { CATEGORIES } from "@routes/categories";
 import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { CategorySlim } from "@lib/constants/category";
-import { getGlossaryDisciplineColor, type GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
+import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
 import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
+import { GlossaryDisciplineCard } from "@components/feature/glossary/GlossaryDisciplineCard";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 
 // Confete de educação/globo
@@ -106,41 +108,20 @@ const GlossaryPage = () => {
                 </div>
             </div>
 
-            {/* Disciplinas do glossário — cards clicáveis que filtram os sinais */}
-            {disciplines.length > 0 && (
-                <div className="flex flex-col gap-3">
-                    <h2 className="font-baskerville text-xl text-cloud-500">Disciplinas</h2>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                        {disciplines.map((disc) => {
-                            const active = glossaryDisciplineId === disc.id;
-                            return (
-                                <button
-                                    key={disc.id}
-                                    type="button"
-                                    onClick={() => setGlossaryDisciplineId(active ? "" : disc.id)}
-                                    className={`relative h-28 overflow-hidden rounded-3xl border-2 text-left transition-all hover:-translate-y-0.5 ${
-                                        active ? "border-campfire-500 ring-2 ring-campfire-300" : "border-transparent"
-                                    }`}
-                                >
-                                    <CardMemphisBackground
-                                        seed={disc.id}
-                                        color={getGlossaryDisciplineColor(disc.id)}
-                                        rounded="rounded-3xl"
-                                        icons={GLOSSARY_ICONS}
-                                    />
-                                    <div className="relative z-10 flex h-full flex-col justify-end p-3">
-                                        <span className="truncate font-bold text-white">{disc.name}</span>
-                                        <span className="text-xs text-white/80">{disc._count?.signs ?? 0} sinais</span>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
-
             {/* Filtros */}
             <div className="flex flex-col gap-5 rounded-3xl bg-white p-5 sm:p-6">
+                <div className="flex items-center gap-2.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-campfire-100">
+                        <HugeiconsIcon icon={FilterIcon} size={20} className="text-campfire-600" />
+                    </div>
+                    <div>
+                        <h2 className="font-baskerville text-lg font-bold text-cloud-600">Buscar sinais</h2>
+                        <p className="text-sm text-neutral-500">
+                            Combine busca por palavra, categoria, configuração de mão e disciplina.
+                        </p>
+                    </div>
+                </div>
+
                 {/* Busca textual */}
                 <Input
                     icon={Search01Icon}
@@ -198,6 +179,29 @@ const GlossaryPage = () => {
                         itemsPerPage={24}
                     />
                 </div>
+
+                {/* Disciplinas do glossário */}
+                {disciplines.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                        <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
+                            <HugeiconsIcon icon={MortarboardIcon} size={18} />
+                            Disciplinas
+                        </span>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                            {disciplines.map((disc) => (
+                                <GlossaryDisciplineCard
+                                    key={disc.id}
+                                    discipline={disc}
+                                    selected={glossaryDisciplineId === disc.id}
+                                    onToggle={() =>
+                                        setGlossaryDisciplineId(glossaryDisciplineId === disc.id ? "" : disc.id)
+                                    }
+                                    icons={GLOSSARY_ICONS}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Conteúdo */}

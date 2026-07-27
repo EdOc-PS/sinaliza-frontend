@@ -184,6 +184,9 @@ button {
 .reveal-active .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
+    /* Libera a camada de composição depois da entrada — mantê-la viva em dezenas
+       de wrappers engasga as animações de hover dos cards internos. */
+    will-change: auto;
 }
 
 /* Entrada do hero (sem depender de scroll) */
@@ -214,6 +217,20 @@ button {
     animation: floatY 3.2s ease-in-out infinite alternate;
 }
 
+/* Deriva horizontal lenta das nuvens — vai até um ponto próximo e volta */
+@keyframes cloudDriftX {
+    from { transform: translateX(0); }
+    to   { transform: translateX(var(--cloud-drift, 26px)); }
+}
+
+.cloud-drift {
+    animation: cloudDriftX 16s ease-in-out infinite alternate;
+}
+
+.cloud-drift-slow {
+    animation: cloudDriftX 24s ease-in-out infinite alternate;
+}
+
 /* Seta "role para baixo" do hero */
 @keyframes bounceDown {
     0%, 100% { transform: translateY(0); }
@@ -221,7 +238,7 @@ button {
 }
 
 .bounce-down {
-    animation: bounceDown 1.8s ease-in-out infinite;
+    animation: bounceDown 3.4s ease-in-out infinite;
 }
 
 /* Respeita usuários que pedem menos movimento (acessibilidade) */
@@ -236,6 +253,8 @@ button {
     .float-slow,
     .float-medium,
     .float-fast,
+    .cloud-drift,
+    .cloud-drift-slow,
     .bounce-down,
     .wave-auth-1,
     .wave-auth-2 {

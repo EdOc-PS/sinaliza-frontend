@@ -9,6 +9,7 @@ import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
 import Modal from "@components/ui/Modal";
 import Button from "@components/ui/Button";
+import Label from "@components/ui/Label";
 import MultiSelect from "@components/ui/MultiSelect";
 
 interface PromoteSignModalProps {
@@ -69,10 +70,11 @@ const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName 
 
                 {/* Associação a disciplinas do glossário (opcional) */}
                 <div className="flex w-full flex-col gap-1.5">
-                    <span className="pl-1 text-sm font-semibold text-cloud-500">
-                        Disciplinas do glossário <span className="font-normal text-neutral-400">(opcional)</span>
-                    </span>
+                    <Label htmlFor="promote-glossary-disciplines" isOptional>
+                        Disciplinas do glossário
+                    </Label>
                     <MultiSelect
+                        id="promote-glossary-disciplines"
                         icon={MortarboardIcon}
                         options={options}
                         value={selected}
