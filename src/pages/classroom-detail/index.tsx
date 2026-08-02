@@ -21,6 +21,8 @@ import { SignForm } from "@components/feature/workspace/SignForm";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Bookshelf01Icon,
+    Note01Icon,
+    TaskDaily01Icon,
     Edit02Icon,
     FavouriteIcon,
     HandPointingLeft02Icon,
@@ -32,6 +34,8 @@ import {
     UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import NavTabs from "@components/ui/NavTabs";
+import EssayPromptSection from "@components/feature/context/EssayPromptSection";
+import EssayExampleSection from "@components/feature/context/EssayExampleSection";
 
 interface DisciplineDetail {
     id: string;
@@ -39,11 +43,14 @@ interface DisciplineDetail {
     description?: string;
     colorBackground?: string;
     classCode?: string;
+    isContext?: boolean;
     schoolYear?: number;
     schoolLevelLabel?: string;
     userCount: number;
     teacher: { id: string; name: string; avatar?: string; educatorType?: "TEACHER" | "INTERPRETER" | null };
 }
+
+type DetailView = "signs" | "favorites" | "prompts" | "examples" | "settings";
 
 const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -54,7 +61,7 @@ const ClassroomDetailPage = () => {
     const [discipline, setDiscipline] = useState<DisciplineDetail | null>(null);
     const [signs, setSigns] = useState<SignCardData[]>([]);
     const [editModal, setEditModal] = useState(false);
-    const [detailView, setDetailView] = useState<"signs" | "favorites" | "settings">("signs");
+    const [detailView, setDetailView] = useState<DetailView>("signs");
     const [favoritesSigns, setFavoritesSigns] = useState<SignCardData[]>([]);
     const [loadingFavorites, setLoadingFavorites] = useState(false);
     const [members, setMembers] = useState<Member[]>([]);
@@ -167,7 +174,7 @@ const ClassroomDetailPage = () => {
         }
     };
 
-    const handleTabChange = (tab: "signs" | "favorites" | "settings") => {
+    const handleTabChange = (tab: DetailView) => {
         setDetailView(tab);
         if (tab === "favorites" && favoritesSigns.length === 0) loadDisciplineFavorites();
         if (tab === "settings" && members.length === 0) loadMembers();
@@ -272,11 +279,28 @@ const ClassroomDetailPage = () => {
                     items={[
                         { key: "signs",     label: "Todos os sinais", icon: Bookshelf01Icon },
                         { key: "favorites", label: "Favoritos",       icon: FavouriteIcon },
+                        // A disciplina Contexto ganha as áreas do projeto de redação
+                        ...(discipline.isContext
+                            ? [
+                                { key: "prompts" as const,  label: "Propostas", icon: TaskDaily01Icon },
+                                { key: "examples" as const, label: "Exemplos",  icon: Note01Icon },
+                            ]
+                            : []),
                     ]}
                     endItems={[
                         { key: "settings", label: "Configurações", icon: Settings02Icon },
                     ]}
                 />
+
+                {/* View: Propostas de redação (só na disciplina Contexto) */}
+                {detailView === "prompts" && discipline.isContext && (
+                    <EssayPromptSection disciplineId={discipline.id} canManage={canManage} />
+                )}
+
+                {/* View: Exemplos de redação (só na disciplina Contexto) */}
+                {detailView === "examples" && discipline.isContext && (
+                    <EssayExampleSection disciplineId={discipline.id} canManage={canManage} />
+                )}
 
                 {/* View: Todos os sinais */}
                 {detailView === "signs" && (

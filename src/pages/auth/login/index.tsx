@@ -4,11 +4,12 @@ import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
-import { CirclePasswordIcon, Home01Icon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
+import { CirclePasswordIcon, Home01Icon, MailOpenLoveIcon, UserAdd01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/config/context/AuthContext'
 import { isPendingApproval } from '@lib/auth/approval'
+import { isValidEmail } from '@lib/validation/email'
 
 interface AuthProps {
     email: string
@@ -24,7 +25,7 @@ const LoginPage = () => {
     })
 
     const [isLoading, setIsLoading] = useState(false)
-    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(auth.email.trim())
+    const emailValido = isValidEmail(auth.email.trim())
 
     const handleLogin = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -115,20 +116,19 @@ const LoginPage = () => {
                 </div>
 
                 {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-4 flex items-center gap-3 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-3 md:absolute md:right-4 md:top-4 md:mt-0">
-                    {/* Volta para a landing page */}
+                <div className="mt-4 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
                     <button
                         onClick={() => navigate('/')}
-                        title="Ir para a página inicial"
-                        className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-cloud-400 transition-colors duration-300 hover:bg-cloud-100 hover:text-cloud-600"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-bold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
                     >
                         <HugeiconsIcon icon={Home01Icon} size={20} />
+                        Início
                     </button>
-                    <p className="text-cloud-500 font-medium">Não tem uma conta?</p>
                     <button
                         onClick={() => navigate('/auth/register')}
-                        className="cursor-pointer rounded-2xl bg-lime-500 px-5 py-3 font-bold text-cloud-100 transition-all duration-300 hover:bg-lime-500/90"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-lime-500 px-5 py-3 font-bold text-cloud-100 transition-colors duration-300 hover:bg-lime-500/90"
                     >
+                        <HugeiconsIcon icon={UserAdd01Icon} size={20} />
                         Solicitar entrada
                     </button>
                 </div>

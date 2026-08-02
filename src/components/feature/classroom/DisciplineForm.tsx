@@ -14,6 +14,7 @@ import { GetRequest, PatchRequest, PostRequest } from "@requests";
 import { toast } from "sonner";
 
 import type { CreateDisciplineForm } from "@pages/classrooms";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 export const PRESET_COLORS = [
     { hex: "#BACA57", label: "Lime" },
@@ -133,7 +134,8 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {/* Cabeçalho */}
-            <div className="flex flex-col gap-1">
+            <ModalStickyHeader>
+                <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
                     {isEditMode ? "Editar turma" : "Criar nova turma"}
                 </h2>
@@ -143,6 +145,7 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                         : "Defina o nome da disciplina. Um código de convite de 6 dígitos será gerado automaticamente."}
                 </p>
             </div>
+            </ModalStickyHeader>
 
             {/* Nome da turma */}
             <div className="flex flex-col gap-1.5">

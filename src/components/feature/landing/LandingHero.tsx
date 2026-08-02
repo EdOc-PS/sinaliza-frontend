@@ -54,7 +54,7 @@ export const LandingHero = () => {
             <a
                 href="#para-quem"
                 aria-label="Rolar para o conteúdo"
-                className="bounce-down absolute bottom-8 right-6 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-md transition-colors duration-300 ease-out hover:bg-cloud-100 sm:right-10"
+                className="absolute bottom-0 right-6 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-cloud-200 transition-colors duration-300 ease-out hover:bg-cloud-400/60 sm:right-10"
             >
                 <HugeiconsIcon icon={ArrowDown01Icon} size={22} className="text-cloud-500" />
             </a>

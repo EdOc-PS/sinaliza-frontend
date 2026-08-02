@@ -11,6 +11,7 @@ import { MortarboardIcon } from "@hugeicons/core-free-icons";
 import { PostRequest, PatchRequest } from "@requests";
 import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 interface GlossaryDisciplineFormProps {
     /** Quando informado, o formulário entra em modo de edição */
@@ -51,7 +52,8 @@ export const GlossaryDisciplineForm = ({ discipline, onClose, onSuccess }: Gloss
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
+            <ModalStickyHeader>
+                <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
                     {isEditMode ? "Editar disciplina" : "Nova disciplina do glossário"}
                 </h2>
@@ -60,6 +62,7 @@ export const GlossaryDisciplineForm = ({ discipline, onClose, onSuccess }: Gloss
                     Aparecem como cards no glossário global e são associadas ao sinal na hora de promovê-lo.
                 </p>
             </div>
+            </ModalStickyHeader>
 
             <div className="flex flex-col gap-1.5">
                 <Label htmlFor="glossary-discipline-name" isRequired>Nome</Label>

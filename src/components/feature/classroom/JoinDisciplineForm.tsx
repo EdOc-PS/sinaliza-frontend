@@ -3,6 +3,7 @@ import { Key02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { InputCode } from "@components/ui/InputCode";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 import { PostRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
@@ -49,22 +50,24 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6 items-center">
-            {/* Ícone */}
-            <div className="flex items-center justify-between mb-2">
-                <div className="w-16 h-16 rounded-3xl bg-sky-100 flex items-center justify-center">
-                    <HugeiconsIcon icon={Key02Icon} size={32} className="text-sky-500" />
-                </div>
-            </div>
+            <ModalStickyHeader>
+                <div className="flex flex-col items-center gap-4">
+                    {/* Ícone */}
+                    <div className="w-16 h-16 rounded-3xl bg-sky-100 flex items-center justify-center">
+                        <HugeiconsIcon icon={Key02Icon} size={32} className="text-sky-500" />
+                    </div>
 
-            {/* Título */}
-            <div className="flex flex-col gap-1 text-center">
-                <h2 className="text-2xl font-bold text-cloud-700 font-baskerville">
-                    Participar de uma turma
-                </h2>
-                <p className="text-sm text-cloud-400">
-                    Digite o código de 6 dígitos que seu professor compartilhou.
-                </p>
-            </div>
+                    {/* Título */}
+                    <div className="flex flex-col gap-1 text-center">
+                        <h2 className="text-2xl font-bold text-cloud-700 font-baskerville">
+                            Participar de uma turma
+                        </h2>
+                        <p className="text-sm text-cloud-400">
+                            Digite o código de 6 dígitos que seu professor compartilhou.
+                        </p>
+                    </div>
+                </div>
+            </ModalStickyHeader>
 
             {/* Campos de dígitos */}
             <InputCode digits={digits} onChange={setDigits} />

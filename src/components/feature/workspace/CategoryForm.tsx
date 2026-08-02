@@ -9,6 +9,7 @@ import { TagsIcon } from "@hugeicons/core-free-icons";
 
 import { PostRequest } from "@requests";
 import { CATEGORIES } from "@routes/categories";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 interface CategoryFormProps {
     onClose: () => void;
@@ -41,13 +42,15 @@ export const CategoryForm = ({ onClose, onSuccess }: CategoryFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
+            <ModalStickyHeader>
+                <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Nova categoria</h2>
                 <p className="text-sm text-cloud-400 leading-snug">
                     Categorias agrupam os sinais por tipo (ex: Verbo, Animal, Saudação), deixando a busca e a
                     organização mais fáceis para alunos e educadores.
                 </p>
             </div>
+            </ModalStickyHeader>
 
             <div className="flex flex-col gap-1.5">
                 <Label htmlFor="category-name" isRequired>Nome</Label>

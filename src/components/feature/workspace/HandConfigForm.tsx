@@ -10,6 +10,7 @@ import { Clapping02Icon } from "@hugeicons/core-free-icons";
 
 import { HAND_CONFIG } from "@routes/handConfigs";
 import { PostFormDataRequest, PatchFormDataRequest } from "@requests";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 interface HandConfigFormData {
     id?: string;
@@ -65,7 +66,8 @@ export const HandConfigForm = ({ handConfig, onClose, onSuccess }: HandConfigFor
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
+            <ModalStickyHeader>
+                <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
                     {isEditMode ? "Editar configuração de mão" : "Criar configuração de mão"}
                 </h2>
@@ -75,6 +77,7 @@ export const HandConfigForm = ({ handConfig, onClose, onSuccess }: HandConfigFor
                         : "Defina o nome e a imagem que representa esta configuração de mão."}
                 </p>
             </div>
+            </ModalStickyHeader>
 
             <div className="flex flex-col gap-1.5">
                 <Label htmlFor="hand-config-name" isRequired>Nome</Label>

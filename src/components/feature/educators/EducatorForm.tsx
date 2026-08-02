@@ -9,6 +9,7 @@ import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
 import Spinner from "@components/ui/Spinner";
 import ProgressBar from "@components/layout/ProgressBar";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 import BackButton from "@components/ui/BackButton";
 
 import {
@@ -25,6 +26,7 @@ import { USERS } from "@routes/users";
 import { maskPhone } from "@lib/mask/mask";
 import { PERFIL_FORMULARIOS } from "@lib/constants/profileFields";
 import type { CreateEducatorPayload, EducatorType, Role, User } from "@api/requests";
+import { isValidEmail } from "@lib/validation/email";
 
 // Só os dois tipos de educador
 type EducatorKind = "educator" | "interpreter";
@@ -100,7 +102,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
     // Validações por step
     const nameValid = name.trim().length >= 3;
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const emailValid = isValidEmail(email.trim());
     const isStep1Valid = nameValid && emailValid;
 
     const isStep2Valid = () =>
@@ -204,26 +206,44 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
         </Button>
     );
 
+    // Título de cada step — fica no cabeçalho fixo, fora da área que rola
+    const stepTitles = [
+        {
+            title: isEditMode ? "Editar educador" : "Cadastrar educador",
+            description: isEditMode
+                ? "Ajuste o tipo e as permissões do educador."
+                : "Selecione o tipo de educador que deseja cadastrar.",
+        },
+        { title: "Dados pessoais", description: "Informe nome e contato do educador." },
+        { title: formulario?.titulo ?? "", description: formulario?.descricao ?? "" },
+        { title: "Biografia", description: "Conte um pouco sobre o educador. Este passo é opcional." },
+        { title: "Senha de acesso", description: "Defina a senha inicial. O educador poderá alterá-la depois." },
+    ];
+    const stepTitle = stepTitles[view] ?? stepTitles[0];
+
     return (
         <form onSubmit={handleStepSubmit} className="flex flex-col gap-6">
-            <ProgressBar
-                currentStep={view}
-                totalSteps={totalSteps}
-                onStepClick={isEditMode ? setView : undefined}
-            />
+            {/* Cabeçalho fixo: steps + título não rolam junto com os campos */}
+            <ModalStickyHeader>
+                <ProgressBar
+                    currentStep={view}
+                    totalSteps={totalSteps}
+                    onStepClick={isEditMode ? setView : undefined}
+                />
+
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
+                        {stepTitle.title}
+                    </h2>
+                    <p className="text-sm text-cloud-400 leading-snug">
+                        {stepTitle.description}
+                    </p>
+                </div>
+            </ModalStickyHeader>
 
             {/* Step 0: escolher tipo */}
             {view === 0 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
-                            {isEditMode ? "Editar educador" : "Cadastrar educador"}
-                        </h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            {isEditMode ? "Ajuste o tipo e as permissões do educador." : "Selecione o tipo de educador que deseja cadastrar."}
-                        </p>
-                    </div>
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button
                             type="button"
@@ -271,11 +291,6 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             {/* Step 1: dados pessoais */}
             {view === 1 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Dados pessoais</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Informe nome e contato do educador.</p>
-                    </div>
-
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-name" isRequired>Nome:</Label>
@@ -310,11 +325,6 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             {/* Step 2: dados do perfil */}
             {view === 2 && formulario && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">{formulario.titulo}</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">{formulario.descricao}</p>
-                    </div>
-
                     <div className="flex flex-col gap-4">
                         {formulario.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-1.5">
@@ -360,11 +370,6 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             {/* Step 3: biografia (só criação) */}
             {view === 3 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Biografia</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Conte um pouco sobre o educador. Este passo é opcional.</p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edu-bio" isOptional>Biografia:</Label>
                         <InputText id="edu-bio" icon={PenTool03Icon} placeholder="Breve descrição do educador (opcional)." value={bio} onChange={setBio} />
@@ -380,11 +385,6 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             {/* Step 4: senha (só criação) */}
             {view === 4 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Senha de acesso</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Defina a senha inicial. O educador poderá alterá-la depois.</p>
-                    </div>
-
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-password" isRequired>Senha:</Label>

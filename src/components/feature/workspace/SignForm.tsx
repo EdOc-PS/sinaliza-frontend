@@ -12,6 +12,7 @@ import Label from "@components/ui/Label";
 import Select from "@components/ui/Select";
 import MultiSelect from "@components/ui/MultiSelect";
 import ProgressBar from "@components/layout/ProgressBar";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 import InputCheck from "@/components/ui/InputCheck";
 import BackButton from "@components/ui/BackButton";
 
@@ -211,26 +212,62 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
         );
     }
 
+    // Título de cada step — fica no cabeçalho fixo, fora da área que rola
+    const stepMeta = [
+        {
+            title: isEditMode ? "Editar sinal" : "Criar novo sinal",
+            description: isEditMode
+                ? "Atualize as informações do sinal."
+                : "Preencha as informações principais do sinal.",
+        },
+        {
+            title: "Contexto do sinal",
+            description: "Adicione exemplos e descreva o movimento das mãos.",
+        },
+        {
+            title: "Tags do sinal",
+            description:
+                "Adicione palavras-chave e sinais relacionados. Elas ajudam alunos e educadores a encontrar este sinal na busca e a conectá-lo a temas parecidos.",
+        },
+        {
+            title: "Imagem ilustrativa",
+            description:
+                "Envie uma imagem de referência do sinal (opcional). Ela aparece como capa e ajuda na identificação rápida antes de assistir ao vídeo.",
+        },
+        {
+            title: "Vídeo do sinal",
+            description: (
+                <>
+                    Envie um <b>vídeo</b> do sinal <b>ou</b> informe um <b>link</b> (YouTube, etc.).
+                    É obrigatório escolher uma das opções — ao preencher uma, a outra fica bloqueada.
+                </>
+            ),
+        },
+    ];
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <ProgressBar
-                currentStep={view}
-                totalSteps={5}
-                onStepClick={isEditMode ? setView : undefined}
-            />
+            {/* Cabeçalho fixo: steps + título não rolam junto com os campos */}
+            <ModalStickyHeader>
+                <ProgressBar
+                    currentStep={view}
+                    totalSteps={5}
+                    onStepClick={isEditMode ? setView : undefined}
+                />
+
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
+                        {stepMeta[view].title}
+                    </h2>
+                    <p className="text-sm text-cloud-400 leading-snug">
+                        {stepMeta[view].description}
+                    </p>
+                </div>
+            </ModalStickyHeader>
 
             {/* Step 0: Informações principais */}
             {view === 0 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
-                            {isEditMode ? "Editar sinal" : "Criar novo sinal"}
-                        </h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            {isEditMode ? "Atualize as informações do sinal." : "Preencha as informações principais do sinal."}
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="sign-name" isRequired>Nome</Label>
                         <Input
@@ -307,11 +344,6 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             {/* Step 1: Contexto */}
             {view === 1 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Contexto do sinal</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">Adicione exemplos e descreva o movimento das mãos.</p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="example-pt" isOptional>Exemplo em português</Label>
                         <Input
@@ -364,14 +396,6 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             {/* Step 2: Tags */}
             {view === 2 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Tags do sinal</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            Adicione palavras-chave e sinais relacionados. Elas ajudam alunos e educadores a
-                            encontrar este sinal na busca e a conectá-lo a temas parecidos.
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="tag-input" isRequired>Tags / sinais relacionados</Label>
                         <InputCheck
@@ -405,14 +429,6 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             {/* Step 3: Imagem (penúltimo) */}
             {view === 3 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Imagem ilustrativa</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            Envie uma imagem de referência do sinal (opcional). Ela aparece como capa e ajuda
-                            na identificação rápida antes de assistir ao vídeo.
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label isOptional>Imagem ilustrativa</Label>
                         <InputImage
@@ -440,14 +456,6 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             {/* Step 4: Vídeo ou URL (último) */}
             {view === 4 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Vídeo do sinal</h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            Envie um <b>vídeo</b> do sinal <b>ou</b> informe um <b>link</b> (YouTube, etc.).
-                            É obrigatório escolher uma das opções — ao preencher uma, a outra fica bloqueada.
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-1.5">
                         <Label isRequired={!urlDisabled} isOptional={urlDisabled}>Enviar vídeo</Label>
                         <InputVideo

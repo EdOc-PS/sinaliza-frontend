@@ -8,6 +8,8 @@ import Label from "@components/ui/Label";
 
 import { PostRequest } from "@requests";
 import { DISCIPLINES } from "@routes/disciplines";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { isValidEmail } from "@lib/validation/email";
 
 interface AddMemberFormProps {
     disciplineId: string;
@@ -19,7 +21,7 @@ export const AddMemberForm = ({ disciplineId, onClose, onSuccess }: AddMemberFor
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const emailValid = isValidEmail(email.trim());
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,13 +43,15 @@ export const AddMemberForm = ({ disciplineId, onClose, onSuccess }: AddMemberFor
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
+            <ModalStickyHeader>
+                <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Adicionar participante</h2>
                 <p className="text-sm text-cloud-400 leading-snug">
                     Informe o email de um usuário já cadastrado para incluí-lo nesta disciplina. O papel (aluno,
                     familiar ou educador) é definido pelo perfil da conta.
                 </p>
             </div>
+            </ModalStickyHeader>
 
             <div className="flex flex-col gap-1.5">
                 <Label htmlFor="member-email" isRequired>E-mail do usuário</Label>

@@ -13,6 +13,7 @@ import {
     CirclePasswordIcon,
     Home01Icon,
     LocationUser01Icon,
+    Login03Icon,
     MailOpenLoveIcon,
     PenTool03Icon,
     SmartPhone01Icon,
@@ -22,6 +23,7 @@ import BackButton from '@components/ui/BackButton'
 import { maskPhone } from '@lib/mask/mask'
 import { PERFIL_FORMULARIOS as perfilFormularios, type PerfilId } from '@lib/constants/profileFields'
 import type { Role } from '@api/requests'
+import { isValidEmail } from '@lib/validation/email'
 
 // Register cria apenas contas de STUDENT e GUARDIAN.
 // Educadores (professor/intérprete) são cadastrados pelo MANAGER via EducatorForm.
@@ -95,7 +97,7 @@ const RegisterPage = () => {
 
     // View 0: Dados pessoais (nome e email obrigatórios; nome mínimo 3 chars)
     const nomeValido = user.nome.trim().length >= 3
-    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email.trim())
+    const emailValido = isValidEmail(user.email.trim())
     const isView0Valid = nomeValido && emailValido
 
     // View 2: Dados do perfil (campos obrigatórios; opcionais são ignorados)
@@ -491,21 +493,20 @@ const RegisterPage = () => {
                 </form>
 
                 {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-1 flex items-center gap-3 rounded-3xl border-2 border-neutral-300 bg-white p-2 pl-3 md:absolute md:right-4 md:top-4 md:mt-0">
-                    {/* Volta para a landing page */}
+                <div className="mt-1 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
                     <button
                         onClick={() => navigate('/')}
-                        title="Ir para a página inicial"
-                        className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-2xl text-cloud-400 transition-colors duration-300 hover:bg-cloud-100 hover:text-cloud-600"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-bold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
                     >
                         <HugeiconsIcon icon={Home01Icon} size={20} />
+                        Início
                     </button>
-                    <p className="text-cloud-500 font-medium">Já tem uma conta?</p>
                     <button
                         onClick={() => navigate('/auth/login')}
-                        className="cursor-pointer rounded-2xl bg-campfire-500 px-5 py-3 font-bold text-cloud-100 transition-all duration-300 hover:bg-campfire-500/90"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-campfire-500 px-5 py-3 font-bold text-cloud-100 transition-colors duration-300 hover:bg-campfire-500/90"
                     >
-                        Faça login
+                        <HugeiconsIcon icon={Login03Icon} size={20} />
+                        Fazer login
                     </button>
                 </div>
             </div>

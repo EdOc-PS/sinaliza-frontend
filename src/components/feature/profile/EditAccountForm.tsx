@@ -18,6 +18,8 @@ import Select from "@components/ui/Select";
 import Button from "@components/ui/Button";
 import BackButton from "@components/ui/BackButton";
 import ProgressBar from "@components/layout/ProgressBar";
+import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { isValidEmail } from "@lib/validation/email";
 
 interface EditAccountFormProps {
     onClose: () => void;
@@ -56,7 +58,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
     const bioView = formularioPerfil ? 2 : 1;
 
     const nameValid = name.trim().length >= 3;
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const emailValid = isValidEmail(email.trim());
     const isView0Valid = nameValid && emailValid;
 
     const handleSave = async () => {
@@ -94,22 +96,33 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
         </Button>
     );
 
+    // Título de cada step — fica no cabeçalho fixo, fora da área que rola
+    const stepTitle =
+        view === 0
+            ? { title: "Editar conta", description: "Atualize seus dados pessoais." }
+            : view === 1 && formularioPerfil
+                ? { title: formularioPerfil.titulo, description: formularioPerfil.descricao }
+                : { title: "Sua bio", description: "Conte um pouco sobre você." };
+
     return (
         <div className="space-y-6">
-            <ProgressBar currentStep={view} totalSteps={totalSteps} onStepClick={setView} />
+            {/* Cabeçalho fixo: steps + título não rolam junto com os campos */}
+            <ModalStickyHeader>
+                <ProgressBar currentStep={view} totalSteps={totalSteps} onStepClick={setView} />
+
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
+                        {stepTitle.title}
+                    </h2>
+                    <p className="text-sm text-cloud-400 leading-snug">
+                        {stepTitle.description}
+                    </p>
+                </div>
+            </ModalStickyHeader>
 
             {/* Step 0: Dados pessoais */}
             {view === 0 && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
-                            Editar conta
-                        </h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            Atualize seus dados pessoais.
-                        </p>
-                    </div>
-
                     <div className="space-y-4">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="name" isRequired>Seu nome:</Label>
@@ -175,15 +188,6 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
             {/* Step 1: Dados do perfil */}
             {view === 1 && formularioPerfil && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
-                            {formularioPerfil.titulo}
-                        </h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            {formularioPerfil.descricao}
-                        </p>
-                    </div>
-
                     <div className="space-y-4">
                         {formularioPerfil.campos.map((campo) => (
                             <div key={campo.id} className="flex flex-col gap-2">
@@ -224,15 +228,6 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
             {/* Último step: Bio */}
             {view === bioView && (
                 <>
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">
-                            Sua bio
-                        </h2>
-                        <p className="text-sm text-cloud-400 leading-snug">
-                            Conte um pouco sobre você.
-                        </p>
-                    </div>
-
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="bio" isOptional>Biografia:</Label>
                         <InputText

@@ -98,19 +98,19 @@ const PublicGlossaryPage = () => {
 
             <main className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8">
                 <section className="flex flex-col gap-8">
-                    {/* Voltar para a landing page */}
-                    <button
-                        onClick={() => navigate("/")}
-                        className="flex w-fit cursor-pointer items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-cloud-500 transition-colors duration-300 ease-out hover:bg-white hover:text-campfire-600"
-                    >
-                        <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
-                        Voltar ao início
-                    </button>
-
                     {/* Banner */}
                     <div className="relative overflow-hidden rounded-3xl">
                         <CardMemphisBackground seed="glossary" color="#BACA57" rounded="rounded-3xl" icons={GLOSSARY_ICONS} />
                         <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
+                            {/* Voltar para a landing page */}
+                            <button
+                                onClick={() => navigate("/")}
+                                className="flex w-fit cursor-pointer items-center gap-1.5 rounded-2xl bg-white/20 px-3 py-1.5 text-sm font-semibold text-white transition-colors duration-300 ease-out hover:bg-white/30"
+                            >
+                                <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
+                                Voltar ao início
+                            </button>
+
                             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
                                 <HugeiconsIcon icon={GlobalEducationIcon} size={28} className="text-white" />
                             </div>
@@ -251,7 +251,7 @@ const PublicGlossaryPage = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {filtered.map((sign) => (
                                 <SignCard key={sign.id} sign={sign} publicMode />
                             ))}
