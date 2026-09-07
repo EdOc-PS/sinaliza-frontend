@@ -1,6 +1,8 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
-const BASE_API_URL = 'http://localhost:3004';
+// Em produção (hospedado), defina VITE_API_URL nas variáveis de ambiente do build.
+// Localmente, sem essa variável, cai no backend rodando em localhost.
+const BASE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
 
 let apiInstance: AxiosInstance | null = null;
 
