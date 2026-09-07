@@ -188,6 +188,38 @@ html {
     background: transparent;
 }
 
+/* ─────────────────────────────────────────────
+   Revelação escalonada de cards (mesmo efeito do FAB)
+   Aplique `.stagger-children` no container do grid/lista.
+   ───────────────────────────────────────────── */
+
+@keyframes cardReveal {
+    from { opacity: 0; transform: translateY(12px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.stagger-children > * {
+    animation: cardReveal 0.24s ease-out both;
+}
+
+.stagger-children > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2)  { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3)  { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4)  { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5)  { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6)  { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7)  { animation-delay: 340ms; }
+.stagger-children > *:nth-child(8)  { animation-delay: 380ms; }
+.stagger-children > *:nth-child(9)  { animation-delay: 420ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 460ms; }
+.stagger-children > *:nth-child(11) { animation-delay: 500ms; }
+/* Do 12º em diante entra junto — já está fora da primeira dobra */
+.stagger-children > *:nth-child(n + 12) { animation-delay: 540ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    .stagger-children > * { animation: none; }
+}
+
 /* Esconde a scrollbar mantendo o scroll (ex: tabs horizontais no mobile) */
 .no-scrollbar {
     -ms-overflow-style: none;

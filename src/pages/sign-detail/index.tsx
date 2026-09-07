@@ -348,7 +348,7 @@ const SignDetailPage = () => {
 
                 {/* Cards de descrição do movimento e exemplos */}
                 {(sign.movementDescription || sign.exampleLibras || sign.examplePt) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                    <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                         <div className="flex flex-col gap-2 rounded-3xl bg-white p-5 h-full">
                             <div className="flex items-center gap-2 text-salmon-500">
                                 <HugeiconsIcon icon={RotateRight01Icon} size={18} />

@@ -145,7 +145,7 @@ export const EssayExampleSection = ({ disciplineId, canManage }: EssayExampleSec
                     <p className="text-sm text-neutral-500">Nenhum exemplo de redação ainda.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {examples.map((example) => (
                         <div
                             key={example.id}

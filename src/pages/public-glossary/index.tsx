@@ -5,7 +5,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
     ArrowLeft01Icon,
     BooksIcon,
-    FilterIcon,
     GlobalEducationIcon,
     GlobeIcon,
     MortarboardIcon,
@@ -19,11 +18,10 @@ import type { CategorySlim } from "@lib/constants/category";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 import useScrollReveal from "@lib/hooks/useScrollReveal";
 
-import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
-import HandConfigPicker, { type HandConfig } from "@components/feature/workspace/HandConfigPicker";
+import { type HandConfig } from "@components/feature/workspace/HandConfigPicker";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
-import { GlossaryDisciplineCard } from "@components/feature/glossary/GlossaryDisciplineCard";
+import GlossaryFilters from "@components/feature/glossary/GlossaryFilters";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
 import LandingHeader from "@components/feature/landing/LandingHeader";
 import LandingFooter from "@components/feature/landing/LandingFooter";
@@ -31,7 +29,7 @@ import LandingFooter from "@components/feature/landing/LandingFooter";
 // Confete de educação/globo
 const GLOSSARY_ICONS = [GlobalEducationIcon, GlobalEducationIcon, GlobeIcon, BooksIcon, SignLanguageCIcon, MortarboardIcon];
 
-interface GlossaryFilters {
+interface GlossaryFiltersResponse {
     categories: CategorySlim[];
     handConfigs: HandConfig[];
     glossaryDisciplines: GlossaryDisciplineSlim[];
@@ -59,7 +57,7 @@ const PublicGlossaryPage = () => {
 
     // Filtros vêm de um endpoint público único (/category e /hand-config exigem token)
     const loadFilters = async () => {
-        const res = await GetRequest<GlossaryFilters>(GLOSSARY.FILTERS());
+        const res = await GetRequest<GlossaryFiltersResponse>(GLOSSARY.FILTERS());
         if (!res.success || !res.object) return;
         setCategories(res.object.categories ?? []);
         setHandConfigs(res.object.handConfigs ?? []);
@@ -133,103 +131,22 @@ const PublicGlossaryPage = () => {
                     </div>
 
                     {/* Filtros */}
-                    <div className="flex flex-col gap-5 rounded-3xl bg-white p-5 sm:p-6">
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-campfire-100">
-                                <HugeiconsIcon icon={FilterIcon} size={20} className="text-campfire-600" />
-                            </div>
-                            <div>
-                                <h2 className="font-baskerville text-lg font-bold text-cloud-600">Buscar sinais</h2>
-                                <p className="text-sm text-neutral-500">
-                                    Combine busca por palavra, categoria, configuração de mão e disciplina.
-                                </p>
-                            </div>
-                        </div>
-
-                        <Input
-                            icon={Search01Icon}
-                            wrapperClassName="bg-cloud-100"
-                            value={query}
-                            onChange={setQuery}
-                            placeholder="Buscar no repositório..."
-                        />
-
-                        {/* Categorias como chips */}
-                        {categories.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <span className="px-1 text-sm font-semibold text-cloud-500">Categorias</span>
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setCategoryId("")}
-                                        className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
-                                            categoryId === ""
-                                                ? "bg-campfire-100 text-campfire-600"
-                                                : "bg-cloud-100 text-cloud-500 hover:bg-cloud-200"
-                                        }`}
-                                    >
-                                        Todas
-                                    </button>
-                                    {categories.map((c) => (
-                                        <button
-                                            key={c.id}
-                                            type="button"
-                                            onClick={() => setCategoryId(categoryId === c.id ? "" : c.id)}
-                                            className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
-                                                categoryId === c.id
-                                                    ? "bg-campfire-100 text-campfire-600"
-                                                    : "bg-cloud-100 text-cloud-500 hover:bg-cloud-200"
-                                            }`}
-                                        >
-                                            {c.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Teclado de configuração de mão */}
-                        {handConfigs.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                                    <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                                    Configuração de mão
-                                </span>
-                                <HandConfigPicker
-                                    value={handConfigId}
-                                    onChange={setHandConfigId}
-                                    configs={handConfigs}
-                                    compact
-                                    allowDeselect
-                                    gridClassName="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-1.5"
-                                    itemsPerPage={24}
-                                />
-                            </div>
-                        )}
-
-                        {/* Disciplinas do glossário */}
-                        {disciplines.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                                    <HugeiconsIcon icon={MortarboardIcon} size={18} />
-                                    Disciplinas
-                                </span>
-                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                                    {disciplines.map((disc) => (
-                                        <GlossaryDisciplineCard
-                                            key={disc.id}
-                                            discipline={disc}
-                                            selected={glossaryDisciplineId === disc.id}
-                                            onToggle={() =>
-                                                setGlossaryDisciplineId(glossaryDisciplineId === disc.id ? "" : disc.id)
-                                            }
-                                            icons={GLOSSARY_ICONS}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <GlossaryFilters
+                        query={query}
+                        onQueryChange={setQuery}
+                        categories={categories}
+                        categoryId={categoryId}
+                        onCategoryChange={setCategoryId}
+                        handConfigId={handConfigId}
+                        onHandConfigChange={setHandConfigId}
+                        handConfigs={handConfigs}
+                        disciplines={disciplines}
+                        glossaryDisciplineId={glossaryDisciplineId}
+                        onDisciplineChange={setGlossaryDisciplineId}
+                        disciplineIcons={GLOSSARY_ICONS}
+                        searchWrapperClassName="bg-cloud-100"
+                        placeholder="Buscar no repositório..."
+                    />
 
                     {/* Conteúdo */}
                     {loading ? (
@@ -251,7 +168,7 @@ const PublicGlossaryPage = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="stagger-children grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {filtered.map((sign) => (
                                 <SignCard key={sign.id} sign={sign} publicMode />
                             ))}

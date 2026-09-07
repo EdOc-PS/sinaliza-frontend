@@ -74,7 +74,7 @@ const SearchResultsPage = () => {
             ) : (
                 <div className="flex flex-col gap-5">
                     <span className="text-xs text-neutral-400">{signs.length} sinais encontrados</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                         {signs.map((sign) => (
                             <SignCard
                                 key={sign.id}

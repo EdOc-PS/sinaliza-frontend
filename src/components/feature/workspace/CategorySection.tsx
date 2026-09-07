@@ -94,7 +94,7 @@ export const CategorySection = () => {
                     <p className="text-sm text-neutral-500">Nenhuma categoria cadastrada ainda.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {categories.map((cat) => (
                         <div key={cat.id} className="flex items-center gap-3 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 p-3">
                             <span className="flex-1 truncate pl-1 text-sm font-medium text-cloud-500">{cat.name}</span>

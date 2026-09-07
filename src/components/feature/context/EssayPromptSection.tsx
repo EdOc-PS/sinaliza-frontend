@@ -125,7 +125,7 @@ export const EssayPromptSection = ({ disciplineId, canManage }: EssayPromptSecti
                     <p className="text-sm text-neutral-500">Nenhuma proposta de redação ainda.</p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3">
+                <div className="stagger-children flex flex-col gap-3">
                     {prompts.map((prompt) => (
                         <div
                             key={prompt.id}

@@ -83,7 +83,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                     <Spinner size={28} color="#6B7280" />
                 </div>
             ) : (
-                <div className="flex flex-col gap-2">
+                <div className="stagger-children flex flex-col gap-2">
                     {signs.map((sign) => {
                         const busy = processingId === sign.id;
                         const thumb = sign.imgUrl

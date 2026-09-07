@@ -197,7 +197,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                         <p className="text-sm">Nenhuma configuração encontrada para "<strong>{debouncedSearch}</strong>"</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
+                    <div className="stagger-children grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
                         {paginatedConfigs.map((config) => (
                             <Tooltip key={config.name} label={config.name}>
                                 {selectMode ? (

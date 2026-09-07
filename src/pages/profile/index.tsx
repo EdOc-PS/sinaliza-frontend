@@ -137,7 +137,7 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Listas: últimos acessados + últimas curtidas */}
-                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                <div className="stagger-children grid grid-cols-1 gap-5 lg:grid-cols-2">
                     {/* Últimos acessados */}
                     <ListCard
                         title="Últimos acessados"

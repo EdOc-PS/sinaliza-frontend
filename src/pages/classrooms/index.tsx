@@ -112,7 +112,7 @@ const ClassroomsPage = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {loading ? (
                             <div className="col-span-full flex items-center justify-center py-10">
                                 <Spinner size={32} color="#6B7280" />

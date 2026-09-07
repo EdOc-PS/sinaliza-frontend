@@ -119,7 +119,7 @@ const EducatorsPage = () => {
                 ) : (
                     <div className="flex flex-col gap-3">
                         <span className="text-xs text-neutral-400">{educators.length} educador{educators.length > 1 ? "es" : ""}</span>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {educators.map((edu) => (
                                 <ListCardEducator
                                     key={edu.id}

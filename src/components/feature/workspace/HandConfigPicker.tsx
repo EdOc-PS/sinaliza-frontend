@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ChevronLeft, ChevronRight, Search01Icon, Tick02Icon, Tick04Icon } from "@hugeicons/core-free-icons";
+import { ChevronLeft, ChevronRight, Search01Icon, Tick04Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
 import { HAND_CONFIG } from "@routes/handConfigs";

@@ -30,7 +30,7 @@ export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: 
                     <p className="text-sm text-neutral-400">Nenhum participante nesta seção.</p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-1">
+                <div className="stagger-children flex flex-col gap-1">
                     {members.map((m) => (
                         <div
                             key={m.user.id}

@@ -136,7 +136,7 @@ const MembersPage = () => {
                             Acesso rápido pelas iniciais para facilitar a identificação das pessoas.
                         </span>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {others.map((member) => (
                             <ListCardMember key={member.id} member={member} />
                         ))}

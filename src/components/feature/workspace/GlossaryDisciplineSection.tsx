@@ -96,7 +96,7 @@ export const GlossaryDisciplineSection = () => {
                     <p className="text-sm text-neutral-500">Nenhuma disciplina cadastrada ainda.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {disciplines.map((disc) => (
                         <div key={disc.id} className="flex items-start gap-3 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 p-3">
                             <div className="min-w-0 flex-1 pl-1">
