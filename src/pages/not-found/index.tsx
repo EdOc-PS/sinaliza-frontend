@@ -4,6 +4,7 @@ import { Home01Icon, Alert02Icon } from "@hugeicons/core-free-icons";
 
 import AuthBackground from "@components/layout/AuthBackground";
 import Button from "@components/ui/Button";
+import notFoundImg from "@/assets/images/404.webp";
 
 const NotFoundPage = () => {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ const NotFoundPage = () => {
             <AuthBackground />
 
             <div className="flex w-full max-w-lg flex-col items-center gap-6 rounded-3xl border-2 border-neutral-200 bg-white p-8 text-center sm:p-10">
-                <img src="/src/assets/images/404.webp" alt="" className="h-40 w-40 object-contain sm:h-48 sm:w-48" />
+                <img src={notFoundImg} alt="" className="h-40 w-40 object-contain sm:h-48 sm:w-48" />
 
                 <div className="flex flex-col gap-2">
                     <h1 className="font-baskerville text-2xl font-bold text-cloud-600 sm:text-3xl">

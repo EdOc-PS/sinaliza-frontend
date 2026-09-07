@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import { useAuth } from '@/config/context/AuthContext'
 import { isPendingApproval } from '@lib/auth/approval'
 import { isValidEmail } from '@lib/validation/email'
+import logoImg from '@/assets/images/logo/logo-simples.png'
+import sunImg from '@/assets/images/sun.png'
 
 interface AuthProps {
     email: string
@@ -51,7 +53,7 @@ const LoginPage = () => {
             <div className='flex flex-col items-center w-full'>
                 {/* Logo */}
                 <div className='flex items-center'>
-                    <img src="/src/assets/images/logo/logo-simples.png" alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
+                    <img src={logoImg} alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
                     <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
                 </div>
 
@@ -59,7 +61,7 @@ const LoginPage = () => {
                 <div className="w-full max-w-lg bg-white rounded-4xl p-6 sm:p-8 border-2 border-neutral-300">
                     <div className="space-y-6">
                         <div className='flex w-full justify-center'>
-                            <img src="/src/assets/images/sun.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                            <img src={sunImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                         </div>
 
                         <div className="text-center">

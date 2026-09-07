@@ -24,6 +24,25 @@ import { maskPhone } from '@lib/mask/mask'
 import { PERFIL_FORMULARIOS as perfilFormularios, type PerfilId } from '@lib/constants/profileFields'
 import type { Role } from '@api/requests'
 import { isValidEmail } from '@lib/validation/email'
+import logoImg from '@/assets/images/logo/logo-simples.png'
+import helloImg from '@/assets/images/hello.png'
+import profileImg from '@/assets/images/profile.png'
+import penImg from '@/assets/images/pen.png'
+import securityImg from '@/assets/images/security.png'
+import approveImg from '@/assets/images/approve.png'
+import studentImg from '@/assets/images/student.png'
+import educatorImg from '@/assets/images/educator.png'
+import interpreterImg from '@/assets/images/interpreter.png'
+import guardianImg from '@/assets/images/guardian.png'
+
+// Mapa de imagem por perfil — evita caminho dinâmico (`/src/assets/...${id}.png`),
+// que só funciona em dev (Vite serve /src direto); em produção precisa de import estático.
+const PROFILE_IMAGES: Record<PerfilId, string> = {
+    student: studentImg,
+    educator: educatorImg,
+    interpreter: interpreterImg,
+    guardian: guardianImg,
+}
 
 // Register cria apenas contas de STUDENT e GUARDIAN.
 // Educadores (professor/intérprete) são cadastrados pelo MANAGER via EducatorForm.
@@ -161,7 +180,7 @@ const RegisterPage = () => {
             <div className='flex flex-col items-center gap-3 sm:gap-4 w-full'>
                 {/* Logo */}
                 <div className='flex items-center'>
-                    <img src="/src/assets/images/logo/logo-simples.png" alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
+                    <img src={logoImg} alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
                     <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
                 </div>
 
@@ -174,7 +193,7 @@ const RegisterPage = () => {
                         {view === 0 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src="/src/assets/images/hello.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={helloImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
                                     <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
@@ -247,7 +266,7 @@ const RegisterPage = () => {
                         {view === 1 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src="/src/assets/images/profile.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={profileImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -276,7 +295,7 @@ const RegisterPage = () => {
                                                     <p className="break-normal mt-1 text-sm font-medium opacity-90">{perfil.descricao}</p>
                                                 </div>
 
-                                                <img src={`/src/assets/images/${perfil.id}.png`} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />
+                                                <img src={PROFILE_IMAGES[perfil.id]} alt="" className='w-12 h-12 sm:w-15 sm:h-15 mt-4 sm:mt-8' />
 
 
                                             </button>
@@ -301,7 +320,7 @@ const RegisterPage = () => {
                         {view === 2 && (
                             <>
                                 <div className='flex w-full justify-center'>
-                                    <img src={`/src/assets/images/${user.perfil}.png`} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={user.perfil ? PROFILE_IMAGES[user.perfil] : helloImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -361,7 +380,7 @@ const RegisterPage = () => {
                         {view === 3 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/images/pen.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={penImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
 
                                 <div className="text-center">
@@ -397,7 +416,7 @@ const RegisterPage = () => {
                         {view === 4 && (
                             <>
                                 <div className='flex w-ful justify-center '>
-                                    <img src="/src/assets/images/security.png" alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
+                                    <img src={securityImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
                                     <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
@@ -468,7 +487,7 @@ const RegisterPage = () => {
 
 
                                     <div className="flex justify-center p-6 sm:p-8 rounded-full bg-green-400/50">
-                                        <img src="/src/assets/images/approve.png" alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
+                                        <img src={approveImg} alt="" className='w-20 h-20 sm:w-25 sm:h-25' />
                                     </div>
                                     <p className='text-neutral-500 font-medium text-sm sm:text-base'>
                                         Sua conta foi criada e enviada para <b className="text-cloud-500">análise</b>. Um educador da instituição

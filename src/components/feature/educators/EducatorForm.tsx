@@ -27,6 +27,8 @@ import { maskPhone } from "@lib/mask/mask";
 import { PERFIL_FORMULARIOS } from "@lib/constants/profileFields";
 import type { CreateEducatorPayload, EducatorType, Role, User } from "@api/requests";
 import { isValidEmail } from "@lib/validation/email";
+import educatorImg from "@/assets/images/educator.png";
+import interpreterImg from "@/assets/images/interpreter.png";
 
 // Só os dois tipos de educador
 type EducatorKind = "educator" | "interpreter";
@@ -254,7 +256,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                                 <p className="text-lg font-bold">Professor</p>
                                 <p className="mt-1 text-sm font-medium opacity-90">Gestão de turmas e sinais</p>
                             </div>
-                            <img src="/src/assets/images/educator.png" alt="" className="w-14 h-14 shrink-0" />
+                            <img src={educatorImg} alt="" className="w-14 h-14 shrink-0" />
                         </button>
 
                         <button
@@ -266,7 +268,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                                 <p className="text-lg font-bold">Intérprete</p>
                                 <p className="mt-1 text-sm font-medium opacity-90">Criação de sinais e apoio aos estudantes</p>
                             </div>
-                            <img src="/src/assets/images/interpreter.png" alt="" className="w-14 h-14 shrink-0" />
+                            <img src={interpreterImg} alt="" className="w-14 h-14 shrink-0" />
                         </button>
                     </div>
 

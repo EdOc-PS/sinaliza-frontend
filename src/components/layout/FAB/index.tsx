@@ -11,6 +11,10 @@ import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
 import { JoinDisciplineForm } from "@components/feature/classroom/JoinDisciplineForm";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
+import createClassImg from "@/assets/images/app/create-class.png";
+import joinClassImg from "@/assets/images/app/join-class.png";
+import createHandImg from "@/assets/images/app/create-hand.png";
+import createSignalImg from "@/assets/images/app/create-signal.png";
 
 interface FABActionProps {
     icon: React.ReactNode;
@@ -86,7 +90,7 @@ export const FAB = () => {
                             delay="180ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src="src/assets/images/app/create-class.png" alt="" className="w-6 h-6" />
+                                    <img src={createClassImg} alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar uma turma"
@@ -97,7 +101,7 @@ export const FAB = () => {
                             delay="120ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-100">
-                                    <img src="src/assets/images/app/join-class.png" alt="" className="w-6 h-6" />
+                                    <img src={joinClassImg} alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Participar de uma turma"
@@ -108,7 +112,7 @@ export const FAB = () => {
                             delay="60ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src="src/assets/images/app/create-hand.png" alt="" className="w-6 h-6" />
+                                    <img src={createHandImg} alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar configuração de mão"
@@ -120,7 +124,7 @@ export const FAB = () => {
                             delay="0ms"
                             icon={
                                 <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-salmon-100">
-                                    <img src="src/assets/images/app/create-signal.png" alt="" className="w-6 h-6" />
+                                    <img src={createSignalImg} alt="" className="w-6 h-6" />
                                 </span>
                             }
                             label="Criar sinal"
