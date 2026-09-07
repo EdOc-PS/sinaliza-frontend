@@ -5,6 +5,7 @@ import {
     Calendar03Icon,
     Edit02Icon,
     FavouriteIcon,
+    Logout01Icon,
     Mail01Icon,
     Rotate01Icon,
     SchoolIcon,
@@ -30,7 +31,12 @@ interface HistorySign extends SignListData {
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/auth/login");
+    };
 
     const [editModal, setEditModal] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -177,6 +183,15 @@ const ProfilePage = () => {
                         ))}
                     </ListCard>
                 </div>
+
+                {/* Sair — no desktop essa ação vive na sidebar, que não existe no mobile */}
+                <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center justify-center gap-2 rounded-3xl bg-salmon-100 px-4 py-3 text-sm font-semibold text-salmon-600 transition-colors duration-300 hover:bg-salmon-200 lg:hidden"
+                >
+                    <HugeiconsIcon icon={Logout01Icon} size={18} />
+                    Sair da conta
+                </button>
             </section>
 
             {/* Modal de editar conta */}

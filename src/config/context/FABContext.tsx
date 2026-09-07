@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type FABForm = "create-class" | "join-class" | "create-hand-config" | "create-signal" | null;
 
@@ -16,17 +16,21 @@ export const FABProvider = ({ children }: { children: ReactNode }) => {
     const [activeForm, setActiveForm] = useState<FABForm>(null);
     const refreshRef = useRef<(() => void) | null>(null);
 
-    return (
-        <FABContext.Provider value={{
-            activeForm,
-            openForm: setActiveForm,
-            closeForm: () => setActiveForm(null),
-            registerRefresh: (fn) => { refreshRef.current = fn; },
-            triggerRefresh: () => refreshRef.current?.(),
-        }}>
-            {children}
-        </FABContext.Provider>
+    // As funções precisam ter identidade estável: as páginas registram o refresh
+    // dentro de um useEffect que depende delas. Sem isso, abrir um modal
+    // (que troca `activeForm`) recriava `registerRefresh` e disparava um
+    // recarregamento desnecessário da listagem por trás do modal.
+    const openForm = useCallback((form: FABForm) => setActiveForm(form), []);
+    const closeForm = useCallback(() => setActiveForm(null), []);
+    const registerRefresh = useCallback((fn: () => void) => { refreshRef.current = fn; }, []);
+    const triggerRefresh = useCallback(() => refreshRef.current?.(), []);
+
+    const value = useMemo(
+        () => ({ activeForm, openForm, closeForm, registerRefresh, triggerRefresh }),
+        [activeForm, openForm, closeForm, registerRefresh, triggerRefresh],
     );
+
+    return <FABContext.Provider value={value}>{children}</FABContext.Provider>;
 };
 
 export const useFAB = () => {

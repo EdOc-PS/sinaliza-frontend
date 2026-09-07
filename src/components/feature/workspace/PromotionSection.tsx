@@ -10,6 +10,7 @@ import { getCategoryBadgeClass, type CategorySlim } from "@lib/constants/categor
 import { getYouTubeThumbnail } from "@lib/youtube/youtube";
 
 import Spinner from "@components/ui/Spinner";
+import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 interface PendingSign {
     id: string;
@@ -48,6 +49,9 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
     useEffect(() => {
         load();
     }, [load]);
+
+    // Participa do spinner unificado da tela (LoadingGroup)
+    useReportLoading("promotions", loading);
 
     const review = async (sign: PendingSign, approve: boolean) => {
         setProcessingId(sign.id);

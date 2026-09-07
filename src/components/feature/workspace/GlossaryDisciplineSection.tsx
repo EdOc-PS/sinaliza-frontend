@@ -21,6 +21,7 @@ import {
 } from "@components/ui/DropdownMenu";
 
 import createClassImg from "@/assets/images/app/create-class.png";
+import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 export const GlossaryDisciplineSection = () => {
     const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
@@ -43,6 +44,9 @@ export const GlossaryDisciplineSection = () => {
     useEffect(() => {
         load();
     }, [load]);
+
+    // Participa do spinner unificado da tela (LoadingGroup)
+    useReportLoading("glossary-disciplines", loading);
 
     const handleDelete = async () => {
         if (!deleteModal.id) return;

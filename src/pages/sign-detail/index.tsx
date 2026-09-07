@@ -297,12 +297,12 @@ const SignDetailPage = () => {
                         )}
                     </div>
 
-                    {/* Ações */}
-                    <div className="flex items-center gap-2">
+                    {/* Ações — 2x2 ocupando a largura no mobile, em linha a partir do lg */}
+                    <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto lg:items-center">
                         <button
                             onClick={handleToggleFavorite}
                             disabled={favLoading}
-                            className={`flex items-center gap-2 rounded-2xl px-3.5 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
+                            className={`flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
                                 isFavorite
                                     ? "bg-salmon-100 text-salmon-600 hover:bg-salmon-200"
                                     : "bg-cloud-100 text-cloud-600 hover:bg-cloud-200"
@@ -320,7 +320,7 @@ const SignDetailPage = () => {
                             <>
                                 <button
                                     onClick={() => setEditModal(true)}
-                                    className="flex items-center gap-2 rounded-2xl bg-cloud-100 hover:bg-cloud-200 transition-colors px-3.5 py-2 text-sm font-medium text-cloud-600"
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-cloud-100 hover:bg-cloud-200 transition-colors px-3.5 py-2 text-sm font-medium text-cloud-600"
                                 >
                                     <HugeiconsIcon icon={Edit02Icon} size={18} />
                                     Editar
@@ -328,7 +328,7 @@ const SignDetailPage = () => {
                                 {(sign.globalStatus === "PRIVATE" || sign.globalStatus === "REJECTED") && (
                                     <button
                                         onClick={() => setPromoteModal(true)}
-                                        className="flex items-center gap-2 rounded-2xl bg-campfire-100 hover:bg-campfire-200 transition-colors px-3.5 py-2 text-sm font-medium text-campfire-600"
+                                        className="flex items-center justify-center gap-2 rounded-2xl bg-campfire-100 hover:bg-campfire-200 transition-colors px-3.5 py-2 text-sm font-medium text-campfire-600"
                                     >
                                         <HugeiconsIcon icon={Medal06Icon} size={18} />
                                         Promover
@@ -336,7 +336,7 @@ const SignDetailPage = () => {
                                 )}
                                 <button
                                     onClick={() => setDeleteModal(true)}
-                                    className="flex items-center gap-2 rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-3.5 py-2 text-sm font-medium text-salmon-600"
+                                    className="flex items-center justify-center gap-2 rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-3.5 py-2 text-sm font-medium text-salmon-600"
                                 >
                                     <HugeiconsIcon icon={DeleteIcon} size={18} />
                                     Excluir

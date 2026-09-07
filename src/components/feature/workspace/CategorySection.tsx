@@ -20,6 +20,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@components/ui/DropdownMenu";
+import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 export const CategorySection = () => {
     const [categories, setCategories] = useState<CategorySlim[]>([]);
@@ -42,6 +43,9 @@ export const CategorySection = () => {
     useEffect(() => {
         load();
     }, [load]);
+
+    // Participa do spinner unificado da tela (LoadingGroup)
+    useReportLoading("categories", loading);
 
     const handleDelete = async () => {
         if (!deleteModal.id) return;

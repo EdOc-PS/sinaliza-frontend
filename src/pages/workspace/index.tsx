@@ -12,6 +12,8 @@ import { CategorySection } from "@components/feature/workspace/CategorySection";
 import { GlossaryDisciplineSection } from "@components/feature/workspace/GlossaryDisciplineSection";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 
+import { LoadingGroup } from "@lib/hooks/useLoadingGroup";
+
 import createSignalImg from "@/assets/images/app/create-signal.png";
 import createHandImg from "@/assets/images/app/create-hand.png";
 
@@ -90,21 +92,26 @@ const WorkspacePage = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6">
-                    <VisualKeyboard
-                        onEdit={handleEditConfig}
-                        refreshTrigger={refreshTrigger}
-                    />
-                </div>
+                {/* Um spinner só para a tela inteira, em vez de um por card */}
+                <LoadingGroup>
+                    <div className="flex flex-col gap-10">
+                        <div className="bg-white rounded-3xl p-6">
+                            <VisualKeyboard
+                                onEdit={handleEditConfig}
+                                refreshTrigger={refreshTrigger}
+                            />
+                        </div>
 
-                {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}
-                {(isManager || isEducator) && <PromotionSection canReview={isManager} />}
+                        {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}
+                        {(isManager || isEducator) && <PromotionSection canReview={isManager} />}
 
-                {/* Categorias — CRUD para o educador */}
-                <CategorySection />
+                        {/* Categorias — CRUD para o educador */}
+                        <CategorySection />
 
-                {/* Disciplinas do glossário — CRUD apenas para o gestor */}
-                {isManager && <GlossaryDisciplineSection />}
+                        {/* Disciplinas do glossário — CRUD apenas para o gestor */}
+                        {isManager && <GlossaryDisciplineSection />}
+                    </div>
+                </LoadingGroup>
             </section>
 
             {/* Modal criar sinal */}

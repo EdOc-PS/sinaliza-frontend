@@ -14,6 +14,8 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@components/ui/DropdownMenu";
+import Spinner from "@components/ui/Spinner";
+import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 import createHandImg from "@/assets/images/app/create-hand.png";
 
 export interface HandConfigTypeForm {
@@ -77,6 +79,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
     );
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const searchRef = useRef<HTMLInputElement>(null);
+    const hasLoadedOnce = useRef(false);
 
     // Debounce search 350ms
     useEffect(() => {
@@ -98,12 +101,17 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
             setCurrentPage(1);
         } finally {
             setLoading(false);
+            hasLoadedOnce.current = true;
         }
     }, []);
 
     useEffect(() => {
         fetchAllHandConfigs(debouncedSearch || undefined);
     }, [fetchAllHandConfigs, debouncedSearch, refreshTrigger]);
+
+    // Participa do spinner unificado da tela (LoadingGroup). Só na carga inicial:
+    // buscas seguintes usam o spinner interno, para não esconder o campo de busca.
+    useReportLoading("hand-configs", loading && !debouncedSearch && !hasLoadedOnce.current);
 
     const selectMode = !!onSelectConfig;
     // No modo seleção não há card "+", então a paginação considera só os itens reais
@@ -190,7 +198,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                 {/* Grid de cards */}
                 {loading ? (
                     <div className="flex items-center justify-center py-16">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cloud-500" />
+                        <Spinner size={32} color="#6B7280" />
                     </div>
                 ) : handConfigs.length === 0 && debouncedSearch ? (
                     <div className="flex flex-col items-center justify-center py-12 text-neutral-400 gap-2">

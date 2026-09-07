@@ -25,9 +25,12 @@ const AuthBackground = ({ variant = 'fixed', sun = false }: AuthBackgroundProps)
             const pageH = document.documentElement.scrollHeight - window.innerHeight
             if (pageH <= 0) return
             const pct = scrollY / pageH
-            if (w1Ref.current) w1Ref.current.style.transform = `translateY(${pct * -40}px)`
-            if (w2Ref.current) w2Ref.current.style.transform = `translateY(${pct * -24}px)`
-            if (w3Ref.current) w3Ref.current.style.transform = `translateY(${pct * -10}px)`
+            // O SVG escala com a largura da tela; o deslocamento precisa acompanhar,
+            // senão no mobile ele move mais que a própria altura da onda e as separa.
+            const scale = Math.min(1, window.innerWidth / 1280)
+            if (w1Ref.current) w1Ref.current.style.transform = `translateY(${pct * -40 * scale}px)`
+            if (w2Ref.current) w2Ref.current.style.transform = `translateY(${pct * -24 * scale}px)`
+            if (w3Ref.current) w3Ref.current.style.transform = `translateY(${pct * -10 * scale}px)`
         }
         window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
@@ -41,8 +44,12 @@ const AuthBackground = ({ variant = 'fixed', sun = false }: AuthBackgroundProps)
             <div
                 className="absolute inset-0"
                 style={{
+                    // Na variante `contained` a faixa é azul inteira: quem faz a
+                    // transição para o branco é a própria onda da frente, que
+                    // preenche até a base. Um corte fixo em % brigava com a altura
+                    // do hero (bem maior no mobile) e a onda "descolava" do fundo.
                     background: isContained
-                        ? 'linear-gradient(to bottom, #F5F9FC 82%, #ffffff 18%)'
+                        ? '#F5F9FC'
                         : 'linear-gradient(to bottom, #F5F9FC 65%, #ffffff 35%)',
                 }}
             />
@@ -55,7 +62,7 @@ const AuthBackground = ({ variant = 'fixed', sun = false }: AuthBackgroundProps)
                 style={{ bottom: isContained ? '0' : '25%', left: '-5%', width: '110%', height: '260px' }}
             >
                 {/* Wave back */}
-                <div ref={w1Ref} className="absolute" style={{ bottom: '60px', left: 0, right: 0 }}>
+                <div ref={w1Ref} className="absolute bottom-[15px] sm:bottom-[32px] lg:bottom-[60px]" style={{ left: 0, right: 0 }}>
                     <div className="wave-auth-1">
                         <svg viewBox="0 0 1440 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0,130 C180,210 360,50 540,130 C720,210 900,40 1080,120 C1260,200 1380,80 1440,130 L1440,260 L0,260 Z" fill="#A7DAEB" fillOpacity="0.3" />
@@ -64,7 +71,7 @@ const AuthBackground = ({ variant = 'fixed', sun = false }: AuthBackgroundProps)
                 </div>
 
                 {/* Wave mid */}
-                <div ref={w2Ref} className="absolute" style={{ bottom: '30px', left: 0, right: 0 }}>
+                <div ref={w2Ref} className="absolute bottom-[8px] sm:bottom-[16px] lg:bottom-[30px]" style={{ left: 0, right: 0 }}>
                     <div className="wave-auth-2">
                         <svg viewBox="0 0 1440 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0,160 C200,80 400,210 600,155 C800,100 1000,210 1200,150 C1320,115 1390,170 1440,160 L1440,260 L0,260 Z" fill="#E8F7FF" fillOpacity="0.75" />
