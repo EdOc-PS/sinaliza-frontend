@@ -21,14 +21,14 @@ export interface EssayPrompt {
 }
 
 interface EssayPromptFormProps {
-    disciplineId: string;
+    classroomId: string;
     /** Quando informado, o formulário entra em modo de edição */
     prompt?: EssayPrompt;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const EssayPromptForm = ({ disciplineId, prompt, onClose, onSuccess }: EssayPromptFormProps) => {
+export const EssayPromptForm = ({ classroomId, prompt, onClose, onSuccess }: EssayPromptFormProps) => {
     const isEditMode = !!prompt;
     const [title, setTitle] = useState(prompt?.title ?? "");
     const [description, setDescription] = useState(prompt?.description ?? "");
@@ -48,7 +48,7 @@ export const EssayPromptForm = ({ disciplineId, prompt, onClose, onSuccess }: Es
             };
             const res = isEditMode
                 ? await PatchRequest(ESSAYS.UPDATE_PROMPT(prompt!.id), body)
-                : await PostRequest(ESSAYS.CREATE_PROMPT(disciplineId), body);
+                : await PostRequest(ESSAYS.CREATE_PROMPT(classroomId), body);
 
             if (!res.success) { toast.error("Falha ao salvar proposta: " + res.message); return; }
             toast.success(isEditMode ? "Proposta atualizada!" : "Proposta criada!");

@@ -33,7 +33,6 @@ import approveImg from '@/assets/images/approve.png'
 import studentImg from '@/assets/images/student.png'
 import educatorImg from '@/assets/images/educator.png'
 import interpreterImg from '@/assets/images/interpreter.png'
-import guardianImg from '@/assets/images/guardian.png'
 
 // Mapa de imagem por perfil — evita caminho dinâmico (`/src/assets/...${id}.png`),
 // que só funciona em dev (Vite serve /src direto); em produção precisa de import estático.
@@ -41,14 +40,12 @@ const PROFILE_IMAGES: Record<PerfilId, string> = {
     student: studentImg,
     educator: educatorImg,
     interpreter: interpreterImg,
-    guardian: guardianImg,
 }
 
-// Register cria apenas contas de STUDENT e GUARDIAN.
+// Register cria apenas contas de STUDENT.
 // Educadores (professor/intérprete) são cadastrados pelo MANAGER via EducatorForm.
 const perfilRoleMap: Partial<Record<PerfilId, Role>> = {
     student: 'STUDENT',
-    guardian: 'GUARDIAN',
 }
 
 type UserProps = {
@@ -92,12 +89,6 @@ const RegisterPage = () => {
             titulo: 'Estudante',
             descricao: 'Aprendizado continuo e diario de estudos',
             classes: 'bg-sky-100 text-sky-800',
-        },
-        {
-            id: 'guardian',
-            titulo: 'Familiar',
-            descricao: 'Apoio domestico e conexao familiar',
-            classes: 'bg-lime-100 text-lime-800',
         },
     ]
 

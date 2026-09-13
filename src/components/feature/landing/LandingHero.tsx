@@ -24,8 +24,8 @@ export const LandingHero = () => {
                     className="fade-up mx-auto mt-6 max-w-xl text-base leading-relaxed text-cloud-400 sm:text-lg"
                     style={{ animationDelay: "0.1s" }}
                 >
-                    Um repositório colaborativo de sinais que conecta intérpretes, alunos,
-                    professores e familiares dentro da sala de aula.
+                    Um repositório colaborativo de sinais que conecta intérpretes, alunos
+                    e professores dentro da sala de aula.
                 </p>
 
                 <div

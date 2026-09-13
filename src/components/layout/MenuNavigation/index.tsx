@@ -33,29 +33,26 @@ interface TooltipProps {
     bgColor?: string;
 }
 
-type MenuEntry = { icon: typeof Home06Icon; label: string; path: string; shortLabel?: string };
+// `section: "admin"` separa os acessos de gestão dos acessos gerais no menu lateral
+type MenuEntry = { icon: typeof Home06Icon; label: string; path: string; shortLabel?: string; section?: "admin" };
 
 const menuItemsByRole: Record<string, MenuEntry[]> = {
     STUDENT: [
+        { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
     ],
     EDUCATOR: [
+        { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" }
-    ],
-    GUARDIAN: [
-        { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" }
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
     ],
     MANAGER: [
+        { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: LibrariesIcon, label: "Disciplinas", path: "/classrooms" },
         { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
-        { icon: UserMultiple02Icon, label: "Educadores", path: "/educators" },
-        { icon: StudentsIcon, label: "Alunos e responsáveis", path: "/members", shortLabel: "Alunos" }
-    ]
+        { icon: UserMultiple02Icon, label: "Educadores", path: "/educators", section: "admin" },
+        { icon: StudentsIcon, label: "Alunos", path: "/members", section: "admin" },
+    ],
 };
 
 // Componente de Tooltip para hover do mouse
@@ -235,6 +232,8 @@ const MenuNavigation = () => {
                 .map((item) => [item.path, item]),
         ).values(),
     );
+    const mainItems = menuItems.filter((item) => item.section !== "admin");
+    const adminItems = menuItems.filter((item) => item.section === "admin");
 
     const handleLogout = () => {
         toast.success("Até logo!");
@@ -271,11 +270,11 @@ const MenuNavigation = () => {
             <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-20 bg-cloud-100 flex-col items-center pb-8 pt-4 gap-4 z-40">
                 {/* Logo */}
                 <img src="/logo/logo-simples.png" alt="Logo" className="w-12 h-12 mb-2" />
-                {/* Menu Items */}
+                {/* Acessos gerais */}
                 <div className="bg-white rounded-2xl flex flex-col gap-2">
-                    {menuItems.map((item, index) => (
+                    {mainItems.map((item) => (
                         <MenuItem
-                            key={index}
+                            key={item.path}
                             icon={item.icon}
                             label={item.label}
                             onClick={() => navigate(item.path)}
@@ -284,6 +283,22 @@ const MenuNavigation = () => {
                         />
                     ))}
                 </div>
+
+                {/* Acessos administrativos — só o gestor tem */}
+                {adminItems.length > 0 && (
+                    <div className="bg-white rounded-2xl flex flex-col gap-2">
+                        {adminItems.map((item) => (
+                            <MenuItem
+                                key={item.path}
+                                icon={item.icon}
+                                label={item.label}
+                                onClick={() => navigate(item.path)}
+                                isDesktop={true}
+                                isActive={isPathActive(item.path)}
+                            />
+                        ))}
+                    </div>
+                )}
 
                 {/* Perfil */}
                 <div className="flex flex-col items-center gap-4 mt-auto">

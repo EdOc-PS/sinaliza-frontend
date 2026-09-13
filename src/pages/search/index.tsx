@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { HandPointingLeft02Icon, Search01Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { SEARCH } from "@routes/search";
 
 import Spinner from "@components/ui/Spinner";
@@ -18,28 +19,18 @@ const SearchResultsPage = () => {
     const handConfigId = params.get("handConfigId") ?? "";
     const categoryId = params.get("categoryId") ?? "";
 
-    const [loading, setLoading] = useState(false);
-    const [signs, setSigns] = useState<SignCardData[]>([]);
-
-    const runSearch = useCallback(async () => {
-        setLoading(true);
-        try {
+    // Os parâmetros da URL são a chave: voltar para uma busca já feita é instantâneo
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.search.signs({ search, handConfigId, categoryId }),
+        queryFn: () => {
             const query: Record<string, string> = {};
             if (search) query.search = search;
             if (handConfigId) query.handConfigId = handConfigId;
             if (categoryId) query.categoryId = categoryId;
-
-            const res = await GetRequest<SignCardData[]>(SEARCH.SIGNS(), query);
-            if (!res.success) { toast.error("Falha na busca: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, [search, handConfigId, categoryId]);
-
-    useEffect(() => {
-        runSearch();
-    }, [runSearch]);
+            return unwrap(GetRequest<SignCardData[]>(SEARCH.SIGNS(), query));
+        },
+        meta: { errorMessage: "Falha na busca" },
+    });
 
     return (
         <section className="flex flex-col gap-6">
@@ -49,7 +40,7 @@ const SearchResultsPage = () => {
                     <h1 className="font-baskerville text-2xl font-bold text-cloud-600">
                         {search ? <>Resultados para "<span className="text-campfire-500 italic">{search}</span>"</> : "Resultados da busca"}
                     </h1>
-                    <p className="text-sm text-neutral-500">Sinais das disciplinas em que você participa</p>
+                    <p className="text-sm text-neutral-500">Sinais das turmas em que você participa</p>
                 </div>
                 <button
                     type="button"

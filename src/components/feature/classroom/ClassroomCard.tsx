@@ -11,25 +11,25 @@ import {
 
 import { toast } from "sonner";
 
-import type { CardsDicipline } from "@pages/classrooms";
+import type { ClassroomCardData } from "@pages/classrooms";
 import { CardMemphisBackground } from "./CardMemphisBackground";
 
-export interface DisciplineCardProps {
-    dicipline: CardsDicipline;
+export interface ClassroomCardProps {
+    classroom: ClassroomCardData;
     onEdit?: () => void;
     onDelete?: () => void;
 }
 
-export const DisciplineCard = ({
-    dicipline,
+export const ClassroomCard = ({
+    classroom,
     onEdit,
     onDelete
-}: DisciplineCardProps) => {
+}: ClassroomCardProps) => {
 
     const navigate = useNavigate();
 
     const onCopyCode = () => {
-        navigator.clipboard.writeText(dicipline.classCode)
+        navigator.clipboard.writeText(classroom.classCode)
             .then(() => {
                 toast.success("Código copiado para a área de transferência!");
             })
@@ -38,13 +38,13 @@ export const DisciplineCard = ({
     return (
         <>
             <div
-                onClick={() => navigate(`/classrooms/${dicipline.id}`)}
+                onClick={() => navigate(`/classrooms/${classroom.id}`)}
                 className="relative cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 border border-cloud-300 h-55 hover:border-sunflower-400 focus:outline-none hover:-translate-y-1"
             >
                 {/* Header com Memphis background */}
                 <div className="relative flex justify-end items-start px-4 h-2/5 py-3">
-                    <CardMemphisBackground seed={dicipline.id} color={dicipline.colorBackground} />
-                    {dicipline.canManage && (
+                    <CardMemphisBackground seed={classroom.id} color={classroom.colorBackground} />
+                    {classroom.canManage && (
                         <div onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
 
@@ -89,13 +89,10 @@ export const DisciplineCard = ({
                     {/* Título e descrição */}
                     <div>
                         <h3 className="text-lg font-bold text-cloud-500">
-                            {dicipline.name}
+                            {classroom.name}
                         </h3>
                         <p className="text-xs text-neutral-500">
-                            Prof. {dicipline.teacherName} · {dicipline.schoolYear && `${dicipline.schoolYear}`}
-                        </p>
-                        <p className="text-xs text-neutral-500">
-                            {dicipline.schoolLevelLabel && `${dicipline.schoolLevelLabel}`}
+                            Prof. {classroom.teacherName}
                         </p>
 
                     </div>
@@ -105,13 +102,13 @@ export const DisciplineCard = ({
                         {/* Código de convite */}
                         <div className="flex items-center gap-2 text-gray-600 bg-gray-100/80 p-1 px-2 rounded-xl">
                             <HugeiconsIcon icon={Key02Icon} size={16} />
-                            <span className="text-xs font-mono font-semibold">{dicipline.classCode}</span>
+                            <span className="text-xs font-mono font-semibold">{classroom.classCode}</span>
                         </div>
 
                         {/* Contagem de usuários */}
                         <div className="flex items-center gap-1.5 text-gray-700">
                             <HugeiconsIcon icon={UserGroupIcon} size={16} />
-                            <span className="text-sm font-semibold">{dicipline.userCount}</span>
+                            <span className="text-sm font-semibold">{classroom.userCount}</span>
                         </div>
                     </div>
                 </div>

@@ -9,7 +9,7 @@ import {
 const steps = [
     {
         title: "Solicite sua conta",
-        description: "Escolha seu perfil — aluno ou familiar — e envie a solicitação. Um educador da instituição avalia e libera o acesso. Professores e intérpretes são cadastrados pelo gestor.",
+        description: "Crie sua conta de aluno e envie a solicitação. Um educador da instituição avalia e libera o acesso. Professores e intérpretes são cadastrados pelo gestor.",
     },
     {
         title: "Explore o repositório",
@@ -87,7 +87,7 @@ export const LandingHowItWorks = () => (
                                 </div>
                                 <h3 className="mt-4 font-bold text-cloud-600">Acompanhamento</h3>
                                 <p className="mt-1.5 text-sm leading-relaxed text-cloud-500/80">
-                                    Professores e familiares acompanham o histórico de acesso e os favoritos do aluno.
+                                    Professores acompanham o histórico de acesso e os favoritos dos alunos.
                                 </p>
                             </div>
                         </div>

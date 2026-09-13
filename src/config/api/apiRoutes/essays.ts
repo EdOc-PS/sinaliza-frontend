@@ -1,12 +1,12 @@
-// Disciplina Contexto — propostas e exemplos de redação
+// Turma Contexto — propostas e exemplos de redação
 export const ESSAYS = {
-    PROMPTS:        (disciplineId: string) => `disciplines/${disciplineId}/essay-prompts`,
-    CREATE_PROMPT:  (disciplineId: string) => `disciplines/${disciplineId}/essay-prompts`,
+    PROMPTS:        (classroomId: string) => `classrooms/${classroomId}/essay-prompts`,
+    CREATE_PROMPT:  (classroomId: string) => `classrooms/${classroomId}/essay-prompts`,
     UPDATE_PROMPT:  (id: string) => `essay-prompts/${id}`,
     DELETE_PROMPT:  (id: string) => `essay-prompts/${id}`,
     COMPLETE:       (id: string) => `essay-prompts/${id}/complete`,
 
-    EXAMPLES:       (disciplineId: string) => `disciplines/${disciplineId}/essay-examples`,
-    CREATE_EXAMPLE: (disciplineId: string) => `disciplines/${disciplineId}/essay-examples`,
+    EXAMPLES:       (classroomId: string) => `classrooms/${classroomId}/essay-examples`,
+    CREATE_EXAMPLE: (classroomId: string) => `classrooms/${classroomId}/essay-examples`,
     DELETE_EXAMPLE: (id: string) => `essay-examples/${id}`,
 }

@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+﻿import { useState, useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon } from "@hugeicons/core-free-icons";
@@ -14,6 +14,9 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@components/ui/DropdownMenu";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import Spinner from "@components/ui/Spinner";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 import createHandImg from "@/assets/images/app/create-hand.png";
@@ -69,15 +72,13 @@ export interface VisualKeyboardProps {
 export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, subtitle }: VisualKeyboardProps) => {
     const { openForm } = useFAB();
 
-    const [handConfigs, setHandConfigs] = useState<HandConfigTypeForm[]>([]);
+    const queryClient = useQueryClient();
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; configId?: string; configName?: string }>(
         { open: false }
     );
-    const [deletingId, setDeletingId] = useState<string | null>(null);
     const searchRef = useRef<HTMLInputElement>(null);
     const hasLoadedOnce = useRef(false);
 
@@ -87,27 +88,30 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
         return () => clearTimeout(timer);
     }, [search]);
 
-    const fetchAllHandConfigs = useCallback(async (searchQuery?: string) => {
-        setLoading(true);
-        try {
-            const response = await GetRequest<HandConfigTypeForm[]>(
-                HAND_CONFIG.FIND_ALL(),
-                searchQuery ? { search: searchQuery } : undefined
-            );
-            if (!response.success) {
-                toast.error("Falha ao obter configurações de mão: " + response.message);
-            }
-            setHandConfigs(response.object || []);
-            setCurrentPage(1);
-        } finally {
-            setLoading(false);
-            hasLoadedOnce.current = true;
-        }
-    }, []);
+    const { data: handConfigs = [], isPending: loading, isFetched } = useQuery({
+        queryKey: queryKeys.handConfigs.list(debouncedSearch),
+        queryFn: () => unwrap(GetRequest<HandConfigTypeForm[]>(
+            HAND_CONFIG.FIND_ALL(),
+            debouncedSearch ? { search: debouncedSearch } : undefined,
+        )),
+        meta: { errorMessage: "Falha ao obter configurações de mão" },
+    });
 
+    // Marca que já houve uma carga (usado para o LoadingGroup abaixo).
+    // Em efeito, não no render: mutar ref durante o render é inseguro.
     useEffect(() => {
-        fetchAllHandConfigs(debouncedSearch || undefined);
-    }, [fetchAllHandConfigs, debouncedSearch, refreshTrigger]);
+        if (isFetched) hasLoadedOnce.current = true;
+    }, [isFetched]);
+
+    // Nova busca volta para a primeira página
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch]);
+
+    // O pai ainda sinaliza atualização por prop (ex: após criar pelo FAB)
+    useEffect(() => {
+        if (refreshTrigger) queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+    }, [refreshTrigger, queryClient]);
 
     // Participa do spinner unificado da tela (LoadingGroup). Só na carga inicial:
     // buscas seguintes usam o spinner interno, para não esconder o campo de busca.
@@ -126,22 +130,20 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
         setDeleteModal({ open: true, configId, configName });
     };
 
-    const handleDeleteConfirm = async () => {
-        if (!deleteModal.configId) return;
-
-        setDeletingId(deleteModal.configId);
-        try {
-            const response = await DeleteRequest(HAND_CONFIG.DELETE(deleteModal.configId));
-            if (!response.success) {
-                toast.error("Falha ao deletar configuração: " + response.message);
-                return;
-            }
+    const { mutate: deleteConfig, variables: deletingVars, isPending: deletingConfig } = useMutation({
+        mutationFn: (configId: string) => unwrap(DeleteRequest(HAND_CONFIG.DELETE(configId))),
+        onSuccess: () => {
             toast.success("Configuração deletada com sucesso!");
             setDeleteModal({ open: false });
-            fetchAllHandConfigs(debouncedSearch || undefined);
-        } finally {
-            setDeletingId(null);
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao deletar configuração: " + err.message),
+    });
+    const deletingId = deletingConfig ? deletingVars ?? null : null;
+
+    const handleDeleteConfirm = () => {
+        if (!deleteModal.configId) return;
+        deleteConfig(deleteModal.configId);
     };
 
     return (

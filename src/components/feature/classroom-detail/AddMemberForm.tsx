@@ -7,17 +7,17 @@ import Input from "@components/ui/Input";
 import Label from "@components/ui/Label";
 
 import { PostRequest } from "@requests";
-import { DISCIPLINES } from "@routes/disciplines";
+import { CLASSROOMS } from "@routes/classrooms";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 import { isValidEmail } from "@lib/validation/email";
 
 interface AddMemberFormProps {
-    disciplineId: string;
+    classroomId: string;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const AddMemberForm = ({ disciplineId, onClose, onSuccess }: AddMemberFormProps) => {
+export const AddMemberForm = ({ classroomId, onClose, onSuccess }: AddMemberFormProps) => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export const AddMemberForm = ({ disciplineId, onClose, onSuccess }: AddMemberFor
 
         setLoading(true);
         try {
-            const res = await PostRequest(DISCIPLINES.ADD_MEMBER(disciplineId), { email: email.trim() });
+            const res = await PostRequest(CLASSROOMS.ADD_MEMBER(classroomId), { email: email.trim() });
             if (!res.success) {
                 toast.error("Falha ao adicionar participante: " + res.message);
                 return;
@@ -47,8 +47,8 @@ export const AddMemberForm = ({ disciplineId, onClose, onSuccess }: AddMemberFor
                 <div className="flex flex-col gap-1">
                 <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">Adicionar participante</h2>
                 <p className="text-sm text-cloud-400 leading-snug">
-                    Informe o email de um usuário já cadastrado para incluí-lo nesta disciplina. O papel (aluno,
-                    familiar ou educador) é definido pelo perfil da conta.
+                    Informe o email de um usuário já cadastrado para incluí-lo nesta turma. O papel (aluno ou
+                    educador) é definido pelo perfil da conta.
                 </p>
             </div>
             </ModalStickyHeader>

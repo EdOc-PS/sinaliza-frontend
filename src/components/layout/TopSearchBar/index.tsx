@@ -6,7 +6,10 @@ import { Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
 import Input from "@components/ui/Input";
 import Select from "@components/ui/Select";
 import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
+import { useQuery } from "@tanstack/react-query";
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { CATEGORIES } from "@routes/categories";
 import type { CategorySlim } from "@lib/constants/category";
 
@@ -18,17 +21,18 @@ const TopSearchBar = () => {
     const [search, setSearch] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
     const [categoryId, setCategoryId] = useState("");
-    const [categories, setCategories] = useState<CategorySlim[]>([]);
+
+    const { data: categories = [] } = useQuery({
+        queryKey: queryKeys.categories.list(),
+        queryFn: () => unwrap(GetRequest<CategorySlim[]>(CATEGORIES.LIST())),
+        staleTime: 30 * 60_000,
+    });
 
     const categoryOptions = [
         { value: "", label: "Todas as categorias" },
         ...categories.map((c) => ({ value: c.id, label: c.name })),
     ];
 
-    const loadCategories = async () => {
-        const res = await GetRequest<CategorySlim[]>(CATEGORIES.LIST());
-        if (res.success && res.object) setCategories(res.object);
-    };
 
     // Fecha o dropdown ao clicar fora
     useEffect(() => {
@@ -39,10 +43,6 @@ const TopSearchBar = () => {
         };
         document.addEventListener("mousedown", handleOutsideClick);
         return () => document.removeEventListener("mousedown", handleOutsideClick);
-    }, []);
-
-    useEffect(() => {
-        loadCategories();
     }, []);
 
     const submit = () => {

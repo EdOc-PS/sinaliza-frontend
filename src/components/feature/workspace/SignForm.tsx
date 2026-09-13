@@ -28,12 +28,16 @@ import {
 
 import type { GenericOption } from "@interfaces";
 import { SIGNS } from "@routes/signs";
+import { useQuery } from "@tanstack/react-query";
+
 import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { isValidYouTubeUrl } from "@lib/youtube/youtube";
 
 interface SignOptions {
     categories: GenericOption[];
-    disciplines: GenericOption[];
+    classrooms: GenericOption[];
 }
 
 interface SignFormProps {
@@ -47,7 +51,7 @@ interface SignDetail {
     name: string;
     category?: { id: string; name: string; value: string } | null;
     handConfigId: string;
-    disciplines?: { id: string; name: string }[] | null;
+    classrooms?: { id: string; name: string }[] | null;
     tags: string[];
     examplePt?: string | null;
     exampleLibras?: string | null;
@@ -63,7 +67,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
 
     const [name, setName]                         = useState("");
     const [categoryId, setCategoryId]             = useState("");
-    const [disciplineIds, setDisciplineIds]       = useState<string[]>([]);
+    const [classroomIds, setClassroomIds]       = useState<string[]>([]);
     const [handConfigId, setHandConfigId]         = useState("");
     const [tags, setTags]                         = useState<string[]>([]);
     const [examplePt, setExamplePt]               = useState("");
@@ -76,51 +80,30 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     const [initialImageUrl, setInitialImageUrl]   = useState<string | undefined>();
 
     const [loading, setLoading]                       = useState(false);
-    const [loadingData, setLoadingData]               = useState(false);
-    const [loadingOptions, setLoadingOptions]         = useState(false);
-    const [categoryOptions, setCategoryOptions]       = useState<GenericOption[]>([]);
-    const [disciplineOptions, setDisciplineOptions]   = useState<GenericOption[]>([]);
 
-    const loadAll = async () => {
-        setLoadingOptions(true);
-        if (signId) setLoadingData(true);
-        try {
-            const requests: Promise<any>[] = [
-                GetRequest<SignOptions>(SIGNS.OPTIONS()),
-            ];
-            if (signId) requests.push(GetRequest<SignDetail>(SIGNS.FIND_ONE(signId)));
+    // Listas fixas: ficam em cache e não são rebuscadas a cada abertura do modal
+    const { data: options, isPending: loadingOptions } = useQuery({
+        queryKey: queryKeys.signs.options(),
+        queryFn: () => unwrap(GetRequest<SignOptions>(SIGNS.OPTIONS())),
+        staleTime: 30 * 60_000,
+        meta: { errorMessage: "Falha ao carregar opções" },
+    });
+    const categoryOptions = options?.categories ?? [];
+    const classroomOptions = options?.classrooms ?? [];
 
-            const [optionsRes, signRes] = await Promise.all(requests);
+    // Modo edição: busca o sinal para pré-preencher o formulário
+    const { data: signData, isPending: loadingSign, isError: signError } = useQuery({
+        queryKey: queryKeys.signs.detail(signId ?? ""),
+        queryFn: () => unwrap(GetRequest<SignDetail>(SIGNS.FIND_ONE(signId!))),
+        enabled: !!signId,
+        meta: { errorMessage: "Falha ao carregar sinal" },
+    });
+    const loadingData = !!signId && loadingSign;
 
-            if (optionsRes.success && optionsRes.object) {
-                setCategoryOptions(optionsRes.object.categories ?? []);
-                setDisciplineOptions(optionsRes.object.disciplines ?? []);
-            }
-
-            if (signRes) {
-                if (!signRes.success || !signRes.object) {
-                    toast.error("Falha ao carregar sinal: " + signRes.message);
-                    onClose();
-                    return;
-                }
-                const s: SignDetail = signRes.object;
-                setName(s.name);
-                setCategoryId(s.category?.id ?? "");
-                setHandConfigId(s.handConfigId);
-                setDisciplineIds((s.disciplines ?? []).map((d) => d.id));
-                setTags(s.tags ?? []);
-                setExamplePt(s.examplePt ?? "");
-                setExampleLibras(s.exampleLibras ?? "");
-                setMovementDesc(s.movementDescription ?? "");
-                setAnotherUrl(s.anotherUrl ?? "");
-                setInitialVideoUrl(s.videoUrl ?? undefined);
-                setInitialImageUrl(s.imgUrl ?? undefined);
-            }
-        } finally {
-            setLoadingOptions(false);
-            setLoadingData(false);
-        }
-    };
+    // Sem o sinal não há o que editar — fecha o modal (o toast vem do QueryCache)
+    useEffect(() => {
+        if (signError) onClose();
+    }, [signError, onClose]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -130,11 +113,11 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
         formData.append("categoryId", categoryId);
         formData.append("handConfigId", handConfigId);
 
-        // Disciplinas (m2m). Em edição, sempre envia (mesmo vazio) para permitir remover todas.
-        if (disciplineIds.length > 0) {
-            formData.append("disciplineIds", disciplineIds.join(","));
+        // Turmas (m2m). Em edição, sempre envia (mesmo vazio) para permitir remover todas.
+        if (classroomIds.length > 0) {
+            formData.append("classroomIds", classroomIds.join(","));
         } else if (isEditMode) {
-            formData.append("disciplineIds", "");
+            formData.append("classroomIds", "");
         }
         if (videoFile) formData.append("video", videoFile);
         if (anotherUrl.trim()) formData.append("anotherUrl", anotherUrl.trim());
@@ -167,7 +150,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     const isStep0Valid =
         nameValid &&
         !!categoryId &&
-        disciplineIds.length > 0 &&
+        classroomIds.length > 0 &&
         !!handConfigId;
 
     // Step 2: tags (obrigatório pelo menos uma)
@@ -200,9 +183,22 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
         </Button>
     );
 
+    // Copia o sinal carregado para o estado do formulário
     useEffect(() => {
-        loadAll();
-    }, [signId]);
+        if (!signData) return;
+        const s: SignDetail = signData;
+        setName(s.name);
+        setCategoryId(s.category?.id ?? "");
+        setHandConfigId(s.handConfigId);
+        setClassroomIds((s.classrooms ?? []).map((c) => c.id));
+        setTags(s.tags ?? []);
+        setExamplePt(s.examplePt ?? "");
+        setExampleLibras(s.exampleLibras ?? "");
+        setMovementDesc(s.movementDescription ?? "");
+        setAnotherUrl(s.anotherUrl ?? "");
+        setInitialVideoUrl(s.videoUrl ?? undefined);
+        setInitialImageUrl(s.imgUrl ?? undefined);
+    }, [signData]);
 
     if (loadingData) {
         return (
@@ -303,16 +299,16 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                         />
                     </div>
 
-                    {/* Disciplinas (múltiplas) — ocupa a linha inteira */}
+                    {/* Turmas (múltiplas) — ocupa a linha inteira */}
                     <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="disciplines" isRequired>Disciplinas</Label>
+                        <Label htmlFor="classrooms" isRequired>Turmas</Label>
                         <MultiSelect
-                            id="disciplines"
+                            id="classrooms"
                             icon={LayersIcon}
-                            placeholder={loadingOptions ? "Carregando..." : "Selecione uma ou mais disciplinas"}
-                            options={disciplineOptions}
-                            value={disciplineIds}
-                            onChange={setDisciplineIds}
+                            placeholder={loadingOptions ? "Carregando..." : "Selecione uma ou mais turmas"}
+                            options={classroomOptions}
+                            value={classroomIds}
+                            onChange={setClassroomIds}
                             disabled={loadingOptions}
                         />
                     </div>

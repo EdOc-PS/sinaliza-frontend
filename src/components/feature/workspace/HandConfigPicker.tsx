@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Search01Icon, Tick04Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { HAND_CONFIG } from "@routes/handConfigs";
 import Spinner from "@components/ui/Spinner";
 
@@ -43,8 +45,6 @@ const HandConfigPicker = ({
 }: HandConfigPickerProps) => {
     const ITEMS_PER_PAGE = itemsPerPage;
     const isControlled = providedConfigs !== undefined;
-    const [fetchedConfigs, setFetchedConfigs] = useState<HandConfig[]>([]);
-    const [loading, setLoading]     = useState(false);
     const [search, setSearch]       = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,36 +55,29 @@ const HandConfigPicker = ({
         return () => clearTimeout(timer);
     }, [search]);
 
-    const fetchConfigs = useCallback(async (query?: string) => {
-        setLoading(true);
-        try {
-            const response = await GetRequest<HandConfig[]>(
-                HAND_CONFIG.FIND_ALL(),
-                query ? { search: query } : undefined
-            );
-            if (!response.success) toast.error("Falha ao obter configurações de mão: " + response.message);
-            setFetchedConfigs(response.object || []);
-            setCurrentPage(1);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // `enabled: !isControlled` — quando o pai fornece as configs (glossário
+    // público, cujo endpoint exige token) nenhuma requisição é feita.
+    const { data: fetchedConfigs = [], isPending } = useQuery({
+        queryKey: queryKeys.handConfigs.list(debouncedSearch),
+        queryFn: () => unwrap(GetRequest<HandConfig[]>(
+            HAND_CONFIG.FIND_ALL(),
+            debouncedSearch ? { search: debouncedSearch } : undefined,
+        )),
+        enabled: !isControlled,
+        meta: { errorMessage: "Falha ao obter configurações de mão" },
+    });
+    const loading = !isControlled && isPending;
 
+    // Nova busca volta para a primeira página
     useEffect(() => {
-        if (isControlled) return;
-        fetchConfigs(debouncedSearch || undefined);
-    }, [isControlled, fetchConfigs, debouncedSearch]);
+        setCurrentPage(1);
+    }, [debouncedSearch]);
 
     // Com configs vindas do pai, a busca é filtrada localmente
     const configs = isControlled
         ? providedConfigs!.filter((c) =>
             !debouncedSearch.trim() || c.name.toLowerCase().includes(debouncedSearch.trim().toLowerCase()))
         : fetchedConfigs;
-
-    // Volta para a primeira página quando o filtro local muda o conjunto
-    useEffect(() => {
-        if (isControlled) setCurrentPage(1);
-    }, [isControlled, debouncedSearch]);
 
     const totalPages = Math.max(1, Math.ceil(configs.length / ITEMS_PER_PAGE));
     const pageStart  = (currentPage - 1) * ITEMS_PER_PAGE;

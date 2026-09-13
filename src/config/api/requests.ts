@@ -15,7 +15,7 @@ export type APIResponse<T = unknown> = {
 // Tipos de domínio (espelham o backend)
 // ─────────────────────────────────────────────
 
-export type Role = 'STUDENT' | 'EDUCATOR' | 'GUARDIAN' | 'MANAGER';
+export type Role = 'STUDENT' | 'EDUCATOR' | 'MANAGER';
 export type EducatorType = 'TEACHER' | 'INTERPRETER';
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type LibrasLevel = 'BASICO' | 'INTERMEDIARIO' | 'AVANCADO' | 'FLUENTE';
@@ -32,9 +32,6 @@ export type DataProfile = {
   certificate?: string;
   areaAtuacao?: string;
   proficienciaLibras?: LibrasLevel;
-  // GUARDIAN
-  parentesco?: string;
-  studentEmail?: string;
 };
 
 export type User = {
@@ -51,6 +48,7 @@ export type User = {
   approvalStatus?: ApprovalStatus | null;
   institution?: { name: string } | null;
   dataProfile?: DataProfile | null;
+  onboardingSeenAt?: string | null;
   createdAt: string;
   updatedAt: string;
 };

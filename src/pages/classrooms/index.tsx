@@ -1,39 +1,36 @@
 import { useAuth } from "@context/AuthContext"
 import { SchoolBell01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { useState, useEffect, useCallback } from "react"
+import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GetRequest, DeleteRequest } from "@requests";
-import { DISCIPLINES } from "@routes/disciplines";
-import { useFAB } from "@context/FABContext";
+import { CLASSROOMS } from "@routes/classrooms";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 
 import { toast } from "sonner";
 
-import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
-import { CreateClassroomCard } from "@components/feature/classroom/CreateDisciplineCard";
-import { JoinClassroomCard } from "@components/feature/classroom/JoinDiciplineCard";
-import { DisciplineCard } from "@components/feature/classroom/DisciplineCard";
+import { ClassroomForm } from "@components/feature/classroom/ClassroomForm";
+import { CreateClassroomCard } from "@components/feature/classroom/CreateClassroomCard";
+import { JoinClassroomCard } from "@components/feature/classroom/JoinClassroomCard";
+import { ClassroomCard } from "@components/feature/classroom/ClassroomCard";
 
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@/components/layout/ConfirmDeleteModal";
 
-export interface CreateDisciplineForm {
+export interface CreateClassroomForm {
     name: string;
     description?: string;
     colorBackground: string;
-    schoolYear?: number;
-    schoolLevel?: string;
 }
 
-export interface CardsDicipline {
+export interface ClassroomCardData {
     id: string;
     name: string;
     teacherName: string;
     description: string;
     colorBackground: string;
-    schoolYear?: number;
-    schoolLevel?: string;
-    schoolLevelLabel?: string;
     classCode: string;
     userCount: number;
     canManage: boolean;
@@ -41,55 +38,38 @@ export interface CardsDicipline {
 
 const ClassroomsPage = () => {
     const { user } = useAuth();
-    const { registerRefresh } = useFAB();
+    const queryClient = useQueryClient();
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [classCards, setClassCards] = useState<CardsDicipline[]>([]);
+    const [editModal, setEditModal] = useState<{ open: boolean; classroomId?: string }>({ open: false });
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; classroomId?: string; name?: string }>({ open: false });
 
-    const [editModal, setEditModal] = useState<{ open: boolean; disciplineId?: string }>({ open: false });
-    const [deleteModal, setDeleteModal] = useState<{ open: boolean; disciplineId?: string; name?: string }>({ open: false });
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+    // O cache vive fora do componente: ao voltar para esta tela a lista já
+    // aparece preenchida e a revalidação acontece em segundo plano.
+    const { data: classCards = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.classrooms.mine(),
+        queryFn: () => unwrap(GetRequest<ClassroomCardData[]>(CLASSROOMS.MINE())),
+        meta: { errorMessage: "Falha ao obter suas turmas" },
+    });
 
-    const getClassrooms = useCallback(async () => {
-        setLoading(true);
-        try {
-            const response = await GetRequest<CardsDicipline[]>(DISCIPLINES.MINE());
-            if (!response.success) {
-                toast.error("Falha ao obter suas turmas: " + response.message);
-                return;
-            }
-            setClassCards(response.object || []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const handleDeleteClick = (disciplineId: string, disciplineName: string) => {
-        setDeleteModal({ open: true, disciplineId, name: disciplineName });
-    };
-
-    const handleDeleteConfirm = async () => {
-        if (!deleteModal.disciplineId) return;
-
-        setDeletingId(deleteModal.disciplineId);
-        try {
-            const response = await DeleteRequest(DISCIPLINES.DELETE(deleteModal.disciplineId));
-            if (!response.success) {
-                toast.error("Falha ao deletar turma: " + response.message);
-                return;
-            }
+    const { mutate: deleteClassroom, isPending: deleting } = useMutation({
+        mutationFn: (id: string) => unwrap(DeleteRequest(CLASSROOMS.DELETE(id))),
+        onSuccess: () => {
             toast.success("Turma deletada com sucesso!");
             setDeleteModal({ open: false });
-            getClassrooms();
-        } finally {
-            setDeletingId(null);
-        }
+            // Marca toda chave que comeca com ["classrooms"] como desatualizada
+            queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao deletar turma: " + err.message),
+    });
+
+    const handleDeleteClick = (classroomId: string, classroomName: string) => {
+        setDeleteModal({ open: true, classroomId, name: classroomName });
     };
 
-    useEffect(() => {
-        getClassrooms();
-        registerRefresh(getClassrooms);
-    }, [getClassrooms, registerRefresh]);
+    const handleDeleteConfirm = () => {
+        if (!deleteModal.classroomId) return;
+        deleteClassroom(deleteModal.classroomId);
+    };
 
     return (
         <>
@@ -120,10 +100,10 @@ const ClassroomsPage = () => {
                         ) : (
                             <>
                                 {classCards.map((card) => (
-                                    <DisciplineCard
+                                    <ClassroomCard
                                         key={card.id}
-                                        dicipline={card}
-                                        onEdit={() => setEditModal({ open: true, disciplineId: card.id })}
+                                        classroom={card}
+                                        onEdit={() => setEditModal({ open: true, classroomId: card.id })}
                                         onDelete={() => handleDeleteClick(card.id, card.name)}
                                     />
                                 ))}
@@ -139,10 +119,10 @@ const ClassroomsPage = () => {
 
             {/* Modal: editar turma */}
             <Modal open={editModal.open} onClose={() => setEditModal({ open: false })}>
-                <DisciplineForm
-                    disciplineId={editModal.disciplineId}
+                <ClassroomForm
+                    classroomId={editModal.classroomId}
                     onClose={() => setEditModal({ open: false })}
-                    onSuccess={() => { setEditModal({ open: false }); getClassrooms(); }}
+                    onSuccess={() => { setEditModal({ open: false }); queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.all }); }}
                 />
             </Modal>
 
@@ -151,8 +131,8 @@ const ClassroomsPage = () => {
                 open={deleteModal.open}
                 onClose={() => setDeleteModal({ open: false })}
                 onConfirm={handleDeleteConfirm}
-                loading={deletingId !== null}
-                title={<>Excluir <span className="text-salmon-600 italic">Disciplina</span>?</>}
+                loading={deleting}
+                title={<>Excluir <span className="text-salmon-600 italic">Turma</span>?</>}
                 description={
                     <>
                         A turma{" "}

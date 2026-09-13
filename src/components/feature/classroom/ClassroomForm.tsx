@@ -1,19 +1,20 @@
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
 import Label from "@components/ui/Label";
-import Select from "@components/ui/Select";
 import Spinner from "@components/ui/Spinner";
 
-import { Book01Icon, TextSelectIcon, Calendar01Icon, Layers01Icon } from "@hugeicons/core-free-icons";
+import { Book01Icon, TextSelectIcon } from "@hugeicons/core-free-icons";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-import type { GenericOption } from "@interfaces";
-import { DISCIPLINES } from "@routes/disciplines";
+import { CLASSROOMS } from "@routes/classrooms";
 import { GetRequest, PatchRequest, PostRequest } from "@requests";
 
 import { toast } from "sonner";
 
-import type { CreateDisciplineForm } from "@pages/classrooms";
+import type { CreateClassroomForm } from "@pages/classrooms";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 export const PRESET_COLORS = [
@@ -24,79 +25,50 @@ export const PRESET_COLORS = [
     { hex: "#213547", label: "Cloud" },
 ];
 
-const EMPTY_FORM: CreateDisciplineForm = {
+const EMPTY_FORM: CreateClassroomForm = {
     name: "",
     description: "",
     colorBackground: PRESET_COLORS[0].hex,
-    schoolYear: Number(new Date().getFullYear()),
-    schoolLevel: undefined,
 };
 
-interface DisciplineFormProps {
-    disciplineId?: string;
+interface ClassroomFormProps {
+    classroomId?: string;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineFormProps) => {
-    const isEditMode = !!disciplineId;
+export const ClassroomForm = ({ classroomId, onClose, onSuccess }: ClassroomFormProps) => {
+    const isEditMode = !!classroomId;
 
-    const [form, setForm] = useState<CreateDisciplineForm>(EMPTY_FORM);
+    const [form, setForm] = useState<CreateClassroomForm>(EMPTY_FORM);
     const [loading, setLoading] = useState(false);
-    const [loadingData, setLoadingData] = useState(false);
-    const [schoolLevelOptions, setSchoolLevelOptions] = useState<GenericOption[]>([]);
-    const [loadingSchoolLevels, setLoadingSchoolLevels] = useState(false);
 
-    const fetchSchoolLevels = async () => {
-        setLoadingSchoolLevels(true);
-        try {
-            const response = await GetRequest<GenericOption[]>(DISCIPLINES.OPTIONS());
-            if (!response.success) toast.error("Falha ao obter níveis escolares: " + response.message);
-            setSchoolLevelOptions(response.object || []);
-        } finally {
-            setLoadingSchoolLevels(false);
-        }
-    };
+    // Modo edição: busca a turma para pré-preencher o formulário
+    const { data: classroom, isPending: loadingClassroom, isError: classroomError } = useQuery({
+        queryKey: queryKeys.classrooms.detail(classroomId ?? ""),
+        queryFn: () => unwrap(GetRequest<any>(CLASSROOMS.FIND_ONE(classroomId!))),
+        enabled: !!classroomId,
+        meta: { errorMessage: "Falha ao carregar turma" },
+    });
+    const loadingData = !!classroomId && loadingClassroom;
 
-    const fetchDiscipline = async (disciplineId: string) => {
-        setLoadingData(true);
-        try {
-            const response = await GetRequest<any>(DISCIPLINES.FIND_ONE(disciplineId));
-            if (!response.success || !response.object) {
-                toast.error("Falha ao carregar turma: " + response.message);
-                onClose();
-                return;
-            }
-            const d = response.object;
-            setForm({
-                name: d.name ?? "",
-                description: d.description ?? "",
-                colorBackground: d.colorBackground ?? PRESET_COLORS[0].hex,
-                schoolYear: d.schoolYear ?? Number(new Date().getFullYear()),
-                schoolLevel: d.schoolLevel ?? undefined,
-            });
-        } finally {
-            setLoadingData(false);
-        }
-    };
-
-    // Busca dados da disciplina para pré-preencher o form no modo edição
+    // Sem a turma não há o que editar — fecha o modal (o toast vem do QueryCache)
     useEffect(() => {
-        if (!disciplineId) return;
-        fetchDiscipline(disciplineId);
-    }, [disciplineId]);
+        if (classroomError) onClose();
+    }, [classroomError, onClose]);
 
-    // Busca opções de nível escolar
+    // Copia a turma carregada para o estado do formulário
     useEffect(() => {
+        if (!classroom) return;
+        setForm({
+            name: classroom.name ?? "",
+            description: classroom.description ?? "",
+            colorBackground: classroom.colorBackground ?? PRESET_COLORS[0].hex,
+        });
+    }, [classroom]);
 
-        fetchSchoolLevels();
-    }, []);
-
-    const handleChange = (field: keyof CreateDisciplineForm, value: string) => {
-        setForm(prev => ({
-            ...prev,
-            [field]: field === "schoolYear" ? (value ? Number(value) : Number(new Date().getFullYear())) : value,
-        }));
+    const handleChange = (field: keyof CreateClassroomForm, value: string) => {
+        setForm(prev => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = async (e: React.SubmitEvent) => {
@@ -106,8 +78,8 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
         setLoading(true);
         try {
             const response = isEditMode
-                ? await PatchRequest<CreateDisciplineForm>(DISCIPLINES.UPDATE(disciplineId!), form)
-                : await PostRequest<CreateDisciplineForm>(DISCIPLINES.CREATE(), form);
+                ? await PatchRequest<CreateClassroomForm>(CLASSROOMS.UPDATE(classroomId!), form)
+                : await PostRequest<CreateClassroomForm>(CLASSROOMS.CREATE(), form);
 
             if (!response.success) {
                 toast.error(response.message);
@@ -142,16 +114,16 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
                 <p className="text-sm text-cloud-400 leading-snug">
                     {isEditMode
                         ? "Atualize as informações da turma abaixo."
-                        : "Defina o nome da disciplina. Um código de convite de 6 dígitos será gerado automaticamente."}
+                        : "Defina o nome da turma. Um código de convite de 6 dígitos será gerado automaticamente."}
                 </p>
             </div>
             </ModalStickyHeader>
 
             {/* Nome da turma */}
             <div className="flex flex-col gap-1.5">
-                <Label htmlFor="discipline-name" isRequired>Nome da turma</Label>
+                <Label htmlFor="classroom-name" isRequired>Nome da turma</Label>
                 <Input
-                    id="discipline-name"
+                    id="classroom-name"
                     icon={Book01Icon}
                     placeholder="Ex: Libras Básico"
                     value={form.name}
@@ -171,42 +143,14 @@ export const DisciplineForm = ({ disciplineId, onClose, onSuccess }: DisciplineF
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <Label htmlFor="discipline-description" isOptional>Descrição</Label>
+                <Label htmlFor="classroom-description" isOptional>Descrição</Label>
                 <Input
-                    id="discipline-description"
+                    id="classroom-description"
                     icon={TextSelectIcon}
                     placeholder="Ex: Turma de Libras para iniciantes"
                     value={form.description}
                     onChange={(v) => handleChange("description", v)}
                 />
-            </div>
-
-            {/* Ano e Nível escolar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="school-year" isOptional>Ano letivo</Label>
-                    <Input
-                        id="school-year"
-                        icon={Calendar01Icon}
-                        type="number"
-                        placeholder="Ex: 2026"
-                        value={form.schoolYear}
-                        onChange={(v) => handleChange("schoolYear", v)}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                    <Label htmlFor="school-level" isOptional>Nível escolar</Label>
-                    <Select
-                        id="school-level"
-                        icon={Layers01Icon}
-                        placeholder={loadingSchoolLevels ? "Carregando..." : "Selecione"}
-                        options={schoolLevelOptions}
-                        value={form.schoolLevel}
-                        onChange={(v) => handleChange("schoolLevel", v)}
-                        disabled={loadingSchoolLevels}
-                    />
-                </div>
             </div>
 
             {/* Cor de identificação */}

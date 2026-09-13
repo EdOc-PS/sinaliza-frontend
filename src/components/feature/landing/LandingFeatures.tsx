@@ -5,7 +5,7 @@ import {
     TagsIcon,
     Video01Icon,
     WheelchairIcon,
-    Home01Icon,
+    Key02Icon,
 } from "@hugeicons/core-free-icons";
 
 interface Feature {
@@ -41,9 +41,9 @@ const features: Feature[] = [
         iconClass: "bg-lime-100 text-lime-700",
     },
     {
-        title: "Área da família",
-        description: "Familiares acompanham o desenvolvimento do aluno e praticam os sinais em casa.",
-        icon: Home01Icon,
+        title: "Turmas por convite",
+        description: "Professores criam turmas e alunos entram com um código de 6 dígitos, sem burocracia.",
+        icon: Key02Icon,
         iconClass: "bg-sunflower-100 text-sunflower-700",
     },
     {

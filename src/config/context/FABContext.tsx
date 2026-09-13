@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
 export type FABForm = "create-class" | "join-class" | "create-hand-config" | "create-signal" | null;
 
@@ -6,28 +6,28 @@ interface FABContextValue {
     activeForm: FABForm;
     openForm: (form: FABForm) => void;
     closeForm: () => void;
-    registerRefresh: (fn: () => void) => void;
-    triggerRefresh: () => void;
 }
 
 const FABContext = createContext<FABContextValue | null>(null);
 
+/**
+ * Guarda apenas qual formulário do FAB está aberto.
+ *
+ * Antes daqui saía também um `registerRefresh`/`triggerRefresh`: cada tela
+ * registrava uma função para o FAB chamar depois de criar algo. Isso saiu com a
+ * migração para o TanStack Query — quem cria agora invalida a chave do cache e
+ * qualquer tela montada se atualiza sozinha.
+ */
 export const FABProvider = ({ children }: { children: ReactNode }) => {
     const [activeForm, setActiveForm] = useState<FABForm>(null);
-    const refreshRef = useRef<(() => void) | null>(null);
 
-    // As funções precisam ter identidade estável: as páginas registram o refresh
-    // dentro de um useEffect que depende delas. Sem isso, abrir um modal
-    // (que troca `activeForm`) recriava `registerRefresh` e disparava um
-    // recarregamento desnecessário da listagem por trás do modal.
+    // Identidade estável: as telas usam essas funções em dependências de efeito.
     const openForm = useCallback((form: FABForm) => setActiveForm(form), []);
     const closeForm = useCallback(() => setActiveForm(null), []);
-    const registerRefresh = useCallback((fn: () => void) => { refreshRef.current = fn; }, []);
-    const triggerRefresh = useCallback(() => refreshRef.current?.(), []);
 
     const value = useMemo(
-        () => ({ activeForm, openForm, closeForm, registerRefresh, triggerRefresh }),
-        [activeForm, openForm, closeForm, registerRefresh, triggerRefresh],
+        () => ({ activeForm, openForm, closeForm }),
+        [activeForm, openForm, closeForm],
     );
 
     return <FABContext.Provider value={value}>{children}</FABContext.Provider>;

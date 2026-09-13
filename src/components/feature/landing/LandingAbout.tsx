@@ -32,8 +32,8 @@ export const LandingAbout = () => {
                                 por <strong className="text-cloud-500">Eduardo Octavio</strong>.
                             </p>
                             <p>
-                                A proposta é criar uma ponte acessível entre intérpretes de Libras, alunos, professores
-                                e familiares democratizando o acesso ao aprendizado da Língua Brasileira de Sinais
+                                A proposta é criar uma ponte acessível entre intérpretes de Libras, alunos e
+                                professores, democratizando o acesso ao aprendizado da Língua Brasileira de Sinais
                                 através de uma plataforma colaborativa, moderna e inclusiva.
                             </p>
                             <p>

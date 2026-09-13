@@ -6,16 +6,16 @@ import { InputCode } from "@components/ui/InputCode";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 
 import { PostRequest } from "@requests";
-import { DISCIPLINES } from "@routes/disciplines";
+import { CLASSROOMS } from "@routes/classrooms";
 
 import { toast } from "sonner";
 
-interface JoinDisciplineFormProps {
+interface JoinClassroomFormProps {
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormProps) => {
+export const JoinClassroomForm = ({ onClose, onSuccess }: JoinClassroomFormProps) => {
     const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export const JoinDisciplineForm = ({ onClose, onSuccess }: JoinDisciplineFormPro
 
         setLoading(true);
         try {
-            const response = await PostRequest(DISCIPLINES.JOIN(), {
+            const response = await PostRequest(CLASSROOMS.JOIN(), {
                 classCode
             });
 

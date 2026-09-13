@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     BooksIcon,
@@ -12,6 +12,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GLOSSARY } from "@routes/signs";
 import { CATEGORIES } from "@routes/categories";
 import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
@@ -28,53 +30,50 @@ const GLOSSARY_ICONS = [GlobalEducationIcon, GlobalEducationIcon, GlobeIcon, Boo
 
 const GlossaryPage = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [signs, setSigns] = useState<SignCardData[]>([]);
-    const [categories, setCategories] = useState<CategorySlim[]>([]);
-    const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
     const [query, setQuery] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
     const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
 
-    const filtered = query.trim()
-        ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
-        : signs;
+    // Opções dos filtros — mudam pouco, por isso o staleTime alto
+    const [categoriesQuery, disciplinesQuery] = useQueries({
+        queries: [
+            {
+                queryKey: queryKeys.categories.list(),
+                queryFn: () => unwrap(GetRequest<CategorySlim[]>(CATEGORIES.LIST())),
+                staleTime: 30 * 60_000,
+                meta: { errorMessage: "Falha ao carregar categorias" },
+            },
+            {
+                queryKey: queryKeys.glossaryDisciplines.list(),
+                queryFn: () => unwrap(GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST())),
+                staleTime: 30 * 60_000,
+                meta: { errorMessage: "Falha ao carregar disciplinas" },
+            },
+        ],
+    });
+    const categories = categoriesQuery.data ?? [];
+    const disciplines = disciplinesQuery.data ?? [];
 
-    // Categorias e disciplinas para os filtros (carregadas uma vez)
-    const loadFilters = async () => {
-        const [catRes, discRes] = await Promise.all([
-            GetRequest<CategorySlim[]>(CATEGORIES.LIST()),
-            GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST()),
-        ]);
-        if (catRes.success && catRes.object) setCategories(catRes.object);
-        if (discRes.success && discRes.object) setDisciplines(discRes.object);
-    };
-
-    // Sinais públicos — filtro por categoria, configuração de mão e disciplina no servidor
-    const loadGlossary = async () => {
-        setLoading(true);
-        try {
+    // Sinais — os filtros fazem parte da chave, então trocar um deles refaz a
+    // busca sozinho (e volta instantâneo de um filtro já visitado).
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.glossary.list({ categoryId, handConfigId, glossaryDisciplineId }),
+        queryFn: () => {
             const params: Record<string, string> = {};
             if (categoryId) params.categoryId = categoryId;
             if (handConfigId) params.handConfigId = handConfigId;
             if (glossaryDisciplineId) params.glossaryDisciplineId = glossaryDisciplineId;
+            return unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined));
+        },
+        meta: { errorMessage: "Falha ao carregar o glossário" },
+    });
 
-            const res = await GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined);
-            if (!res.success) { toast.error("Falha ao carregar o glossário: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Busca textual é filtrada no cliente sobre o resultado já carregado
+    const filtered = query.trim()
+        ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
+        : signs;
 
-    useEffect(() => {
-        loadFilters();
-    }, []);
-
-    useEffect(() => {
-        loadGlossary();
-    }, [categoryId, handConfigId, glossaryDisciplineId]);
 
     const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
 

@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { DeleteRequest, GetRequest, PatchRequest } from "@requests";
-import { DISCIPLINES } from "@routes/disciplines";
+import { CLASSROOMS } from "@routes/classrooms";
 import { SIGNS } from "@routes/signs";
 import { useAuth } from "@context/AuthContext";
 
@@ -15,7 +18,7 @@ import { SignCard, type SignCardData } from "@/components/feature/classroom-deta
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
-import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
+import { ClassroomForm } from "@components/feature/classroom/ClassroomForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
 
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -37,15 +40,13 @@ import NavTabs from "@components/ui/NavTabs";
 import EssayPromptSection from "@components/feature/context/EssayPromptSection";
 import EssayExampleSection from "@components/feature/context/EssayExampleSection";
 
-interface DisciplineDetail {
+interface ClassroomDetail {
     id: string;
     name: string;
     description?: string;
     colorBackground?: string;
     classCode?: string;
     isContext?: boolean;
-    schoolYear?: number;
-    schoolLevelLabel?: string;
     userCount: number;
     teacher: { id: string; name: string; avatar?: string; educatorType?: "TEACHER" | "INTERPRETER" | null };
 }
@@ -57,132 +58,113 @@ const ClassroomDetailPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(true);
-    const [discipline, setDiscipline] = useState<DisciplineDetail | null>(null);
-    const [signs, setSigns] = useState<SignCardData[]>([]);
+    const queryClient = useQueryClient();
+
     const [editModal, setEditModal] = useState(false);
     const [detailView, setDetailView] = useState<DetailView>("signs");
-    const [favoritesSigns, setFavoritesSigns] = useState<SignCardData[]>([]);
-    const [loadingFavorites, setLoadingFavorites] = useState(false);
-    const [members, setMembers] = useState<Member[]>([]);
-    const [loadingMembers, setLoadingMembers] = useState(false);
-
     const [editSignModal, setEditSignModal] = useState<{ open: boolean; signId?: string }>({ open: false });
     const [deleteSignModal, setDeleteSignModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
-    const [deletingSignId, setDeletingSignId] = useState<string | null>(null);
     const [leaveModal, setLeaveModal] = useState(false);
-    const [leaving, setLeaving] = useState(false);
     const [addMemberModal, setAddMemberModal] = useState(false);
     const [promoteModal, setPromoteModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
-    const [promoting, setPromoting] = useState(false);
     const [removeMemberModal, setRemoveMemberModal] = useState<{ open: boolean; member?: Member }>({ open: false });
-    const [removingMember, setRemovingMember] = useState(false);
 
-    const handleDeleteSign = async () => {
-        if (!deleteSignModal.signId) return;
-        setDeletingSignId(deleteSignModal.signId);
-        try {
-            const res = await DeleteRequest(SIGNS.DELETE(deleteSignModal.signId));
-            if (!res.success) { toast.error("Falha ao excluir sinal: " + res.message); return; }
+    const [classroomQuery, signsQuery] = useQueries({
+        queries: [
+            {
+                queryKey: queryKeys.classrooms.detail(id ?? ""),
+                queryFn: () => unwrap(GetRequest<ClassroomDetail>(CLASSROOMS.FIND_ONE(id!))),
+                enabled: !!id,
+                meta: { errorMessage: "Falha ao carregar a turma" },
+            },
+            {
+                queryKey: queryKeys.classrooms.signs(id ?? ""),
+                queryFn: () => unwrap(GetRequest<SignCardData[]>(CLASSROOMS.SIGNS(id!))),
+                enabled: !!id,
+                meta: { errorMessage: "Falha ao carregar os sinais" },
+            },
+        ],
+    });
+    const classroom = classroomQuery.data ?? null;
+    const signs = signsQuery.data ?? [];
+    const loading = classroomQuery.isPending || signsQuery.isPending;
+
+    // Abas carregam sob demanda: `enabled` só dispara quando a aba é aberta,
+    // e o resultado fica em cache ao alternar de volta.
+    const { data: favoritesSigns = [], isPending: loadingFavorites } = useQuery({
+        queryKey: queryKeys.classrooms.signsFavorites(id ?? ""),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(CLASSROOMS.SIGNS_FAVORITES(id!))),
+        enabled: !!id && detailView === "favorites",
+    });
+
+    const { data: members = [], isPending: loadingMembers } = useQuery({
+        queryKey: queryKeys.classrooms.members(id ?? ""),
+        queryFn: () => unwrap(GetRequest<Member[]>(CLASSROOMS.MEMBERS(id!))),
+        enabled: !!id && detailView === "settings",
+    });
+
+    const invalidateClassroom = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.all });
+
+    const { mutate: deleteSign, variables: deletingVars, isPending: deletingSign } = useMutation({
+        mutationFn: (signId: string) => unwrap(DeleteRequest(SIGNS.DELETE(signId))),
+        onSuccess: () => {
             toast.success("Sinal excluído com sucesso!");
             setDeleteSignModal({ open: false });
-            load();
-        } finally {
-            setDeletingSignId(null);
-        }
+            invalidateClassroom();
+        },
+        onError: (err: Error) => toast.error("Falha ao excluir sinal: " + err.message),
+    });
+    const deletingSignId = deletingSign ? deletingVars ?? null : null;
+
+    const handleDeleteSign = () => {
+        if (!deleteSignModal.signId) return;
+        deleteSign(deleteSignModal.signId);
     };
 
-    const load = useCallback(async () => {
-        if (!id) return;
-        setLoading(true);
-        try {
-            const [disciplineRes, signsRes] = await Promise.all([
-                GetRequest<DisciplineDetail>(DISCIPLINES.FIND_ONE(id)),
-                GetRequest<SignCardData[]>(DISCIPLINES.SIGNS(id)),
-            ]);
-
-            if (!disciplineRes.success) {
-                toast.error("Falha ao carregar a disciplina: " + disciplineRes.message);
-                return;
-            }
-            setDiscipline(disciplineRes.object ?? null);
-            setSigns(signsRes.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, [id]);
-
-    const loadDisciplineFavorites = async () => {
-        if (!id) return;
-        setLoadingFavorites(true);
-        try {
-            const res = await GetRequest<SignCardData[]>(DISCIPLINES.SIGNS_FAVORITES(id));
-            setFavoritesSigns(res.object ?? []);
-        } finally {
-            setLoadingFavorites(false);
-        }
-    };
-
-    const loadMembers = async () => {
-        if (!id) return;
-        setLoadingMembers(true);
-        try {
-            const res = await GetRequest<Member[]>(DISCIPLINES.MEMBERS(id));
-            setMembers(res.object ?? []);
-        } finally {
-            setLoadingMembers(false);
-        }
-    };
-
-    const handleLeave = async () => {
-        if (!id) return;
-        setLeaving(true);
-        try {
-            const res = await DeleteRequest(DISCIPLINES.LEAVE(id));
-            if (!res.success) { toast.error("Falha ao sair da disciplina: " + res.message); return; }
-            toast.success("Você saiu da disciplina");
+    const { mutate: leaveClassroom, isPending: leaving } = useMutation({
+        mutationFn: () => unwrap(DeleteRequest(CLASSROOMS.LEAVE(id!))),
+        onSuccess: () => {
+            toast.success("Você saiu da turma");
+            invalidateClassroom();
             navigate("/classrooms");
-        } finally {
-            setLeaving(false);
-        }
-    };
+        },
+        onError: (err: Error) => toast.error("Falha ao sair da turma: " + err.message),
+    });
+    const handleLeave = () => leaveClassroom();
 
-    const handlePromoteSign = async (glossaryDisciplineIds: string[]) => {
-        if (!promoteModal.signId) return;
-        setPromoting(true);
-        try {
-            const res = await PatchRequest(SIGNS.PROMOTE(promoteModal.signId), { glossaryDisciplineIds });
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: promoteSign, isPending: promoting } = useMutation({
+        mutationFn: (glossaryDisciplineIds: string[]) =>
+            unwrap(PatchRequest(SIGNS.PROMOTE(promoteModal.signId!), { glossaryDisciplineIds })),
+        onSuccess: () => {
             toast.success("Sinal enviado para aprovação do gestor!");
             setPromoteModal({ open: false });
-        } finally {
-            setPromoting(false);
-        }
+            invalidateClassroom();
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+    const handlePromoteSign = (ids: string[]) => {
+        if (!promoteModal.signId) return;
+        promoteSign(ids);
     };
 
-    const handleRemoveMember = async () => {
-        if (!id || !removeMemberModal.member) return;
-        setRemovingMember(true);
-        try {
-            const res = await DeleteRequest(DISCIPLINES.REMOVE_MEMBER(id, removeMemberModal.member.user.id));
-            if (!res.success) { toast.error("Falha ao remover participante: " + res.message); return; }
-            toast.success("Participante removido da disciplina");
+    const { mutate: removeMember, isPending: removingMember } = useMutation({
+        mutationFn: (memberUserId: string) =>
+            unwrap(DeleteRequest(CLASSROOMS.REMOVE_MEMBER(id!, memberUserId))),
+        onSuccess: () => {
+            toast.success("Participante removido da turma");
             setRemoveMemberModal({ open: false });
-            loadMembers();
-        } finally {
-            setRemovingMember(false);
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.members(id ?? "") });
+        },
+        onError: (err: Error) => toast.error("Falha ao remover participante: " + err.message),
+    });
+    const handleRemoveMember = () => {
+        if (!removeMemberModal.member) return;
+        removeMember(removeMemberModal.member.user.id);
     };
 
-    const handleTabChange = (tab: DetailView) => {
-        setDetailView(tab);
-        if (tab === "favorites" && favoritesSigns.length === 0) loadDisciplineFavorites();
-        if (tab === "settings" && members.length === 0) loadMembers();
-    };
-
-    useEffect(() => {
-        load();
-    }, [load]);
+    // O carregamento por aba agora é feito pelo `enabled` das queries acima
+    const handleTabChange = (tab: DetailView) => setDetailView(tab);
 
     if (loading) {
         return (
@@ -192,10 +174,10 @@ const ClassroomDetailPage = () => {
         );
     }
 
-    if (!discipline) {
+    if (!classroom) {
         return (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
-                <p className="text-lg font-semibold text-cloud-500">Disciplina não encontrada</p>
+                <p className="text-lg font-semibold text-cloud-500">Turma não encontrada</p>
                 <button onClick={() => navigate("/classrooms")} className="text-sm text-campfire-500 hover:underline">
                     Voltar para minhas turmas
                 </button>
@@ -203,15 +185,15 @@ const ClassroomDetailPage = () => {
         );
     }
 
-    const canManage = !!user?.roles?.includes("EDUCATOR") && discipline.teacher.id === user?.id;
-    const color = discipline.colorBackground || "#213547";
+    const canManage = !!user?.roles?.includes("EDUCATOR") && classroom.teacher.id === user?.id;
+    const color = classroom.colorBackground || "#213547";
 
     return (
         <>
             <section className="flex flex-col gap-8">
-                {/* Header da disciplina */}
+                {/* Header da turma */}
                 <div className="relative overflow-hidden rounded-3xl text-white" style={{ minHeight: 220 }}>
-                    <CardMemphisBackground seed={discipline.id} color={color} rounded="rounded-3xl" />
+                    <CardMemphisBackground seed={classroom.id} color={color} rounded="rounded-3xl" />
 
                     {/* Botões flutuando no canto superior direito */}
                 <div className="absolute top-5 right-5 sm:top-6 sm:right-8 z-20 flex items-center gap-2">
@@ -238,11 +220,11 @@ const ClassroomDetailPage = () => {
                         {/* Nome + descrição (topo esquerdo) */}
                         <div>
                             <h1 className="font-baskerville text-2xl sm:text-3xl font-bold leading-tight drop-shadow">
-                                {discipline.name}
+                                {classroom.name}
                             </h1>
-                            {discipline.description && (
+                            {classroom.description && (
                                 <p className="mt-1.5 max-w-xl text-sm text-white/75 leading-snug">
-                                    {discipline.description}
+                                    {classroom.description}
                                 </p>
                             )}
                         </div>
@@ -255,18 +237,16 @@ const ClassroomDetailPage = () => {
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <HugeiconsIcon icon={UserGroupIcon} size={16} className="text-white/60" />
-                                <span><b className="text-white">{discipline.userCount}</b> alunos</span>
+                                <span><b className="text-white">{classroom.userCount}</b> alunos</span>
                             </div>
-                            {discipline.classCode && (
+                            {classroom.classCode && (
                                 <span className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white">
                                     <HugeiconsIcon icon={SquareLock02Icon} size={14} className="text-white/70" />
-                                    Código: <span className="font-mono tracking-wider">{discipline.classCode}</span>
+                                    Código: <span className="font-mono tracking-wider">{classroom.classCode}</span>
                                 </span>
                             )}
                             <span className="text-white/60 text-xs">
-                                Prof. {discipline.teacher.name}
-                                {discipline.schoolYear ? ` · ${discipline.schoolYear}` : ""}
-                                {discipline.schoolLevelLabel ? ` · ${discipline.schoolLevelLabel}` : ""}
+                                Prof. {classroom.teacher.name}
                             </span>
                         </div>
                     </div>
@@ -279,8 +259,8 @@ const ClassroomDetailPage = () => {
                     items={[
                         { key: "signs",     label: "Todos os sinais", icon: Bookshelf01Icon },
                         { key: "favorites", label: "Favoritos",       icon: FavouriteIcon },
-                        // A disciplina Contexto ganha as áreas do projeto de redação
-                        ...(discipline.isContext
+                        // A turma Contexto ganha as áreas do projeto de redação
+                        ...(classroom.isContext
                             ? [
                                 { key: "prompts" as const,  label: "Propostas", icon: TaskDaily01Icon },
                                 { key: "examples" as const, label: "Exemplos",  icon: Note01Icon },
@@ -292,14 +272,14 @@ const ClassroomDetailPage = () => {
                     ]}
                 />
 
-                {/* View: Propostas de redação (só na disciplina Contexto) */}
-                {detailView === "prompts" && discipline.isContext && (
-                    <EssayPromptSection disciplineId={discipline.id} canManage={canManage} />
+                {/* View: Propostas de redação (só na turma Contexto) */}
+                {detailView === "prompts" && classroom.isContext && (
+                    <EssayPromptSection classroomId={classroom.id} canManage={canManage} />
                 )}
 
-                {/* View: Exemplos de redação (só na disciplina Contexto) */}
-                {detailView === "examples" && discipline.isContext && (
-                    <EssayExampleSection disciplineId={discipline.id} canManage={canManage} />
+                {/* View: Exemplos de redação (só na turma Contexto) */}
+                {detailView === "examples" && classroom.isContext && (
+                    <EssayExampleSection classroomId={classroom.id} canManage={canManage} />
                 )}
 
                 {/* View: Todos os sinais */}
@@ -314,7 +294,7 @@ const ClassroomDetailPage = () => {
                             <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
                                 <HugeiconsIcon icon={SignLanguageCIcon} size={36} className="text-cloud-300" />
                                 <p className="text-sm text-neutral-500">
-                                    Nenhum sinal cadastrado nesta disciplina ainda.
+                                    Nenhum sinal cadastrado nesta turma ainda.
                                 </p>
                             </div>
                         ) : (
@@ -353,7 +333,7 @@ const ClassroomDetailPage = () => {
                             <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
                                 <HugeiconsIcon icon={FavouriteIcon} size={36} className="text-cloud-300" />
                                 <p className="text-sm text-neutral-500">
-                                    Nenhum sinal favoritado nesta disciplina ainda.
+                                    Nenhum sinal favoritado nesta turma ainda.
                                 </p>
                             </div>
                         ) : (
@@ -399,18 +379,18 @@ const ClassroomDetailPage = () => {
                                 <MemberSection
                                     title="Educadores"
                                     members={[
-                                        // Professor da disciplina sempre aparece primeiro
-                                        { roleInClass: "EDUCATOR", createdAt: "", user: { id: discipline.teacher.id, name: discipline.teacher.name, avatar: discipline.teacher.avatar, role: "EDUCATOR", educatorType: discipline.teacher.educatorType } },
-                                        ...members.filter((m) => ["EDUCATOR", "INTERPRETER"].includes(m.roleInClass) && m.user.id !== discipline.teacher.id),
+                                        // Professor da turma sempre aparece primeiro
+                                        { roleInClass: "EDUCATOR", createdAt: "", user: { id: classroom.teacher.id, name: classroom.teacher.name, avatar: classroom.teacher.avatar, role: "EDUCATOR", educatorType: classroom.teacher.educatorType } },
+                                        ...members.filter((m) => m.roleInClass === "EDUCATOR" && m.user.id !== classroom.teacher.id),
                                     ]}
                                     onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
-                                    lockedUserIds={[discipline.teacher.id]}
+                                    lockedUserIds={[classroom.teacher.id]}
                                 />
 
                                 {/* Alunos */}
                                 <MemberSection
                                     title="Alunos"
-                                    members={members.filter((m) => ["STUDENT", "GUARDIAN", "FAMILY"].includes(m.roleInClass))}
+                                    members={members.filter((m) => m.roleInClass === "STUDENT")}
                                     onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                 />
 
@@ -429,12 +409,12 @@ const ClassroomDetailPage = () => {
                 )}
             </section>
 
-            {/* Modal de editar disciplina */}
+            {/* Modal de editar turma */}
             <Modal open={editModal} onClose={() => setEditModal(false)}>
-                <DisciplineForm
-                    disciplineId={discipline.id}
+                <ClassroomForm
+                    classroomId={classroom.id}
                     onClose={() => setEditModal(false)}
-                    onSuccess={() => { setEditModal(false); load(); }}
+                    onSuccess={() => { setEditModal(false); invalidateClassroom(); }}
                 />
             </Modal>
 
@@ -443,7 +423,7 @@ const ClassroomDetailPage = () => {
                 <SignForm
                     signId={editSignModal.signId}
                     onClose={() => setEditSignModal({ open: false })}
-                    onSuccess={() => { setEditSignModal({ open: false }); load(); }}
+                    onSuccess={() => { setEditSignModal({ open: false }); invalidateClassroom(); }}
                 />
             </Modal>
 
@@ -476,9 +456,9 @@ const ClassroomDetailPage = () => {
             {/* Modal de adicionar participante */}
             <Modal open={addMemberModal} onClose={() => setAddMemberModal(false)} size="2xl">
                 <AddMemberForm
-                    disciplineId={discipline.id}
+                    classroomId={classroom.id}
                     onClose={() => setAddMemberModal(false)}
-                    onSuccess={() => { setAddMemberModal(false); loadMembers(); load(); }}
+                    onSuccess={() => { setAddMemberModal(false); invalidateClassroom(); }}
                 />
             </Modal>
 
@@ -492,14 +472,14 @@ const ClassroomDetailPage = () => {
                 description={
                     <>
                         <span className="font-semibold text-salmon-600 italic">{removeMemberModal.member?.user.name}</span>{" "}
-                        deixará de ter acesso a esta disciplina. É possível adicioná-lo novamente depois.
+                        deixará de ter acesso a esta turma. É possível adicioná-lo novamente depois.
                     </>
                 }
                 confirmText="Remover participante"
                 loadingText="Removendo..."
             />
 
-            {/* Modal de confirmar saída da disciplina */}
+            {/* Modal de confirmar saída da turma */}
             <ConfirmDeleteModal
                 open={leaveModal}
                 onClose={() => setLeaveModal(false)}
@@ -509,7 +489,7 @@ const ClassroomDetailPage = () => {
                 description={
                     <>
                         Você deixará de ter acesso aos sinais e materiais de{" "}
-                        <span className="font-semibold text-salmon-600 italic">{discipline.name}</span>.
+                        <span className="font-semibold text-salmon-600 italic">{classroom.name}</span>.
                         Para voltar, será necessário um novo convite.
                     </>
                 }

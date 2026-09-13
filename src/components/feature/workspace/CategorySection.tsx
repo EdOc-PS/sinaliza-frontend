@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DeleteIcon, MoreVerticalIcon, TagsIcon } from "@hugeicons/core-free-icons";
@@ -20,45 +20,39 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@components/ui/DropdownMenu";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 export const CategorySection = () => {
-    const [categories, setCategories] = useState<CategorySlim[]>([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [createModal, setCreateModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
-    const [deleting, setDeleting] = useState(false);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<CategorySlim[]>(CATEGORIES.LIST());
-            if (!res.success) { toast.error("Falha ao carregar categorias: " + res.message); return; }
-            setCategories(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        load();
-    }, [load]);
+    const { data: categories = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.categories.list(),
+        queryFn: () => unwrap(GetRequest<CategorySlim[]>(CATEGORIES.LIST())),
+        staleTime: 30 * 60_000,
+        meta: { errorMessage: "Falha ao carregar categorias" },
+    });
 
     // Participa do spinner unificado da tela (LoadingGroup)
     useReportLoading("categories", loading);
 
-    const handleDelete = async () => {
-        if (!deleteModal.id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(CATEGORIES.DELETE(deleteModal.id));
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: deleteItem, isPending: deleting } = useMutation({
+        mutationFn: (itemId: string) => unwrap(DeleteRequest(CATEGORIES.DELETE(itemId))),
+        onSuccess: () => {
             toast.success("Categoria excluída com sucesso!");
             setDeleteModal({ open: false });
-            load();
-        } finally {
-            setDeleting(false);
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    const handleDelete = () => {
+        if (!deleteModal.id) return;
+        deleteItem(deleteModal.id);
     };
 
     return (
@@ -128,7 +122,7 @@ export const CategorySection = () => {
             <Modal open={createModal} onClose={() => setCreateModal(false)} size="2xl">
                 <CategoryForm
                     onClose={() => setCreateModal(false)}
-                    onSuccess={() => { setCreateModal(false); load(); }}
+                    onSuccess={() => { setCreateModal(false); queryClient.invalidateQueries({ queryKey: queryKeys.categories.all }); }}
                 />
             </Modal>
 

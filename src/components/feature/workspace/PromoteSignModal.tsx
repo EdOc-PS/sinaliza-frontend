@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Medal06Icon, MortarboardIcon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
@@ -24,21 +26,21 @@ interface PromoteSignModalProps {
 // Modal de confirmação de promoção do sinal ao glossário global.
 // Permite associar o sinal a nenhuma, uma ou várias disciplinas fixas do glossário.
 const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName }: PromoteSignModalProps) => {
-    const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
     const [selected, setSelected] = useState<string[]>([]);
 
-    const loadDisciplines = useCallback(async () => {
-        const res = await GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST());
-        if (!res.success) { toast.error("Falha ao carregar disciplinas do glossário: " + res.message); return; }
-        setDisciplines(res.object ?? []);
-    }, []);
+    // Só busca com o modal aberto; reabrir usa o cache em vez de nova requisição
+    const { data: disciplines = [] } = useQuery({
+        queryKey: queryKeys.glossaryDisciplines.list(),
+        queryFn: () => unwrap(GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST())),
+        enabled: open,
+        staleTime: 30 * 60_000,
+        meta: { errorMessage: "Falha ao carregar disciplinas do glossário" },
+    });
 
-    // Carrega as disciplinas e limpa a seleção sempre que o modal abre
+    // Limpa a seleção sempre que o modal abre
     useEffect(() => {
-        if (!open) return;
-        setSelected([]);
-        loadDisciplines();
-    }, [open, loadDisciplines]);
+        if (open) setSelected([]);
+    }, [open]);
 
     const options = disciplines.map((d) => ({ value: d.id, label: d.name }));
 
@@ -65,7 +67,7 @@ const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName 
                         <>O sinal se tornará </>
                     )}
                     <b>público</b> no glossário global após a aprovação de um gestor. Ele continuará disponível
-                    normalmente nas disciplinas.
+                    normalmente nas turmas.
                 </p>
 
                 {/* Associação a disciplinas do glossário (opcional) */}

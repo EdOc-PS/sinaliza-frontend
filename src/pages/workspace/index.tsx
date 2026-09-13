@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
 
-import { useFAB } from "@context/FABContext";
 import { useAuth } from "@context/AuthContext";
 
 import Modal from "@components/ui/Modal";
@@ -18,7 +19,7 @@ import createSignalImg from "@/assets/images/app/create-signal.png";
 import createHandImg from "@/assets/images/app/create-hand.png";
 
 const WorkspacePage = () => {
-    const { registerRefresh } = useFAB();
+    const queryClient = useQueryClient();
     const { user } = useAuth();
     const isManager = !!user?.roles?.includes("MANAGER");
     const isEducator = !!user?.roles?.includes("EDUCATOR");
@@ -27,17 +28,19 @@ const WorkspacePage = () => {
     const [editModal, setEditModal] = useState<boolean>(false);
     const [signModal, setSignModal] = useState<boolean>(false);
     const [handModal, setHandModal] = useState<boolean>(false);
-    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
     const handleEditConfig = (config: HandConfigTypeForm) => {
         setEditingConfig(config);
         setEditModal(true);
     };
 
+    const invalidateHandConfigs = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+
     const handleEditSuccess = () => {
         setEditModal(false);
         setEditingConfig(null);
-        setRefreshTrigger(prev => prev + 1);
+        invalidateHandConfigs();
     };
 
     const handleEditClose = () => {
@@ -47,14 +50,8 @@ const WorkspacePage = () => {
 
     const handleHandSuccess = () => {
         setHandModal(false);
-        setRefreshTrigger(prev => prev + 1);
+        invalidateHandConfigs();
     };
-
-    useEffect(() => {
-        registerRefresh(() => {
-            setRefreshTrigger(prev => prev + 1);
-        });
-    }, [registerRefresh]);
 
     return (
         <>
@@ -96,10 +93,7 @@ const WorkspacePage = () => {
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
                         <div className="bg-white rounded-3xl p-6">
-                            <VisualKeyboard
-                                onEdit={handleEditConfig}
-                                refreshTrigger={refreshTrigger}
-                            />
+                            <VisualKeyboard onEdit={handleEditConfig} />
                         </div>
 
                         {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}

@@ -1,7 +1,6 @@
 import interpreterImg from "@/assets/images/interpreter.png";
 import studentImg from "@/assets/images/student.png";
 import educatorImg from "@/assets/images/educator.png";
-import guardianImg from "@/assets/images/guardian.png";
 
 interface Audience {
     tag: string;
@@ -29,20 +28,13 @@ const audiences: Audience[] = [
     {
         tag: "Gestor do conteúdo",
         title: "Professor",
-        description: "Gerencia turmas, cadastra sinais na disciplina, valida conteúdos e acompanha o percurso de aprendizado.",
+        description: "Gerencia turmas, cadastra sinais, valida conteúdos e acompanha o percurso de aprendizado.",
         image: educatorImg,
         cardClass: "bg-campfire-100",
     },
-    {
-        tag: "Apoio",
-        title: "Familiar",
-        description: "Acompanha a evolução do aluno, acessa os sinais das disciplinas e participa do processo de inclusão.",
-        image: guardianImg,
-        cardClass: "bg-salmon-100",
-    },
 ];
 
-// "Para quem é" — os 4 perfis da plataforma.
+// "Para quem é" — os 3 perfis da plataforma.
 // O `.reveal` fica no wrapper: se o delay do stagger ficasse no mesmo elemento do
 // hover, ele atrasaria a transição do hover e o movimento pareceria travado.
 export const LandingAudience = () => (
@@ -57,13 +49,13 @@ export const LandingAudience = () => (
                     cada papel na educação
                 </h2>
                 <p className="mt-4 text-base text-cloud-400">
-                    Do intérprete que cria ao familiar que apoia — o Sinaliza conecta todos os
+                    Do intérprete que cria ao aluno que aprende — o Sinaliza conecta todos os
                     envolvidos no aprendizado de Libras.
                 </p>
             </div>
 
             {/* Cards */}
-            <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {audiences.map((item, i) => (
                     <div key={item.title} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
                         <div

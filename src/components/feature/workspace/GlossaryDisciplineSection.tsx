@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DeleteIcon, Edit02Icon, MoreVerticalIcon, MortarboardIcon } from "@hugeicons/core-free-icons";
@@ -21,45 +21,39 @@ import {
 } from "@components/ui/DropdownMenu";
 
 import createClassImg from "@/assets/images/app/create-class.png";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 export const GlossaryDisciplineSection = () => {
-    const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [formModal, setFormModal] = useState<{ open: boolean; discipline?: GlossaryDisciplineSlim }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
-    const [deleting, setDeleting] = useState(false);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST());
-            if (!res.success) { toast.error("Falha ao carregar disciplinas: " + res.message); return; }
-            setDisciplines(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        load();
-    }, [load]);
+    const { data: disciplines = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.glossaryDisciplines.list(),
+        queryFn: () => unwrap(GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST())),
+        staleTime: 30 * 60_000,
+        meta: { errorMessage: "Falha ao carregar disciplinas" },
+    });
 
     // Participa do spinner unificado da tela (LoadingGroup)
     useReportLoading("glossary-disciplines", loading);
 
-    const handleDelete = async () => {
-        if (!deleteModal.id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(GLOSSARY_DISCIPLINES.DELETE(deleteModal.id));
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: deleteItem, isPending: deleting } = useMutation({
+        mutationFn: (itemId: string) => unwrap(DeleteRequest(GLOSSARY_DISCIPLINES.DELETE(itemId))),
+        onSuccess: () => {
             toast.success("Disciplina excluída com sucesso!");
             setDeleteModal({ open: false });
-            load();
-        } finally {
-            setDeleting(false);
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.glossaryDisciplines.all });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    const handleDelete = () => {
+        if (!deleteModal.id) return;
+        deleteItem(deleteModal.id);
     };
 
     return (
@@ -146,7 +140,7 @@ export const GlossaryDisciplineSection = () => {
                 <GlossaryDisciplineForm
                     discipline={formModal.discipline}
                     onClose={() => setFormModal({ open: false })}
-                    onSuccess={() => { setFormModal({ open: false }); load(); }}
+                    onSuccess={() => { setFormModal({ open: false }); queryClient.invalidateQueries({ queryKey: queryKeys.glossaryDisciplines.all }); }}
                 />
             </Modal>
 

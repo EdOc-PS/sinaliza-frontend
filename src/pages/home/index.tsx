@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/config/query/queryKeys'
+import { unwrap } from '@/config/query/unwrap'
 import { GetRequest } from '@requests'
 import { GLOSSARY } from '@routes/signs'
 import useScrollReveal from '@lib/hooks/useScrollReveal'
@@ -17,17 +19,13 @@ import LandingFooter from '@components/feature/landing/LandingFooter'
 function Home() {
     useScrollReveal()
 
-    const [signs, setSigns] = useState<SignCardData[]>([])
-
-    // Endpoint público — a landing não exige login
-    const loadPublicSigns = async () => {
-        const res = await GetRequest<SignCardData[]>(GLOSSARY.LIST())
-        if (res.success && res.object) setSigns(res.object)
-    }
-
-    useEffect(() => {
-        loadPublicSigns()
-    }, [])
+    // Endpoint público — a landing não exige login. Compartilha a chave com o
+    // repositório público: ir da landing para /public-glossary não refaz o fetch.
+    const { data: signs = [] } = useQuery({
+        queryKey: queryKeys.glossary.list({}),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST())),
+        meta: { errorMessage: 'Falha ao carregar sinais' },
+    })
 
     return (
         <div className="min-h-screen bg-white">

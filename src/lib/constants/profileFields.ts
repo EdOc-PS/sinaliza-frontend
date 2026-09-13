@@ -3,16 +3,14 @@ import {
     ConversationIcon,
     DiplomaIcon,
     HealtcareIcon,
-    HierarchyCircle02Icon,
     LocationUser01Icon,
-    Mail01Icon,
     StationeryIcon,
     TeacherIcon,
 } from "@hugeicons/core-free-icons";
 
 import type { EducatorType, Role } from "@api/requests";
 
-export type PerfilId = "student" | "educator" | "interpreter" | "guardian";
+export type PerfilId = "student" | "educator" | "interpreter";
 
 export type CampoFormulario = {
     id: string;
@@ -111,32 +109,12 @@ export const PERFIL_FORMULARIOS: Record<
             },
         ],
     },
-    guardian: {
-        titulo: "Dados do responsável",
-        descricao: "Preencha as informações de vínculo.",
-        campos: [
-            {
-                id: "studentEmail",
-                label: "Email do aluno:",
-                placeholder: "aluno@email.com",
-                icon: Mail01Icon,
-            },
-            {
-                id: "parentesco",
-                label: "Parentesco:",
-                placeholder: "Ex: mãe, pai, avó",
-                icon: HierarchyCircle02Icon,
-                noSpecialChars: true,
-            },
-        ],
-    },
 };
 
 // Mapeia roles + educatorType (Educador/Intérprete são a mesma role) para o perfil de campos correspondente.
 // Como um usuário pode ter múltiplas roles, usa a de maior prioridade para o formulário de perfil.
 export const getPerfilId = (roles: Role[], educatorType?: EducatorType | null): PerfilId | null => {
     if (roles.includes("EDUCATOR")) return educatorType === "INTERPRETER" ? "interpreter" : "educator";
-    if (roles.includes("GUARDIAN")) return "guardian";
     if (roles.includes("STUDENT")) return "student";
     return null;
 };

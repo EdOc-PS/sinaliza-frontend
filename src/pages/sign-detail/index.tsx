@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { DeleteRequest, GetRequest, PatchRequest, PostRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { SIGNS } from "@routes/signs";
 import { FAVORITES } from "@routes/favorites";
 import { HISTORY } from "@routes/history";
@@ -51,7 +55,7 @@ interface SignDetail {
     creatorId: string;
     globalStatus?: "PRIVATE" | "PENDING" | "PUBLIC" | "REJECTED";
     handConfig?: { id: string; name: string; imgUrl?: string | null } | null;
-    disciplines?: { id: string; name: string }[] | null;
+    classrooms?: { id: string; name: string }[] | null;
 }
 
 const SignDetailPage = () => {
@@ -59,17 +63,31 @@ const SignDetailPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const [loading, setLoading] = useState(true);
-    const [sign, setSign] = useState<SignDetail | null>(null);
-    const [related, setRelated] = useState<SignCardData[]>([]);
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [favLoading, setFavLoading] = useState(false);
+    const queryClient = useQueryClient();
 
     const [editModal, setEditModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
-    const [deleting, setDeleting] = useState(false);
     const [promoteModal, setPromoteModal] = useState(false);
-    const [promoting, setPromoting] = useState(false);
+
+    const { data: sign = null, isPending: loading } = useQuery({
+        queryKey: queryKeys.signs.detail(id ?? ""),
+        queryFn: () => unwrap(GetRequest<SignDetail>(SIGNS.FIND_ONE(id!))),
+        enabled: !!id,
+        meta: { errorMessage: "Falha ao carregar o sinal" },
+    });
+
+    // Mesma chave de /favorites — reaproveita o cache em vez de buscar de novo
+    const { data: favorites = [] } = useQuery({
+        queryKey: queryKeys.favorites.list(),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(FAVORITES.ALL())),
+    });
+    const isFavorite = favorites.some((s) => s.id === id);
+
+    const { data: related = [] } = useQuery({
+        queryKey: queryKeys.signs.related(id ?? ""),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(SEARCH.RELATED(id!))),
+        enabled: !!id,
+    });
 
     const carouselRef = useRef<HTMLDivElement>(null);
     const [canPrev, setCanPrev] = useState(false);
@@ -90,87 +108,53 @@ const SignDetailPage = () => {
         el.scrollBy({ left: direction === "next" ? amount : -amount, behavior: "smooth" });
     };
 
-    const loadSign = async () => {
-        if (!id) return;
-        setLoading(true);
-        try {
-            const [signRes, favRes] = await Promise.all([
-                GetRequest<SignDetail>(SIGNS.FIND_ONE(id)),
-                GetRequest<SignCardData[]>(FAVORITES.ALL()),
-            ]);
-
-            if (!signRes.success) {
-                toast.error("Falha ao carregar o sinal: " + signRes.message);
-                return;
-            }
-            setSign(signRes.object ?? null);
-            setIsFavorite((favRes.object ?? []).some((s) => s.id === id));
-
-            // Registra o acesso no histórico (não bloqueia a tela em caso de falha)
-            PostRequest(HISTORY.REGISTER(id), {}).catch(() => { });
-
-            // Sinais semelhantes (não bloqueia a tela em caso de falha)
-            loadRelated(id);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadRelated = async (signId: string) => {
-        const res = await GetRequest<SignCardData[]>(SEARCH.RELATED(signId));
-        setRelated(res.object ?? []);
-    };
 
     const handleSelectHandConfig = (config: HandConfigTypeForm) => {
         if (!config.id) return;
         navigate(`/search?handConfigId=${config.id}`);
     };
 
-    const handleToggleFavorite = async () => {
-        if (!id) return;
-        setFavLoading(true);
-        try {
-            const res = isFavorite
-                ? await DeleteRequest(FAVORITES.REMOVE(id))
-                : await PostRequest(FAVORITES.ADD(id), {});
-            if (!res.success) { toast.error("Falha ao atualizar favorito: " + res.message); return; }
-            setIsFavorite((prev) => !prev);
+    const { mutate: handleToggleFavorite, isPending: favLoading } = useMutation({
+        mutationFn: () => unwrap(isFavorite
+            ? DeleteRequest(FAVORITES.REMOVE(id!))
+            : PostRequest(FAVORITES.ADD(id!), {})),
+        onSuccess: () => {
             toast.success(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos");
-        } finally {
-            setFavLoading(false);
-        }
-    };
+            queryClient.invalidateQueries({ queryKey: queryKeys.favorites.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao atualizar favorito: " + err.message),
+    });
 
-    const handlePromote = async (glossaryDisciplineIds: string[]) => {
-        if (!id) return;
-        setPromoting(true);
-        try {
-            const res = await PatchRequest(SIGNS.PROMOTE(id), { glossaryDisciplineIds });
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: promoteSign, isPending: promoting } = useMutation({
+        mutationFn: (glossaryDisciplineIds: string[]) =>
+            unwrap(PatchRequest(SIGNS.PROMOTE(id!), { glossaryDisciplineIds })),
+        onSuccess: () => {
             toast.success("Sinal enviado para aprovação do gestor!");
             setPromoteModal(false);
-            loadSign();
-        } finally {
-            setPromoting(false);
-        }
-    };
+            queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
 
-    const handleDelete = async () => {
-        if (!id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(SIGNS.DELETE(id));
-            if (!res.success) { toast.error("Falha ao excluir sinal: " + res.message); return; }
+    const { mutate: handleDelete, isPending: deleting } = useMutation({
+        mutationFn: () => unwrap(DeleteRequest(SIGNS.DELETE(id!))),
+        onSuccess: () => {
             toast.success("Sinal excluído com sucesso!");
+            queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
             navigate(-1);
-        } finally {
-            setDeleting(false);
-        }
-    };
+        },
+        onError: (err: Error) => toast.error("Falha ao excluir sinal: " + err.message),
+    });
 
+    const handlePromote = (glossaryDisciplineIds: string[]) => promoteSign(glossaryDisciplineIds);
+
+    // Registra o acesso no histórico — efeito colateral, não bloqueia a tela
     useEffect(() => {
-        loadSign();
-    }, [id]);
+        if (!id) return;
+        PostRequest(HISTORY.REGISTER(id), {})
+            .then(() => queryClient.invalidateQueries({ queryKey: queryKeys.history.all }))
+            .catch(() => { });
+    }, [id, queryClient]);
 
     // Recalcula as setas do carrossel quando os relacionados carregam e ao redimensionar
     useEffect(() => {
@@ -290,9 +274,9 @@ const SignDetailPage = () => {
                                 </span>
                             )}
                         </div>
-                        {sign.disciplines && sign.disciplines.length > 0 && (
+                        {sign.classrooms && sign.classrooms.length > 0 && (
                             <span className="text-xs text-neutral-400">
-                                {sign.disciplines.map((d) => d.name).join(" · ")}
+                                {sign.classrooms.map((d) => d.name).join(" · ")}
                             </span>
                         )}
                     </div>
@@ -300,7 +284,7 @@ const SignDetailPage = () => {
                     {/* Ações — 2x2 ocupando a largura no mobile, em linha a partir do lg */}
                     <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto lg:items-center">
                         <button
-                            onClick={handleToggleFavorite}
+                            onClick={() => handleToggleFavorite()}
                             disabled={favLoading}
                             className={`flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
                                 isFavorite
@@ -435,7 +419,7 @@ const SignDetailPage = () => {
                 <SignForm
                     signId={sign.id}
                     onClose={() => setEditModal(false)}
-                    onSuccess={() => { setEditModal(false); loadSign(); }}
+                    onSuccess={() => { setEditModal(false); queryClient.invalidateQueries({ queryKey: queryKeys.signs.all }); }}
                 />
             </Modal>
 
@@ -452,7 +436,7 @@ const SignDetailPage = () => {
             <ConfirmDeleteModal
                 open={deleteModal}
                 onClose={() => setDeleteModal(false)}
-                onConfirm={handleDelete}
+                onConfirm={() => handleDelete()}
                 loading={deleting}
                 title={<>Excluir <span className="text-salmon-600 italic">Sinal</span>?</>}
                 description={

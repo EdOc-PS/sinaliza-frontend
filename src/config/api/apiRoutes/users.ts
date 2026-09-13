@@ -8,4 +8,5 @@ export const USERS = {
     DELETE: (id: string) => `users/${id}`,
     UPDATE_ROLES: (id: string) => `users/${id}/roles`,
     APPROVAL: (id: string) => `users/${id}/approval`,
+    ONBOARDING: () => `users/me/onboarding`,
 }

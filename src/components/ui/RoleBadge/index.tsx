@@ -15,9 +15,6 @@ const ROLE_META: Record<string, RoleMeta> = {
     PROFESSOR:   { label: "Professor",  icon: Knowledge01Icon, className: "bg-salmon-100 text-salmon-700" },
     INTERPRETER: { label: "Intérprete", icon: Knowledge01Icon, className: "bg-campfire-100 text-campfire-700" },
     STUDENT:     { label: "Aluno",      icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
-    GUARDIAN:    { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
-    FAMILY:      { label: "Familiar",   icon: Knowledge02Icon, className: "bg-sky-100 text-sky-700" },
-    ASSISTANT:   { label: "Assistente", icon: Knowledge02Icon, className: "bg-cloud-100 text-cloud-600" },
     MANAGER:     { label: "Gestor",     icon: StarAward01Icon, className: "bg-lime-100 text-lime-700" },
 };
 

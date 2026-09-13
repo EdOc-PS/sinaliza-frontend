@@ -1,31 +1,24 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, UserGroup03Icon, UserGroupIcon, StudentsIcon} from "@hugeicons/core-free-icons";
+import { Search01Icon, UserGroupIcon, StudentsIcon} from "@hugeicons/core-free-icons";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GetRequest, PatchRequest } from "@requests";
 import { USERS } from "@routes/users";
-import type { Role } from "@api/requests";
 
 import Input from "@components/ui/Input";
-import Select from "@components/ui/Select";
 import Spinner from "@components/ui/Spinner";
 import { ListCardMember, type MemberListItem } from "@components/feature/members/ListCardMember";
 import { PendingApprovalCard } from "@components/feature/members/PendingApprovalCard";
 
-const ROLE_OPTIONS = [
-    { label: "Alunos", value: "STUDENT" },
-    { label: "Responsáveis", value: "GUARDIAN" },
-];
-
 const MembersPage = () => {
-    const [role, setRole] = useState<Role>("STUDENT");
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    const [loading, setLoading] = useState(true);
-    const [members, setMembers] = useState<MemberListItem[]>([]);
-    const [processingId, setProcessingId] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
     // Debounce da busca (350ms)
     useEffect(() => {
@@ -33,38 +26,37 @@ const MembersPage = () => {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const loadMembers = useCallback(async (currentRole: Role, query?: string) => {
-        setLoading(true);
-        try {
-            const params: Record<string, string> = { role: currentRole };
-            if (query) params.search = query;
-            const res = await GetRequest<MemberListItem[]>(USERS.MEMBERS(), params);
-            if (!res.success) { toast.error("Falha ao carregar usuários: " + res.message); return; }
-            setMembers(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Papel e busca fazem parte da chave: alternar entre abas já visitadas
+    // volta instantâneo, sem novo request.
+    const { data: members = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.users.members("STUDENT", debouncedSearch),
+        queryFn: () => {
+            const params: Record<string, string> = { role: "STUDENT" };
+            if (debouncedSearch) params.search = debouncedSearch;
+            return unwrap(GetRequest<MemberListItem[]>(USERS.MEMBERS(), params));
+        },
+        meta: { errorMessage: "Falha ao carregar usuários" },
+    });
 
-    useEffect(() => {
-        loadMembers(role, debouncedSearch || undefined);
-    }, [loadMembers, role, debouncedSearch]);
-
-    const handleApproval = async (member: MemberListItem, status: "APPROVED" | "REJECTED") => {
-        setProcessingId(member.id);
-        try {
-            const res = await PatchRequest(USERS.APPROVAL(member.id), { status });
-            if (!res.success) { toast.error("Falha ao atualizar: " + res.message); return; }
+    const { mutate: approvalMutate, variables: approvalVars, isPending: approving } = useMutation({
+        mutationFn: ({ member, status }: { member: MemberListItem; status: "APPROVED" | "REJECTED" }) =>
+            unwrap(PatchRequest(USERS.APPROVAL(member.id), { status })),
+        onSuccess: (_data, { status }) => {
             toast.success(status === "APPROVED" ? "Conta aprovada!" : "Conta recusada.");
-            loadMembers(role, debouncedSearch || undefined);
-        } finally {
-            setProcessingId(null);
-        }
-    };
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao atualizar: " + err.message),
+    });
+
+    // Qual linha está em processamento (para o spinner do botão)
+    const processingId = approving ? approvalVars?.member.id ?? null : null;
+
+    const handleApproval = (member: MemberListItem, status: "APPROVED" | "REJECTED") =>
+        approvalMutate({ member, status });
 
     const pending = members.filter((m) => m.approvalStatus === "PENDING");
     const others = members.filter((m) => m.approvalStatus !== "PENDING");
-    const roleLabel = role === "STUDENT" ? "aluno" : "responsável";
+    const roleLabel = "aluno";
 
     return (
         <section className="flex flex-col gap-8">
@@ -75,7 +67,7 @@ const MembersPage = () => {
                         <HugeiconsIcon icon={StudentsIcon} size={26} className="text-sky-600" />
                     </div>
                     <div>
-                        <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Alunos e responsáveis</h1>
+                        <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Alunos</h1>
                         <p className="text-sm text-neutral-500">Acompanhe e aprove as contas da instituição</p>
                     </div>
                 </div>
@@ -88,14 +80,6 @@ const MembersPage = () => {
                             value={search}
                             onChange={setSearch}
                             placeholder="Buscar por nome ou email..."
-                        />
-                    </div>
-                    <div className="sm:w-52">
-                        <Select
-                            icon={UserGroup03Icon}
-                            options={ROLE_OPTIONS}
-                            value={role}
-                            onChange={(v) => setRole(v as Role)}
                         />
                     </div>
                 </div>
@@ -131,7 +115,7 @@ const MembersPage = () => {
             ) : (
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-neutral-400">{others.length} {role === "STUDENT" ? "aluno(s)" : "responsável(is)"}</span>
+                        <span className="text-xs text-neutral-400">{others.length} aluno(s)</span>
                         <span className="text-xs text-neutral-400">
                             Acesso rápido pelas iniciais para facilitar a identificação das pessoas.
                         </span>

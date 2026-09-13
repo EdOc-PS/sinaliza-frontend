@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -10,6 +10,9 @@ import { getCategoryBadgeClass, type CategorySlim } from "@lib/constants/categor
 import { getYouTubeThumbnail } from "@lib/youtube/youtube";
 
 import Spinner from "@components/ui/Spinner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
 interface PendingSign {
@@ -20,7 +23,7 @@ interface PendingSign {
     imgUrl?: string | null;
     createdAt: string;
     category?: CategorySlim | null;
-    disciplines?: { id: string; name: string }[] | null;
+    classrooms?: { id: string; name: string }[] | null;
 }
 
 interface PromotionSectionProps {
@@ -31,39 +34,32 @@ interface PromotionSectionProps {
 // Promoções de sinais ao glossário global — educador visualiza, só gestor aprova/recusa
 export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
     const navigate = useNavigate();
-    const [signs, setSigns] = useState<PendingSign[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [processingId, setProcessingId] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<PendingSign[]>(SIGNS.PROMOTIONS());
-            if (!res.success) { toast.error("Falha ao carregar promoções: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        load();
-    }, [load]);
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.signs.promotions(),
+        queryFn: () => unwrap(GetRequest<PendingSign[]>(SIGNS.PROMOTIONS())),
+        meta: { errorMessage: "Falha ao carregar promoções" },
+    });
 
     // Participa do spinner unificado da tela (LoadingGroup)
     useReportLoading("promotions", loading);
 
-    const review = async (sign: PendingSign, approve: boolean) => {
-        setProcessingId(sign.id);
-        try {
-            const res = await PatchRequest(SIGNS.REVIEW_PROMOTION(sign.id), { approve });
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: reviewMutate, variables: reviewVars, isPending: reviewing } = useMutation({
+        mutationFn: ({ sign, approve }: { sign: PendingSign; approve: boolean }) =>
+            unwrap(PatchRequest(SIGNS.REVIEW_PROMOTION(sign.id), { approve })),
+        onSuccess: (_data, { sign, approve }) => {
             toast.success(approve ? `"${sign.name}" agora é público!` : `Promoção de "${sign.name}" recusada`);
-            setSigns((prev) => prev.filter((s) => s.id !== sign.id));
-        } finally {
-            setProcessingId(null);
-        }
-    };
+            queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.glossary.all });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    // Qual card está em processamento (para o spinner do botão)
+    const processingId = reviewing ? reviewVars?.sign.id ?? null : null;
+
+    const review = (sign: PendingSign, approve: boolean) => reviewMutate({ sign, approve });
 
     if (!loading && signs.length === 0) return null;
 
@@ -119,9 +115,9 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                                 </span>
                                             )}
                                         </div>
-                                        {sign.disciplines && sign.disciplines.length > 0 && (
+                                        {sign.classrooms && sign.classrooms.length > 0 && (
                                             <span className="truncate text-xs text-neutral-400">
-                                                {sign.disciplines.map((d) => d.name).join(" · ")}
+                                                {sign.classrooms.map((d) => d.name).join(" · ")}
                                             </span>
                                         )}
                                     </div>

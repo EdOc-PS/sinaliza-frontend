@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,6 +12,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { DeleteRequest, GetRequest, PostRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { ESSAYS } from "@routes/essays";
 
 import Button from "@components/ui/Button";
@@ -26,70 +29,60 @@ import {
 import { EssayPromptForm, type EssayPrompt } from "./EssayPromptForm";
 
 interface EssayPromptSectionProps {
-    disciplineId: string;
-    /** Educador/gestor da disciplina pode criar, editar e excluir propostas */
+    classroomId: string;
+    /** Educador/gestor da turma pode criar, editar e excluir propostas */
     canManage: boolean;
 }
 
-// Propostas de redação da disciplina Contexto — lista de tarefas com marcação individual
-export const EssayPromptSection = ({ disciplineId, canManage }: EssayPromptSectionProps) => {
-    const [prompts, setPrompts] = useState<EssayPrompt[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [togglingId, setTogglingId] = useState<string | null>(null);
+// Propostas de redação da turma Contexto — lista de tarefas com marcação individual
+export const EssayPromptSection = ({ classroomId, canManage }: EssayPromptSectionProps) => {
+    const queryClient = useQueryClient();
     const [formModal, setFormModal] = useState<{ open: boolean; prompt?: EssayPrompt }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; title?: string }>({ open: false });
-    const [deleting, setDeleting] = useState(false);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<EssayPrompt[]>(ESSAYS.PROMPTS(disciplineId));
-            if (!res.success) { toast.error("Falha ao carregar propostas: " + res.message); return; }
-            setPrompts(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, [disciplineId]);
+    const promptsKey = queryKeys.essays.prompts(classroomId);
 
-    useEffect(() => {
-        load();
-    }, [load]);
+    const { data: prompts = [], isPending: loading } = useQuery({
+        queryKey: promptsKey,
+        queryFn: () => unwrap(GetRequest<EssayPrompt[]>(ESSAYS.PROMPTS(classroomId))),
+        meta: { errorMessage: "Falha ao carregar propostas" },
+    });
 
-    // Marca/desmarca a proposta para o usuário logado (atualização otimista)
-    const toggleCompleted = async (prompt: EssayPrompt) => {
-        if (togglingId) return;
-        setTogglingId(prompt.id);
+    // Marca/desmarca a proposta para o usuário logado.
+    // Atualização otimista: o cache muda antes da resposta e volta atrás se falhar.
+    const { mutate: toggleCompleted, variables: togglingPrompt, isPending: toggling } = useMutation({
+        mutationFn: (prompt: EssayPrompt) => unwrap(prompt.completed
+            ? DeleteRequest(ESSAYS.COMPLETE(prompt.id))
+            : PostRequest(ESSAYS.COMPLETE(prompt.id), {})),
+        onMutate: async (prompt) => {
+            // Evita que um refetch em voo sobrescreva a alteração otimista
+            await queryClient.cancelQueries({ queryKey: promptsKey });
+            const previous = queryClient.getQueryData<EssayPrompt[]>(promptsKey);
+            queryClient.setQueryData<EssayPrompt[]>(promptsKey, (old) =>
+                (old ?? []).map((p) => (p.id === prompt.id ? { ...p, completed: !p.completed } : p)));
+            return { previous };
+        },
+        onError: (err: Error, _prompt, context) => {
+            if (context?.previous) queryClient.setQueryData(promptsKey, context.previous);
+            toast.error(err.message);
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: promptsKey }),
+    });
+    const togglingId = toggling ? togglingPrompt?.id ?? null : null;
 
-        const next = !prompt.completed;
-        setPrompts((prev) => prev.map((p) => (p.id === prompt.id ? { ...p, completed: next } : p)));
-
-        try {
-            const res = next
-                ? await PostRequest(ESSAYS.COMPLETE(prompt.id), {})
-                : await DeleteRequest(ESSAYS.COMPLETE(prompt.id));
-
-            if (!res.success) {
-                // Desfaz em caso de erro
-                setPrompts((prev) => prev.map((p) => (p.id === prompt.id ? { ...p, completed: !next } : p)));
-                toast.error(res.message);
-            }
-        } finally {
-            setTogglingId(null);
-        }
-    };
-
-    const handleDelete = async () => {
-        if (!deleteModal.id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(ESSAYS.DELETE_PROMPT(deleteModal.id));
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: deletePrompt, isPending: deleting } = useMutation({
+        mutationFn: (promptId: string) => unwrap(DeleteRequest(ESSAYS.DELETE_PROMPT(promptId))),
+        onSuccess: () => {
             toast.success("Proposta excluída!");
             setDeleteModal({ open: false });
-            load();
-        } finally {
-            setDeleting(false);
-        }
+            queryClient.invalidateQueries({ queryKey: promptsKey });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    const handleDelete = () => {
+        if (!deleteModal.id) return;
+        deletePrompt(deleteModal.id);
     };
 
     const doneCount = prompts.filter((p) => p.completed).length;
@@ -202,10 +195,10 @@ export const EssayPromptSection = ({ disciplineId, canManage }: EssayPromptSecti
             {/* Modal de criar/editar */}
             <Modal open={formModal.open} onClose={() => setFormModal({ open: false })} size="2xl">
                 <EssayPromptForm
-                    disciplineId={disciplineId}
+                    classroomId={classroomId}
                     prompt={formModal.prompt}
                     onClose={() => setFormModal({ open: false })}
-                    onSuccess={() => { setFormModal({ open: false }); load(); }}
+                    onSuccess={() => { setFormModal({ open: false }); queryClient.invalidateQueries({ queryKey: promptsKey }); }}
                 />
             </Modal>
 

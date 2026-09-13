@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FavouriteIcon, Search01Icon, SignLanguageCIcon, StarIcon } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
 import { FAVORITES } from "@routes/favorites";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
@@ -17,28 +19,17 @@ const FAVORITE_ICONS = [FavouriteIcon, FavouriteIcon, FavouriteIcon, FavouriteIc
 
 const FavoritesPage = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [signs, setSigns] = useState<SignCardData[]>([]);
     const [query, setQuery] = useState("");
+
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.favorites.list(),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(FAVORITES.ALL())),
+        meta: { errorMessage: "Falha ao carregar favoritos" },
+    });
 
     const filtered = query.trim()
         ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
         : signs;
-
-    const loadFavorites = async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<SignCardData[]>(FAVORITES.ALL());
-            if (!res.success) { toast.error("Falha ao carregar favoritos: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadFavorites();
-    }, []);
 
     return (
         <section className="flex flex-col gap-8">
@@ -92,7 +83,7 @@ const FavoritesPage = () => {
                     <div>
                         <p className="text-sm font-medium text-cloud-500">Nenhum favorito ainda</p>
                         <p className="text-xs text-neutral-400 mt-1">
-                            Favorite sinais nas disciplinas para encontrá-los aqui.
+                            Favorite sinais nas turmas para encontrá-los aqui.
                         </p>
                     </div>
                 </div>

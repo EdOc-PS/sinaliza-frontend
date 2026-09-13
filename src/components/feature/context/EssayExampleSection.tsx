@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -10,6 +11,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { DeleteRequest, GetRequest, PostFormDataRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { ESSAYS } from "@routes/essays";
 
 import Button from "@components/ui/Button";
@@ -37,41 +40,31 @@ interface EssayExample {
 }
 
 interface EssayExampleSectionProps {
-    disciplineId: string;
+    classroomId: string;
     canManage: boolean;
 }
 
-// Exemplos de redação da disciplina Contexto — arquivos (PDF/imagem) no R2
-export const EssayExampleSection = ({ disciplineId, canManage }: EssayExampleSectionProps) => {
-    const [examples, setExamples] = useState<EssayExample[]>([]);
-    const [loading, setLoading] = useState(true);
+// Exemplos de redação da turma Contexto — arquivos (PDF/imagem) no R2
+export const EssayExampleSection = ({ classroomId, canManage }: EssayExampleSectionProps) => {
+    const queryClient = useQueryClient();
     const [formModal, setFormModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; title?: string }>({ open: false });
-    const [deleting, setDeleting] = useState(false);
 
     // Formulário
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);
-    const [saving, setSaving] = useState(false);
 
     const titleValid = title.trim().length >= 3;
     const formValid = titleValid && !!file;
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<EssayExample[]>(ESSAYS.EXAMPLES(disciplineId));
-            if (!res.success) { toast.error("Falha ao carregar exemplos: " + res.message); return; }
-            setExamples(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, [disciplineId]);
+    const examplesKey = queryKeys.essays.examples(classroomId);
 
-    useEffect(() => {
-        load();
-    }, [load]);
+    const { data: examples = [], isPending: loading } = useQuery({
+        queryKey: examplesKey,
+        queryFn: () => unwrap(GetRequest<EssayExample[]>(ESSAYS.EXAMPLES(classroomId))),
+        meta: { errorMessage: "Falha ao carregar exemplos" },
+    });
 
     const resetForm = () => {
         setTitle("");
@@ -79,41 +72,42 @@ export const EssayExampleSection = ({ disciplineId, canManage }: EssayExampleSec
         setFile(null);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formValid) return;
-
-        setSaving(true);
-        try {
+    const { mutate: createExample, isPending: saving } = useMutation({
+        mutationFn: () => {
             const formData = new FormData();
             formData.append("title", title.trim());
             if (description.trim()) formData.append("description", description.trim());
             formData.append("file", file!);
-
-            const res = await PostFormDataRequest(ESSAYS.CREATE_EXAMPLE(disciplineId), formData);
-            if (!res.success) { toast.error("Falha ao enviar exemplo: " + res.message); return; }
-
+            return unwrap(PostFormDataRequest(ESSAYS.CREATE_EXAMPLE(classroomId), formData));
+        },
+        onSuccess: () => {
             toast.success("Exemplo adicionado!");
             setFormModal(false);
             resetForm();
-            load();
-        } finally {
-            setSaving(false);
-        }
+            queryClient.invalidateQueries({ queryKey: examplesKey });
+        },
+        onError: (err: Error) => toast.error("Falha ao enviar exemplo: " + err.message),
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formValid) return;
+        createExample();
     };
 
-    const handleDelete = async () => {
-        if (!deleteModal.id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(ESSAYS.DELETE_EXAMPLE(deleteModal.id));
-            if (!res.success) { toast.error(res.message); return; }
+    const { mutate: deleteExample, isPending: deleting } = useMutation({
+        mutationFn: (exampleId: string) => unwrap(DeleteRequest(ESSAYS.DELETE_EXAMPLE(exampleId))),
+        onSuccess: () => {
             toast.success("Exemplo excluído!");
             setDeleteModal({ open: false });
-            load();
-        } finally {
-            setDeleting(false);
-        }
+            queryClient.invalidateQueries({ queryKey: examplesKey });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    const handleDelete = () => {
+        if (!deleteModal.id) return;
+        deleteExample(deleteModal.id);
     };
 
     return (

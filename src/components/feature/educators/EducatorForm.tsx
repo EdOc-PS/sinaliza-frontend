@@ -21,7 +21,11 @@ import {
     StarAward01Icon,
 } from "@hugeicons/core-free-icons";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { GetRequest, PatchRequest, PostRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { USERS } from "@routes/users";
 import { maskPhone } from "@lib/mask/mask";
 import { PERFIL_FORMULARIOS } from "@lib/constants/profileFields";
@@ -50,7 +54,6 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
     // Edição: tipo (0), dados (1) e perfil (2). Criação inclui ainda bio (3) e senha (4).
     const [view, setView] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [loadingData, setLoadingData] = useState(isEditMode);
 
     const [kind, setKind] = useState<EducatorKind | null>(null);
     const [isManager, setIsManager] = useState(false);
@@ -63,38 +66,34 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
     const [confirmPassword, setConfirmPassword] = useState("");
     const [dadosPerfil, setDadosPerfil] = useState<Record<string, string>>({});
 
-    const loadEducator = async (id: string) => {
-        setLoadingData(true);
-        try {
-            const res = await GetRequest<User>(USERS.FIND_ONE(id));
-            if (!res.success || !res.object) {
-                toast.error("Falha ao carregar educador: " + res.message);
-                return;
-            }
-            const u = res.object;
-            setKind(u.educatorType === "INTERPRETER" ? "interpreter" : "educator");
-            setIsManager((u.roles ?? []).includes("MANAGER"));
-            setCurrentRoles(u.roles ?? []);
-            setName(u.name ?? "");
-            setEmail(u.email ?? "");
-            setPhone(u.phone ?? "");
-            setBio(u.bio ?? "");
-            const p = u.dataProfile ?? {};
-            setDadosPerfil({
-                department: p.department ?? "",
-                specialty: p.specialty ?? "",
-                certificate: p.certificate ?? "",
-                areaAtuacao: p.areaAtuacao ?? "",
-                proficienciaLibras: p.proficienciaLibras ?? "",
-            });
-        } finally {
-            setLoadingData(false);
-        }
-    };
+    const { data: educator, isPending: loadingEducator } = useQuery({
+        queryKey: queryKeys.users.detail(educatorId ?? ""),
+        queryFn: () => unwrap(GetRequest<User>(USERS.FIND_ONE(educatorId!))),
+        enabled: !!educatorId,
+        meta: { errorMessage: "Falha ao carregar educador" },
+    });
+    const loadingData = isEditMode && loadingEducator;
 
+    // Copia o educador carregado para o estado do formulário
     useEffect(() => {
-        if (educatorId) loadEducator(educatorId);
-    }, [educatorId]);
+        if (!educator) return;
+        const u = educator;
+        setKind(u.educatorType === "INTERPRETER" ? "interpreter" : "educator");
+        setIsManager((u.roles ?? []).includes("MANAGER"));
+        setCurrentRoles(u.roles ?? []);
+        setName(u.name ?? "");
+        setEmail(u.email ?? "");
+        setPhone(u.phone ?? "");
+        setBio(u.bio ?? "");
+        const p = u.dataProfile ?? {};
+        setDadosPerfil({
+            department: p.department ?? "",
+            specialty: p.specialty ?? "",
+            certificate: p.certificate ?? "",
+            areaAtuacao: p.areaAtuacao ?? "",
+            proficienciaLibras: p.proficienciaLibras ?? "",
+        });
+    }, [educator]);
 
     const formulario = kind ? PERFIL_FORMULARIOS[kind] : null;
 

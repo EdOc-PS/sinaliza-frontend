@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,6 +11,9 @@ import {
     SchoolIcon,
 } from "@hugeicons/core-free-icons";
 
+import { useQueries } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GetRequest } from "@requests";
 import { FAVORITES } from "@routes/favorites";
 import { HISTORY } from "@routes/history";
@@ -39,27 +42,27 @@ const ProfilePage = () => {
     };
 
     const [editModal, setEditModal] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [history, setHistory] = useState<HistorySign[]>([]);
-    const [favorites, setFavorites] = useState<SignListData[]>([]);
 
-    const loadLists = async () => {
-        setLoading(true);
-        try {
-            const [historyRes, favoritesRes] = await Promise.all([
-                GetRequest<HistorySign[]>(HISTORY.ALL()),
-                GetRequest<SignListData[]>(FAVORITES.ALL()),
-            ]);
-            setHistory(historyRes.object ?? []);
-            setFavorites(favoritesRes.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Mesmas chaves de /history e /favorites: se o usuário já visitou aquelas
+    // telas, estes cards aparecem preenchidos na hora.
+    const [historyQuery, favoritesQuery] = useQueries({
+        queries: [
+            {
+                queryKey: queryKeys.history.list(),
+                queryFn: () => unwrap(GetRequest<HistorySign[]>(HISTORY.ALL())),
+                meta: { errorMessage: "Falha ao carregar histórico" },
+            },
+            {
+                queryKey: queryKeys.favorites.list(),
+                queryFn: () => unwrap(GetRequest<SignListData[]>(FAVORITES.ALL())),
+                meta: { errorMessage: "Falha ao carregar favoritos" },
+            },
+        ],
+    });
 
-    useEffect(() => {
-        loadLists();
-    }, []);
+    const history = historyQuery.data ?? [];
+    const favorites = favoritesQuery.data ?? [];
+    const loading = historyQuery.isPending || favoritesQuery.isPending;
 
     if (!user) {
         return (

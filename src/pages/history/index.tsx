@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -14,6 +15,8 @@ import {
 
 import { DeleteRequest, GetRequest } from "@requests";
 import { HISTORY } from "@routes/history";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 
 import Spinner from "@components/ui/Spinner";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
@@ -61,45 +64,33 @@ const relativeTime = (iso: string): string => {
 const HistoryPage = () => {
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(true);
-    const [signs, setSigns] = useState<HistorySign[]>([]);
+    const queryClient = useQueryClient();
     const [clearModal, setClearModal] = useState(false);
-    const [clearing, setClearing] = useState(false);
 
-    const loadHistory = async () => {
-        setLoading(true);
-        try {
-            const res = await GetRequest<HistorySign[]>(HISTORY.ALL());
-            if (!res.success) { toast.error("Falha ao carregar histórico: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.history.list(),
+        queryFn: () => unwrap(GetRequest<HistorySign[]>(HISTORY.ALL())),
+        meta: { errorMessage: "Falha ao carregar histórico" },
+    });
 
-    const handleRemove = async (signId: string) => {
-        const res = await DeleteRequest(HISTORY.REMOVE(signId));
-        if (!res.success) { toast.error("Falha ao remover do histórico: " + res.message); return; }
-        setSigns((prev) => prev.filter((s) => s.id !== signId));
-        toast.success("Sinal removido do histórico");
-    };
+    const { mutate: handleRemove } = useMutation({
+        mutationFn: (signId: string) => unwrap(DeleteRequest(HISTORY.REMOVE(signId))),
+        onSuccess: () => {
+            toast.success("Sinal removido do histórico");
+            queryClient.invalidateQueries({ queryKey: queryKeys.history.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao remover do histórico: " + err.message),
+    });
 
-    const handleClear = async () => {
-        setClearing(true);
-        try {
-            const res = await DeleteRequest(HISTORY.CLEAR());
-            if (!res.success) { toast.error("Falha ao limpar histórico: " + res.message); return; }
-            setSigns([]);
-            setClearModal(false);
+    const { mutate: handleClear, isPending: clearing } = useMutation({
+        mutationFn: () => unwrap(DeleteRequest(HISTORY.CLEAR())),
+        onSuccess: () => {
             toast.success("Histórico limpo com sucesso");
-        } finally {
-            setClearing(false);
-        }
-    };
-
-    useEffect(() => {
-        loadHistory();
-    }, []);
+            setClearModal(false);
+            queryClient.invalidateQueries({ queryKey: queryKeys.history.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao limpar histórico: " + err.message),
+    });
 
     // Agrupa os sinais por dia, preservando a ordem (mais recente primeiro)
     const groups = useMemo<HistoryGroup[]>(() => {

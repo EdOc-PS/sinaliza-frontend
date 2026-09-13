@@ -2,15 +2,17 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
 import { useFAB } from "@context/FABContext";
 
 import Modal from "@components/ui/Modal";
-import { DisciplineForm } from "@components/feature/classroom/DisciplineForm";
-import { JoinDisciplineForm } from "@components/feature/classroom/JoinDisciplineForm";
+import { ClassroomForm } from "@components/feature/classroom/ClassroomForm";
+import { JoinClassroomForm } from "@components/feature/classroom/JoinClassroomForm";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
+import { queryKeys } from "@/config/query/queryKeys";
 import createClassImg from "@/assets/images/app/create-class.png";
 import joinClassImg from "@/assets/images/app/join-class.png";
 import createHandImg from "@/assets/images/app/create-hand.png";
@@ -46,9 +48,10 @@ const FABAction = ({ icon, label, onClick, delay = "0ms", visible }: FABActionPr
 
 export const FAB = () => {
     const { user } = useAuth();
-    const { activeForm, openForm, closeForm, triggerRefresh } = useFAB();
+    const { activeForm, openForm, closeForm } = useFAB();
     const navigate = useNavigate();
     const location = useLocation();
+    const queryClient = useQueryClient();
 
     const [open, setOpen] = useState(false);
 
@@ -71,11 +74,15 @@ export const FAB = () => {
         closeForm();
         const currentPath = location.pathname;
 
-        // Se está em classrooms ou workspace, apenas refresh
-        if (currentPath === "/classrooms" || currentPath === "/workspace") {
-            triggerRefresh();
-        } else {
-            // Caso contrário, navega para classrooms
+        // Invalidar a chave basta: qualquer tela montada que use esses dados
+        // se atualiza sozinha, esteja ela por trás do modal ou não.
+        queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.glossary.all });
+
+        // Fora das telas que já mostram o que foi criado, leva o usuário até lá
+        if (currentPath !== "/classrooms" && currentPath !== "/workspace") {
             navigate("/classrooms");
         }
     };
@@ -149,12 +156,12 @@ export const FAB = () => {
 
             {/* Modal: Criar turma */}
             <Modal open={activeForm === "create-class"} onClose={closeForm}>
-                <DisciplineForm onClose={closeForm} onSuccess={handleSuccess} />
+                <ClassroomForm onClose={closeForm} onSuccess={handleSuccess} />
             </Modal>
 
             {/* Modal: Entrar em turma */}
             <Modal open={activeForm === "join-class"} onClose={closeForm}>
-                <JoinDisciplineForm onClose={closeForm} onSuccess={handleSuccess} />
+                <JoinClassroomForm onClose={closeForm} onSuccess={handleSuccess} />
             </Modal>
 
             {/* Modal: Criar configuração de mão */}

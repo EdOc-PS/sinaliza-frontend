@@ -1,8 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GetRequest, DeleteRequest } from "@requests";
 import { USERS } from "@routes/users";
 
@@ -17,14 +20,12 @@ import { EducatorForm } from "@components/feature/educators/EducatorForm";
 import { ListCardEducator, type EducatorListItem } from "@components/feature/educators/ListCardEducator";
 
 const EducatorsPage = () => {
-    const [loading, setLoading] = useState(true);
-    const [educators, setEducators] = useState<EducatorListItem[]>([]);
+    const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
     const [formModal, setFormModal] = useState<{ open: boolean; educatorId?: string }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
-    const [deleting, setDeleting] = useState(false);
 
     // Debounce da busca (350ms)
     useEffect(() => {
@@ -32,36 +33,28 @@ const EducatorsPage = () => {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const loadEducators = useCallback(async (query?: string) => {
-        setLoading(true);
-        try {
-            const response = await GetRequest<EducatorListItem[]>(
-                USERS.EDUCATORS(),
-                query ? { search: query } : undefined,
-            );
-            if (!response.success) { toast.error("Falha ao carregar educadores: " + response.message); return; }
-            setEducators(response.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const { data: educators = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.users.educators(debouncedSearch),
+        queryFn: () => unwrap(GetRequest<EducatorListItem[]>(
+            USERS.EDUCATORS(),
+            debouncedSearch ? { search: debouncedSearch } : undefined,
+        )),
+        meta: { errorMessage: "Falha ao carregar educadores" },
+    });
 
-    useEffect(() => {
-        loadEducators(debouncedSearch || undefined);
-    }, [loadEducators, debouncedSearch]);
-
-    const handleDeleteConfirm = async () => {
-        if (!deleteModal.id) return;
-        setDeleting(true);
-        try {
-            const res = await DeleteRequest(USERS.DELETE(deleteModal.id));
-            if (!res.success) { toast.error("Falha ao excluir educador: " + res.message); return; }
+    const { mutate: deleteEducator, isPending: deleting } = useMutation({
+        mutationFn: (id: string) => unwrap(DeleteRequest(USERS.DELETE(id))),
+        onSuccess: () => {
             toast.success("Educador excluído com sucesso!");
             setDeleteModal({ open: false });
-            loadEducators(debouncedSearch || undefined);
-        } finally {
-            setDeleting(false);
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao excluir educador: " + err.message),
+    });
+
+    const handleDeleteConfirm = () => {
+        if (!deleteModal.id) return;
+        deleteEducator(deleteModal.id);
     };
 
     return (
@@ -138,7 +131,7 @@ const EducatorsPage = () => {
                 <EducatorForm
                     educatorId={formModal.educatorId}
                     onClose={() => setFormModal({ open: false })}
-                    onSuccess={() => { setFormModal({ open: false }); loadEducators(debouncedSearch || undefined); }}
+                    onSuccess={() => { setFormModal({ open: false }); queryClient.invalidateQueries({ queryKey: queryKeys.users.all }); }}
                 />
             </Modal>
 

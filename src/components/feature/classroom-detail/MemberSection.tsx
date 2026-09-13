@@ -13,7 +13,7 @@ interface MemberSectionProps {
     members: Member[];
     /** Quando definido, mostra um botão de remover em cada participante (exceto os bloqueados) */
     onRemove?: (member: Member) => void;
-    /** IDs de usuários que não podem ser removidos (ex: professor da disciplina) */
+    /** IDs de usuários que não podem ser removidos (ex: professor da turma) */
     lockedUserIds?: string[];
 }
 
@@ -56,7 +56,7 @@ export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: 
                                 <button
                                     type="button"
                                     onClick={() => onRemove(m)}
-                                    title="Remover da disciplina"
+                                    title="Remover da turma"
                                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-salmon-100 hover:text-salmon-600"
                                 >
                                     <HugeiconsIcon icon={Delete02Icon} size={18} />

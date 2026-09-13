@@ -21,7 +21,7 @@ export const LandingFooter = () => (
                         <span className="font-baskerville text-xl font-bold text-cloud-500">Sinaliza</span>
                     </div>
                     <p className="max-w-xs text-sm leading-relaxed text-cloud-400">
-                        Repositório colaborativo de Libras para intérpretes, alunos, professores e familiares.
+                        Repositório colaborativo de Libras para intérpretes, alunos e professores.
                     </p>
                     <div className="flex gap-2">
                         {socials.map(({ icon, label, href }) => (

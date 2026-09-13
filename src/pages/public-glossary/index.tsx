@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     ArrowLeft01Icon,
@@ -13,6 +13,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { GetRequest } from "@requests";
+import { queryKeys } from "@/config/query/queryKeys";
+import { unwrap } from "@/config/query/unwrap";
 import { GLOSSARY } from "@routes/signs";
 import type { CategorySlim } from "@lib/constants/category";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
@@ -41,52 +43,38 @@ const PublicGlossaryPage = () => {
     const navigate = useNavigate();
     useScrollReveal();
 
-    const [loading, setLoading] = useState(true);
-    const [signs, setSigns] = useState<SignCardData[]>([]);
-    const [categories, setCategories] = useState<CategorySlim[]>([]);
-    const [handConfigs, setHandConfigs] = useState<HandConfig[]>([]);
-    const [disciplines, setDisciplines] = useState<GlossaryDisciplineSlim[]>([]);
     const [query, setQuery] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
     const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
 
-    const filtered = query.trim()
-        ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
-        : signs;
-
     // Filtros vêm de um endpoint público único (/category e /hand-config exigem token)
-    const loadFilters = async () => {
-        const res = await GetRequest<GlossaryFiltersResponse>(GLOSSARY.FILTERS());
-        if (!res.success || !res.object) return;
-        setCategories(res.object.categories ?? []);
-        setHandConfigs(res.object.handConfigs ?? []);
-        setDisciplines(res.object.glossaryDisciplines ?? []);
-    };
+    const { data: filterData } = useQuery({
+        queryKey: queryKeys.glossary.filters(),
+        queryFn: () => unwrap(GetRequest<GlossaryFiltersResponse>(GLOSSARY.FILTERS())),
+        staleTime: 30 * 60_000,
+        meta: { errorMessage: "Falha ao carregar filtros" },
+    });
+    const categories = filterData?.categories ?? [];
+    const handConfigs = filterData?.handConfigs ?? [];
+    const disciplines = filterData?.glossaryDisciplines ?? [];
 
-    const loadGlossary = async () => {
-        setLoading(true);
-        try {
+    const { data: signs = [], isPending: loading } = useQuery({
+        queryKey: queryKeys.glossary.list({ categoryId, handConfigId, glossaryDisciplineId }),
+        queryFn: () => {
             const params: Record<string, string> = {};
             if (categoryId) params.categoryId = categoryId;
             if (handConfigId) params.handConfigId = handConfigId;
             if (glossaryDisciplineId) params.glossaryDisciplineId = glossaryDisciplineId;
+            return unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined));
+        },
+        meta: { errorMessage: "Falha ao carregar o repositório" },
+    });
 
-            const res = await GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined);
-            if (!res.success) { toast.error("Falha ao carregar o repositório: " + res.message); return; }
-            setSigns(res.object ?? []);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadFilters();
-    }, []);
-
-    useEffect(() => {
-        loadGlossary();
-    }, [categoryId, handConfigId, glossaryDisciplineId]);
+    // Busca textual é filtrada no cliente sobre o resultado já carregado
+    const filtered = query.trim()
+        ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
+        : signs;
 
     const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
 
