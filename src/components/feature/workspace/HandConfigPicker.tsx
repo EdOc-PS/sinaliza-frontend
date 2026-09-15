@@ -162,7 +162,7 @@ const HandConfigPicker = ({
             {/* Grid de imagens */}
             {loading ? (
                 <div className="flex items-center justify-center py-8">
-                    <Spinner size={24} />
+                    <Spinner size={24} color="#6B7280" />
                 </div>
             ) : configs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-neutral-400 gap-1">

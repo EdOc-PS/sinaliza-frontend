@@ -67,25 +67,27 @@ const WorkspacePage = () => {
 
                     {/* Cards de ação */}
                     <div className="flex flex-col sm:flex-row gap-4">
-                        {/* Criar novo sinal — ocupa mais espaço */}
+                        {/* Criar novo sinal — ocupa mais espaço quando a config. de mão também aparece */}
                         <ActionButton
                             variant="cloud"
                             image={createSignalImg}
                             title="Criar novo sinal"
                             description="Publique um sinal no repositório global"
                             onClick={() => setSignModal(true)}
-                            className="flex-[1.5]"
+                            className={isManager ? "flex-[1.5]" : "flex-1"}
                         />
 
-                        {/* Nova configuração de mão */}
-                        <ActionButton
-                            variant="lime"
-                            image={createHandImg}
-                            title="Nova configuração de mão"
-                            description="Adicione ao teclado visual"
-                            onClick={() => setHandModal(true)}
-                            className="flex-1"
-                        />
+                        {/* Nova configuração de mão — só o gestor cria; educador só visualiza o teclado */}
+                        {isManager && (
+                            <ActionButton
+                                variant="lime"
+                                image={createHandImg}
+                                title="Nova configuração de mão"
+                                description="Adicione ao teclado visual"
+                                onClick={() => setHandModal(true)}
+                                className="flex-1"
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -93,7 +95,7 @@ const WorkspacePage = () => {
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
                         <div className="bg-white rounded-3xl p-6">
-                            <VisualKeyboard onEdit={handleEditConfig} />
+                            <VisualKeyboard onEdit={handleEditConfig} canManage={isManager} />
                         </div>
 
                         {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}
@@ -102,8 +104,15 @@ const WorkspacePage = () => {
                         {/* Categorias — CRUD para o educador */}
                         <CategorySection />
 
-                        {/* Disciplinas do glossário — CRUD apenas para o gestor */}
-                        {isManager && <GlossaryDisciplineSection />}
+                        {/* Administração — visível apenas ao gestor, separada do restante do ambiente */}
+                        {isManager && (
+                            <div className="flex flex-col gap-4">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-cloud-400">
+                                    Administração
+                                </p>
+                                <GlossaryDisciplineSection />
+                            </div>
+                        )}
                     </div>
                 </LoadingGroup>
             </section>

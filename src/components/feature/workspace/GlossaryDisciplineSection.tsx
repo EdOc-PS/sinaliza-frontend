@@ -58,8 +58,8 @@ export const GlossaryDisciplineSection = () => {
 
     return (
         <div className="bg-white rounded-3xl p-6 flex flex-col gap-5">
-            {/* Cabeçalho */}
-            <div className="flex flex-col gap-7 sm:flex-row sm:items-center sm:justify-between">
+            {/* Cabeçalho — botão sempre abaixo do texto, ocupando a largura inteira */}
+            <div className="flex flex-col gap-5">
                 <div className="flex items-start gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-100">
                         <HugeiconsIcon icon={MortarboardIcon} size={24} className="text-sky-600" />
@@ -79,7 +79,7 @@ export const GlossaryDisciplineSection = () => {
                     title="Nova disciplina"
                     description="Cadastre uma disciplina do glossário"
                     onClick={() => setFormModal({ open: true })}
-                    className="flex-1"
+                    className="w-full"
                 />
             </div>
 

@@ -205,7 +205,8 @@ const ClassroomDetailPage = () => {
                         Voltar
                     </button>
 
-                    {canManage && (
+                    {/* Contexto é automática e do sistema — nem o gestor dono edita */}
+                    {canManage && !classroom.isContext && (
                         <button
                             onClick={() => setEditModal(true)}
                             className="flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"

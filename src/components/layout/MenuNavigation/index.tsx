@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 import { useAuth } from "@context/AuthContext";
+import { Tooltip } from "@components/ui/Tooltip";
 
 import {
     FavouriteIcon,
@@ -26,13 +27,6 @@ interface MenuItemProps {
     isActive?: boolean;
 }
 
-interface TooltipProps {
-    label: string;
-    isDesktop?: boolean;
-    children: ReactNode;
-    bgColor?: string;
-}
-
 // `section: "admin"` separa os acessos de gestão dos acessos gerais no menu lateral
 type MenuEntry = { icon: typeof Home06Icon; label: string; path: string; shortLabel?: string; section?: "admin" };
 
@@ -53,51 +47,6 @@ const menuItemsByRole: Record<string, MenuEntry[]> = {
         { icon: UserMultiple02Icon, label: "Educadores", path: "/educators", section: "admin" },
         { icon: StudentsIcon, label: "Alunos", path: "/members", section: "admin" },
     ],
-};
-
-// Componente de Tooltip para hover do mouse
-const Tooltip = ({ label, isDesktop = false, children, bgColor = "bg-cloud-700" }: TooltipProps) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    const colorMap: Record<string, string> = {
-        "bg-cloud-700": "#132433",
-        "bg-salmon-500": "#EEA2A2",
-    };
-
-    const arrowFill = colorMap[bgColor] || "#132433";
-
-    return (
-        <div
-            className="relative"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            {children}
-
-            {isHovered && (
-                <div
-                    className={`
-                        absolute z-50 text-white px-3 py-2 rounded-full text-sm font-medium
-                        whitespace-nowrap shadow-lg pointer-events-none
-                        ${bgColor}
-                        ${isDesktop ? "left-full ml-3 top-1/2 -translate-y-1/2" : "bottom-full mb-2 left-1/2 -translate-x-1/2"}
-                    `}
-                >
-                    {label}
-
-                    {isDesktop ? (
-                        <svg className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-7" viewBox="0 0 10 10" fill={arrowFill}>
-                            <path d="M 8 2 Q 4 5 8 8 L 2 5 Z" />
-                        </svg>
-                    ) : (
-                        <svg className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-7" viewBox="0 0 10 10" fill={arrowFill}>
-                            <path d="M 2 2 Q 5 4 8 2 L 5 8 Z" />
-                        </svg>
-                    )}
-                </div>
-            )}
-        </div>
-    );
 };
 
 // Componente de MenuItem que recebe ícone, label e função de clique
@@ -138,7 +87,7 @@ const MenuItem = ({ icon, label, shortLabel, onClick, isDesktop = false, isActiv
 
     // Desktop: Tooltip + bounce no clique + transição suave do fundo
     return (
-        <Tooltip label={label} isDesktop={true}>
+        <Tooltip label={label} position="left">
             <button
                 onClick={handleClick}
                 className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
@@ -200,7 +149,7 @@ const ActionItem = ({
             : "text-cloud-500";
 
     return (
-        <Tooltip label={label} isDesktop={true} bgColor={logout ? "bg-salmon-500" : "bg-cloud-700"}>
+        <Tooltip label={label} position="left" bgColor={logout ? "bg-salmon-500" : "bg-cloud-700"}>
             <button
                 onClick={handleClick}
                 className={`flex items-center justify-center transition-all duration-300 ${sizeClass} ${bgClass}`}

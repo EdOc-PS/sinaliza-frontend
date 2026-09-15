@@ -6,6 +6,7 @@ import { HelpCircleIcon } from "@hugeicons/core-free-icons"
 import MenuNavigation from "@components/layout/MenuNavigation"
 import MobileHeader from "@components/layout/MobileHeader"
 import TopSearchBar from "@components/layout/TopSearchBar"
+import { Tooltip } from "@components/ui/Tooltip"
 import { FAB } from "@components/layout/FAB"
 import { OnboardingModal } from "@components/feature/onboarding/OnboardingModal"
 
@@ -27,21 +28,28 @@ const MainLayout = () => {
             <MenuNavigation />
 
             <main className="lg:ml-20 min-h-screen pb-28 lg:pb-10">
-                {/* Barra de busca fixa no topo (estilo e-commerce) + ajuda */}
+                {/* Barra de busca fixa no topo (estilo e-commerce). O botão de ajuda fica fora do
+                    container centralizado, alinhado ao mesmo offset do FAB (right-5 lg:right-10),
+                    em vez de preso à largura do conteúdo. */}
                 <div className="sticky top-0 z-30 bg-transparent backdrop-blur-sm pb-3">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 py-3 flex items-center gap-3">
-                        <div className="flex-1 min-w-0">
+                    <div className="relative py-3">
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pr-16 lg:pr-24">
                             <TopSearchBar />
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => setOnboardingOpen(true)}
-                            aria-label="Ajuda: como usar a plataforma"
-                            title="Como usar a plataforma"
-                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-sm ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
+                        <Tooltip
+                            label="Como usar a plataforma"
+                            position="right"
+                            className="absolute top-1/2 right-5 lg:right-10 -translate-y-1/2"
                         >
-                            <HugeiconsIcon icon={HelpCircleIcon} size={22} />
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => setOnboardingOpen(true)}
+                                aria-label="Ajuda: como usar a plataforma"
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-sm ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
+                            >
+                                <HugeiconsIcon icon={HelpCircleIcon} size={22} />
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
 

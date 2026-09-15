@@ -116,9 +116,6 @@ const MembersPage = () => {
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-neutral-400">{others.length} aluno(s)</span>
-                        <span className="text-xs text-neutral-400">
-                            Acesso rápido pelas iniciais para facilitar a identificação das pessoas.
-                        </span>
                     </div>
                     <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {others.map((member) => (

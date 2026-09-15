@@ -39,7 +39,7 @@ const LoginPage = () => {
                 return
             }
             toast.success('Login realizado com sucesso!')
-            navigate('/glossary')
+            navigate('/classrooms')
         } catch (error: any) {
             toast.error(error.message || 'Erro ao fazer login')
         } finally {

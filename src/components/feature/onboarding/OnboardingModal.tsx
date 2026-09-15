@@ -18,6 +18,7 @@ import Modal from "@components/ui/Modal";
 import Button from "@components/ui/Button";
 import BackButton from "@components/ui/BackButton";
 import ProgressBar from "@/components/layout/ProgressBar";
+import { getRoleMeta } from "@components/ui/RoleBadge";
 
 import { useAuth } from "@context/AuthContext";
 import { PatchRequest } from "@requests";
@@ -54,11 +55,12 @@ const NAV_ENTRIES: NavEntry[] = [
     { icon: User03Icon, label: "Perfil", description: "Seus dados e sua conta." },
 ];
 
-// O papel "mais alto" define como a pessoa é apresentada
-const describeRole = (roles: User["roles"]) => {
-    if (roles.includes("MANAGER")) return "gestor";
-    if (roles.includes("EDUCATOR")) return "educador";
-    return "aluno";
+// O papel "mais alto" define como a pessoa é apresentada — mesmo ícone/cor do RoleBadge
+// (o de gestor é o mesmo StarAward01Icon usado no checkbox "Conceder acesso de gestor" do EducatorForm)
+const getPrimaryRoleMeta = (user: User) => {
+    if (user.roles.includes("MANAGER")) return getRoleMeta("MANAGER");
+    if (user.roles.includes("EDUCATOR")) return getRoleMeta("EDUCATOR", user.educatorType);
+    return getRoleMeta("STUDENT");
 };
 
 const NavRow = ({ entry }: { entry: NavEntry }) => (
@@ -74,7 +76,8 @@ const NavRow = ({ entry }: { entry: NavEntry }) => (
 );
 
 const buildSteps = (user: User): OnboardingStep[] => {
-    const role = describeRole(user.roles);
+    const roleMeta = getPrimaryRoleMeta(user);
+    const roleLabel = roleMeta.label.toLowerCase();
     const visible = NAV_ENTRIES.filter((e) => !e.roles || e.roles.some((r) => user.roles.includes(r)));
     const general = visible.filter((e) => !e.admin);
     const admin = visible.filter((e) => e.admin);
@@ -115,15 +118,19 @@ const buildSteps = (user: User): OnboardingStep[] => {
                             <p><b className="text-cloud-700">Glossário.</b> Sinais validados pela instituição ficam disponíveis para todo mundo.</p>
                         </li>
                     </ul>
-                    <p className="rounded-2xl bg-cloud-100 px-4 py-3 text-cloud-700">
-                        Você está entrando como <b>{role}</b>.
+                    <p className={`flex items-center rounded-2xl px-4 py-3 font-medium ${roleMeta.className}`}>
+                        <span className="mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/60">
+                            <HugeiconsIcon icon={roleMeta.icon} size={18} />
+                        </span>
+                        Você está entrando como: 
+                        <span className="ml-1 font-bold capitalize"> {roleLabel}</span>
                     </p>
                 </div>
             ),
         },
         {
             title: "Como navegar",
-            subtitle: `O que você encontra no menu como ${role}`,
+            subtitle: `O que você encontra no menu como ${roleLabel}`,
             body: (
                 <div className="flex flex-col gap-5">
                     <ul className="flex flex-col gap-3">
@@ -204,23 +211,33 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
                     )}
                 </div>
 
-                <div className="flex items-center gap-3 pt-1">
-                    {view > 0 && <BackButton onClick={() => setView((v) => v - 1)} />}
-                    {!isLast && (
-                        <Button type="button" variant="outline" className="ml-auto w-2/5" onClick={finish} disabled={saving}>
-                            Pular
-                        </Button>
+                {/* Mesmo padrão de navegação do modal de criar educador: primeiro passo tem
+                    Pular + Próximo lado a lado; a partir do segundo, BackButton fixo + ação principal */}
+                <div className="flex gap-3 pt-2">
+                    {view === 0 ? (
+                        <>
+                            <Button type="button" variant="outline" className="flex-1" onClick={finish} disabled={saving}>
+                                Pular
+                            </Button>
+                            <Button type="button" variant="cloud" className="flex-1" onClick={() => setView((v) => v + 1)}>
+                                Próximo
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <BackButton onClick={() => setView((v) => v - 1)} />
+                            <Button
+                                type="button"
+                                variant="cloud"
+                                className="flex-1"
+                                onClick={isLast ? finish : () => setView((v) => v + 1)}
+                                loading={saving}
+                                loadingText="Salvando..."
+                            >
+                                {isLast ? "Começar" : "Próximo"}
+                            </Button>
+                        </>
                     )}
-                    <Button
-                        type="button"
-                        variant="cloud"
-                        className={isLast ? "ml-auto w-3/5" : "w-3/5"}
-                        onClick={isLast ? finish : () => setView((v) => v + 1)}
-                        loading={saving}
-                        loadingText="Salvando..."
-                    >
-                        {isLast ? "Começar" : "Próximo"}
-                    </Button>
                 </div>
             </div>
         </Modal>

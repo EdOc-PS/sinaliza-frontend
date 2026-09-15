@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon } from "@hugeicons/core-free-icons";
+import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon, Clapping02Icon } from "@hugeicons/core-free-icons";
 
 import { GetRequest, DeleteRequest } from "@requests";
 import { HAND_CONFIG } from "@/config/api/apiRoutes/handConfigs";
@@ -67,9 +67,11 @@ export interface VisualKeyboardProps {
     onSelectConfig?: (config: HandConfigTypeForm) => void;
     title?: string;
     subtitle?: string;
+    /** Sem permissão de gestão: some o dropdown de editar/excluir e o card "+" — fica só visualização */
+    canManage?: boolean;
 }
 
-export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, subtitle }: VisualKeyboardProps) => {
+export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, subtitle, canManage = true }: VisualKeyboardProps) => {
     const { openForm } = useFAB();
 
     const queryClient = useQueryClient();
@@ -118,13 +120,13 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
     useReportLoading("hand-configs", loading && !debouncedSearch && !hasLoadedOnce.current);
 
     const selectMode = !!onSelectConfig;
-    // No modo seleção não há card "+", então a paginação considera só os itens reais
-    const totalItems = selectMode ? handConfigs.length : handConfigs.length + 1;
+    // No modo seleção ou sem permissão de gestão não há card "+", só os itens reais
+    const totalItems = selectMode || !canManage ? handConfigs.length : handConfigs.length + 1;
     const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
     const pageStart = (currentPage - 1) * ITEMS_PER_PAGE;
     const pageEnd = currentPage * ITEMS_PER_PAGE;
     const paginatedConfigs = handConfigs.slice(pageStart, Math.min(pageEnd, handConfigs.length));
-    const showPlusCard = !selectMode && pageEnd > handConfigs.length;
+    const showPlusCard = !selectMode && canManage && pageEnd > handConfigs.length;
 
     const handleDeleteClick = (configId: string, configName: string) => {
         setDeleteModal({ open: true, configId, configName });
@@ -207,6 +209,16 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                         <HugeiconsIcon icon={Search01Icon} size={32} />
                         <p className="text-sm">Nenhuma configuração encontrada para "<strong>{debouncedSearch}</strong>"</p>
                     </div>
+                ) : handConfigs.length === 0 && !canManage ? (
+                    // Sem permissão de gestão e nenhuma config. cadastrada: sem o "+" de criar,
+                    // só resta orientar a pessoa a pedir para o gestor
+                    <div className="flex flex-col items-center justify-center py-12 text-neutral-400 gap-2">
+                        <HugeiconsIcon icon={Clapping02Icon} size={32} />
+                        <p className="text-sm text-cloud-500">Nenhuma configuração de mão cadastrada ainda.</p>
+                        <p className="text-xs text-neutral-400 text-center max-w-xs">
+                            Precisa de uma nova? Entre em contato com o gestor da instituição.
+                        </p>
+                    </div>
                 ) : (
                     <div className="stagger-children grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
                         {paginatedConfigs.map((config) => (
@@ -229,7 +241,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                                         )}
                                         <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200" />
                                     </button>
-                                ) : (
+                                ) : canManage ? (
                                     <DropdownMenu modal={false}>
                                         <DropdownMenuTrigger asChild>
                                             <button type="button" className="w-full aspect-square rounded-xl hover:-translate-y-1 duration-300 hover:shadow-md hover:ring-2 hover:ring-campfire-300 transition-all flex items-center justify-center relative group">
@@ -265,6 +277,21 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
+                                ) : (
+                                    // Sem permissão de gestão: mesma aparência, sem dropdown de ações
+                                    <div className="w-full aspect-square rounded-xl flex items-center justify-center relative">
+                                        {config.imgUrl ? (
+                                            <img
+                                                src={config.imgUrl}
+                                                alt={config.name}
+                                                className="w-full h-full rounded-xl object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xs text-neutral-400 font-medium">
+                                                {config.name[0]}
+                                            </span>
+                                        )}
+                                    </div>
                                 )}
                             </Tooltip>
                         ))}

@@ -55,12 +55,15 @@ export const ClassroomCard = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent>
-                                <DropdownMenuItem
-                                    icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
-                                    onSelect={() => onEdit?.()}
-                                >
-                                    Editar turma
-                                </DropdownMenuItem>
+                                {/* Contexto é automática e do sistema — nem o gestor dono edita ou exclui */}
+                                {!classroom.isContext && (
+                                    <DropdownMenuItem
+                                        icon={<HugeiconsIcon icon={Edit02Icon} size={18} />}
+                                        onSelect={() => onEdit?.()}
+                                    >
+                                        Editar turma
+                                    </DropdownMenuItem>
+                                )}
 
                                 <DropdownMenuItem
                                     icon={<HugeiconsIcon icon={CopyIcon} size={18} />}
@@ -69,15 +72,18 @@ export const ClassroomCard = ({
                                     Copiar código
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    variant="danger"
-                                    icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
-                                    onSelect={onDelete}
-                                >
-                                    Excluir turma
-                                </DropdownMenuItem>
+                                {!classroom.isContext && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            variant="danger"
+                                            icon={<HugeiconsIcon icon={DeleteIcon} size={18} />}
+                                            onSelect={onDelete}
+                                        >
+                                            Excluir turma
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                         </div>

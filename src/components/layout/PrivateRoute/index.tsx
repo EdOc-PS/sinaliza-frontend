@@ -9,7 +9,7 @@ const PrivateRoute = () => {
     if (!initialized) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <Spinner size={36} />
+                <Spinner size={36} color="#6B7280" />
             </div>
         )
     }

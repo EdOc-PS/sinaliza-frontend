@@ -203,7 +203,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
     if (loadingData) {
         return (
             <div className="flex items-center justify-center py-16">
-                <Spinner size={32} />
+                <Spinner size={32} color="#6B7280" />
             </div>
         );
     }

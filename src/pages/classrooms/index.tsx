@@ -34,6 +34,8 @@ export interface ClassroomCardData {
     classCode: string;
     userCount: number;
     canManage: boolean;
+    /** Turma automática de redação — não pode ser editada nem excluída, nem pelo gestor dono */
+    isContext: boolean;
 }
 
 const ClassroomsPage = () => {
