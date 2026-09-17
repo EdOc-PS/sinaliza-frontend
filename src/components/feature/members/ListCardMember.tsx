@@ -1,7 +1,14 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Mail01Icon } from "@hugeicons/core-free-icons";
+import { Mail01Icon, MoreVerticalIcon, UserBlock01Icon, UserCheck01Icon } from "@hugeicons/core-free-icons";
 
 import { RoleBadge } from "@components/ui/RoleBadge";
+import Spinner from "@components/ui/Spinner";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@components/ui/DropdownMenu";
 import { getInitials } from "@lib/format/initials";
 import type { ApprovalStatus, EducatorType, Role } from "@api/requests";
 
@@ -13,6 +20,8 @@ export interface MemberListItem {
     roles: Role[];
     educatorType?: EducatorType | null;
     approvalStatus?: ApprovalStatus | null;
+    /** Conta ativa — desativada não consegue mais logar */
+    status: boolean;
     createdAt: string;
 }
 
@@ -24,13 +33,16 @@ const STATUS_META: Record<ApprovalStatus, { label: string; className: string }> 
 
 interface ListCardMemberProps {
     member: MemberListItem;
+    /** Ausente = card sem ação de gerenciar (ex: tela sem gestor) */
+    onToggleStatus?: (member: MemberListItem) => void;
+    updatingStatus?: boolean;
 }
 
-export const ListCardMember = ({ member }: ListCardMemberProps) => {
+export const ListCardMember = ({ member, onToggleStatus, updatingStatus = false }: ListCardMemberProps) => {
     const status = member.approvalStatus ? STATUS_META[member.approvalStatus] : null;
 
     return (
-        <div className="flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24">
+        <div className={`flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24 ${!member.status ? "opacity-60" : ""}`}>
             {/* Avatar */}
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-sky-100 font-baskerville font-bold text-sky-600">
                 {member.avatar ? (
@@ -59,8 +71,50 @@ export const ListCardMember = ({ member }: ListCardMemberProps) => {
                             {status.label}
                         </span>
                     )}
+                    {!member.status && (
+                        <span className="flex items-center gap-1 rounded-lg bg-neutral-200 px-2 py-0.5 text-[11px] font-semibold text-neutral-600">
+                            Desativado
+                        </span>
+                    )}
                 </div>
             </div>
+
+            {/* Ativar/desativar — só quando o pai passa a ação (tela do gestor) */}
+            {onToggleStatus && (
+                <div onClick={(e) => e.stopPropagation()}>
+                    {updatingStatus ? (
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center">
+                            <Spinner size={18} color="#6B7280" />
+                        </div>
+                    ) : (
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-cloud-100 hover:text-cloud-600">
+                                    <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {member.status ? (
+                                    <DropdownMenuItem
+                                        variant="danger"
+                                        icon={<HugeiconsIcon icon={UserBlock01Icon} size={18} />}
+                                        onSelect={() => onToggleStatus(member)}
+                                    >
+                                        Desativar conta
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem
+                                        icon={<HugeiconsIcon icon={UserCheck01Icon} size={18} />}
+                                        onSelect={() => onToggleStatus(member)}
+                                    >
+                                        Reativar conta
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

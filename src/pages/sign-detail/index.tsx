@@ -43,6 +43,7 @@ import {
 interface SignDetail {
     id: string;
     name: string;
+    slug: string;
     category?: CategorySlim | null;
     handConfigId: string;
     videoUrl?: string | null;
@@ -81,12 +82,14 @@ const SignDetailPage = () => {
         queryKey: queryKeys.favorites.list(),
         queryFn: () => unwrap(GetRequest<SignCardData[]>(FAVORITES.ALL())),
     });
-    const isFavorite = favorites.some((s) => s.id === id);
+    // `id` na URL pode ser o slug — a partir daqui, tudo usa sign.id (o UUID
+    // real, devolvido pelo GET acima), nunca o parâmetro cru da URL.
+    const isFavorite = favorites.some((s) => s.id === sign?.id);
 
     const { data: related = [] } = useQuery({
-        queryKey: queryKeys.signs.related(id ?? ""),
-        queryFn: () => unwrap(GetRequest<SignCardData[]>(SEARCH.RELATED(id!))),
-        enabled: !!id,
+        queryKey: queryKeys.signs.related(sign?.id ?? ""),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(SEARCH.RELATED(sign!.id))),
+        enabled: !!sign?.id,
     });
 
     const carouselRef = useRef<HTMLDivElement>(null);
@@ -116,8 +119,8 @@ const SignDetailPage = () => {
 
     const { mutate: handleToggleFavorite, isPending: favLoading } = useMutation({
         mutationFn: () => unwrap(isFavorite
-            ? DeleteRequest(FAVORITES.REMOVE(id!))
-            : PostRequest(FAVORITES.ADD(id!), {})),
+            ? DeleteRequest(FAVORITES.REMOVE(sign!.id))
+            : PostRequest(FAVORITES.ADD(sign!.id), {})),
         onSuccess: () => {
             toast.success(isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos");
             queryClient.invalidateQueries({ queryKey: queryKeys.favorites.all });
@@ -127,7 +130,7 @@ const SignDetailPage = () => {
 
     const { mutate: promoteSign, isPending: promoting } = useMutation({
         mutationFn: (glossaryDisciplineIds: string[]) =>
-            unwrap(PatchRequest(SIGNS.PROMOTE(id!), { glossaryDisciplineIds })),
+            unwrap(PatchRequest(SIGNS.PROMOTE(sign!.id), { glossaryDisciplineIds })),
         onSuccess: () => {
             toast.success("Sinal enviado para aprovação do gestor!");
             setPromoteModal(false);
@@ -137,7 +140,7 @@ const SignDetailPage = () => {
     });
 
     const { mutate: handleDelete, isPending: deleting } = useMutation({
-        mutationFn: () => unwrap(DeleteRequest(SIGNS.DELETE(id!))),
+        mutationFn: () => unwrap(DeleteRequest(SIGNS.DELETE(sign!.id))),
         onSuccess: () => {
             toast.success("Sinal excluído com sucesso!");
             queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
@@ -150,11 +153,11 @@ const SignDetailPage = () => {
 
     // Registra o acesso no histórico — efeito colateral, não bloqueia a tela
     useEffect(() => {
-        if (!id) return;
-        PostRequest(HISTORY.REGISTER(id), {})
+        if (!sign?.id) return;
+        PostRequest(HISTORY.REGISTER(sign.id), {})
             .then(() => queryClient.invalidateQueries({ queryKey: queryKeys.history.all }))
             .catch(() => { });
-    }, [id, queryClient]);
+    }, [sign?.id, queryClient]);
 
     // Recalcula as setas do carrossel quando os relacionados carregam e ao redimensionar
     useEffect(() => {
@@ -397,7 +400,7 @@ const SignDetailPage = () => {
                         >
                             {related.map((item) => (
                                 <div key={item.id} className="w-64 shrink-0">
-                                    <SignCard sign={item} onClick={() => navigate(`/signs/${item.id}`)} />
+                                    <SignCard sign={item} onClick={() => navigate(`/signs/${item.slug}`)} />
                                 </div>
                             ))}
                         </div>

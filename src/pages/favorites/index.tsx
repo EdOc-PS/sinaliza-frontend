@@ -118,7 +118,7 @@ const FavoritesPage = () => {
                                     key={sign.id}
                                     sign={sign}
                                     isFavorite
-                                    onClick={() => navigate(`/signs/${sign.id}`)}
+                                    onClick={() => navigate(`/signs/${sign.slug}`)}
                                 />
                             ))}
                         </div>

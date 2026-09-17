@@ -28,6 +28,7 @@ import { formatDuration } from "@lib/format/duration";
 export interface SignCardData {
     id: string;
     name: string;
+    slug: string;
     category?: CategorySlim | null;
     videoUrl: string | null;
     anotherUrl: string | null;

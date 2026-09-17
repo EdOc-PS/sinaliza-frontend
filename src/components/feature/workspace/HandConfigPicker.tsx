@@ -8,6 +8,7 @@ import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import { HAND_CONFIG } from "@routes/handConfigs";
 import Spinner from "@components/ui/Spinner";
+import { Tooltip } from "@components/ui/Tooltip";
 
 export interface HandConfig {
     id: string;
@@ -174,28 +175,28 @@ const HandConfigPicker = ({
                     {paginated.map((config) => {
                         const selected = value === config.id;
                         return (
-                            <button
-                                key={config.id}
-                                type="button"
-                                title={config.name}
-                                onClick={() => onChange(allowDeselect && selected ? "" : config.id)}
-                                className={`relative aspect-square ${compact ? "rounded-xl" : "rounded-2xl"} overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
-                                    selected
-                                        ? "border-campfire-500 ring-1 ring-campfire-300"
-                                        : "border-transparent hover:border-campfire-300 hover:-translate-y-0.5"
-                                }`}
-                            >
-                                {config.imgUrl ? (
-                                    <img src={config.imgUrl} alt={config.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-xs text-neutral-400 font-medium">{config.name[0]}</span>
-                                )}
-                                {selected && (
-                                    <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                        <HugeiconsIcon icon={Tick04Icon} size={18} className="text-campfire-500 drop-shadow" />
-                                    </span>
-                                )}
-                            </button>
+                            <Tooltip key={config.id} label={config.name} position="top" className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => onChange(allowDeselect && selected ? "" : config.id)}
+                                    className={`relative aspect-square w-full ${compact ? "rounded-xl" : "rounded-2xl"} overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
+                                        selected
+                                            ? "border-campfire-500 ring-1 ring-campfire-300"
+                                            : "border-transparent hover:border-campfire-300 hover:-translate-y-0.5"
+                                    }`}
+                                >
+                                    {config.imgUrl ? (
+                                        <img src={config.imgUrl} alt={config.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-xs text-neutral-400 font-medium">{config.name[0]}</span>
+                                    )}
+                                    {selected && (
+                                        <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                            <HugeiconsIcon icon={Tick04Icon} size={18} className="text-campfire-500 drop-shadow" />
+                                        </span>
+                                    )}
+                                </button>
+                            </Tooltip>
                         );
                     })}
                 </div>

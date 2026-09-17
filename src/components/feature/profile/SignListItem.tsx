@@ -7,6 +7,7 @@ import { getYouTubeThumbnail } from "@lib/youtube/youtube";
 export interface SignListData {
     id: string;
     name: string;
+    slug: string;
     category?: CategorySlim | null;
     videoUrl: string | null;
     anotherUrl: string | null;

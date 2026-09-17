@@ -54,6 +54,17 @@ const MembersPage = () => {
     const handleApproval = (member: MemberListItem, status: "APPROVED" | "REJECTED") =>
         approvalMutate({ member, status });
 
+    const { mutate: statusMutate, variables: statusVars, isPending: updatingStatus } = useMutation({
+        mutationFn: (member: MemberListItem) =>
+            unwrap(PatchRequest(USERS.STATUS(member.id), { status: !member.status })),
+        onSuccess: (_data, member) => {
+            toast.success(member.status ? "Conta desativada." : "Conta reativada.");
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+        },
+        onError: (err: Error) => toast.error("Falha ao atualizar: " + err.message),
+    });
+    const updatingStatusId = updatingStatus ? statusVars?.id ?? null : null;
+
     const pending = members.filter((m) => m.approvalStatus === "PENDING");
     const others = members.filter((m) => m.approvalStatus !== "PENDING");
     const roleLabel = "aluno";
@@ -119,7 +130,12 @@ const MembersPage = () => {
                     </div>
                     <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {others.map((member) => (
-                            <ListCardMember key={member.id} member={member} />
+                            <ListCardMember
+                                key={member.id}
+                                member={member}
+                                onToggleStatus={statusMutate}
+                                updatingStatus={updatingStatusId === member.id}
+                            />
                         ))}
                     </div>
                 </div>

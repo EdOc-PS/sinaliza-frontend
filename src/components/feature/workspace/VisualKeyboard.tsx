@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, type ReactNode } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon, Clapping02Icon } from "@hugeicons/core-free-icons";
@@ -18,6 +18,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import Spinner from "@components/ui/Spinner";
+import { Tooltip } from "@components/ui/Tooltip";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 import createHandImg from "@/assets/images/app/create-hand.png";
 
@@ -28,37 +29,6 @@ export interface HandConfigTypeForm {
 }
 
 const ITEMS_PER_PAGE = 18;
-
-
-interface TooltipProps {
-    label: string;
-    children: ReactNode;
-}
-
-const Tooltip = ({ label, children }: TooltipProps) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    return (
-        <div
-            className="relative"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            {children}
-
-            {isHovered && (
-                <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1.5 pointer-events-none">
-                    <div className="bg-cloud-700 text-white px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap shadow-lg">
-                        {label}
-                    </div>
-                    <svg className="mx-auto block" width="12" height="6" viewBox="0 0 12 6">
-                        <path d="M0 0 L12 0 L6 6 Z" fill="#132433" />
-                    </svg>
-                </div>
-            )}
-        </div>
-    );
-};
 
 export interface VisualKeyboardProps {
     onEdit?: (config: HandConfigTypeForm) => void;
@@ -222,7 +192,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                 ) : (
                     <div className="stagger-children grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
                         {paginatedConfigs.map((config) => (
-                            <Tooltip key={config.name} label={config.name}>
+                            <Tooltip key={config.name} label={config.name} position="top">
                                 {selectMode ? (
                                     <button
                                         onClick={() => onSelectConfig?.(config)}
@@ -298,7 +268,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
 
                         {/* Card "+" */}
                         {showPlusCard && (
-                            <Tooltip label="Nova configuração de mão">
+                            <Tooltip label="Nova configuração de mão" position="top">
                                 <button
                                     onClick={() => openForm("create-hand-config")}
                                     className="w-full aspect-square bg-lime-50 border-2 border-dashed border-lime-400 rounded-xl flex items-center justify-center hover:bg-lime-100 hover:border-lime-500 transition-all hover:-translate-y-1 duration-300"

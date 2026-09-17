@@ -45,7 +45,7 @@ const MainLayout = () => {
                                 type="button"
                                 onClick={() => setOnboardingOpen(true)}
                                 aria-label="Ajuda: como usar a plataforma"
-                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-sm ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
                             >
                                 <HugeiconsIcon icon={HelpCircleIcon} size={22} />
                             </button>

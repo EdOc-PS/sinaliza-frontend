@@ -164,7 +164,7 @@ const ProfilePage = () => {
                             <SignListItem
                                 key={sign.id}
                                 sign={sign}
-                                onClick={() => navigate(`/signs/${sign.id}`)}
+                                onClick={() => navigate(`/signs/${sign.slug}`)}
                                 meta={new Date(sign.accessedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                             />
                         ))}
@@ -184,7 +184,7 @@ const ProfilePage = () => {
                             <SignListItem
                                 key={sign.id}
                                 sign={sign}
-                                onClick={() => navigate(`/signs/${sign.id}`)}
+                                onClick={() => navigate(`/signs/${sign.slug}`)}
                             />
                         ))}
                     </ListCard>

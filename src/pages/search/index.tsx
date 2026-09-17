@@ -70,7 +70,7 @@ const SearchResultsPage = () => {
                             <SignCard
                                 key={sign.id}
                                 sign={sign}
-                                onClick={() => navigate(`/signs/${sign.id}`)}
+                                onClick={() => navigate(`/signs/${sign.slug}`)}
                             />
                         ))}
                     </div>

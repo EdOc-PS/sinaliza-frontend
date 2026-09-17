@@ -19,6 +19,7 @@ import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 interface PendingSign {
     id: string;
     name: string;
+    slug: string;
     videoUrl?: string | null;
     anotherUrl?: string | null;
     imgUrl?: string | null;
@@ -109,7 +110,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                             <div key={sign.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
                                 <div
                                     className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
-                                    onClick={() => navigate(`/signs/${sign.id}`)}
+                                    onClick={() => navigate(`/signs/${sign.slug}`)}
                                 >
                                     {/* Thumbnail */}
                                     <div className="flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-cloud-500">

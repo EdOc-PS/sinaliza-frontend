@@ -201,7 +201,7 @@ const HistoryPage = () => {
                                     <SignCard
                                         key={sign.id}
                                         sign={sign}
-                                        onClick={() => navigate(`/signs/${sign.id}`)}
+                                        onClick={() => navigate(`/signs/${sign.slug}`)}
                                         actions={[
                                             {
                                                 label: "Remover do histórico",
