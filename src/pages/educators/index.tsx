@@ -15,14 +15,18 @@ import Modal from "@components/ui/Modal";
 
 import createEducatorImg from "@/assets/images/app/create-educator.webp";
 import Spinner from "@components/ui/Spinner";
+import Pagination from "@components/ui/Pagination";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { EducatorForm } from "@components/feature/educators/EducatorForm";
 import { ListCardEducator, type EducatorListItem } from "@components/feature/educators/ListCardEducator";
+
+const ITEMS_PER_PAGE = 10;
 
 const EducatorsPage = () => {
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [page, setPage] = useState(1);
 
     const [formModal, setFormModal] = useState<{ open: boolean; educatorId?: string }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
@@ -32,6 +36,11 @@ const EducatorsPage = () => {
         const timer = setTimeout(() => setDebouncedSearch(search), 350);
         return () => clearTimeout(timer);
     }, [search]);
+
+    // Nova busca volta para a primeira página
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch]);
 
     const { data: educators = [], isPending: loading } = useQuery({
         queryKey: queryKeys.users.educators(debouncedSearch),
@@ -56,6 +65,10 @@ const EducatorsPage = () => {
         if (!deleteModal.id) return;
         deleteEducator(deleteModal.id);
     };
+
+    const totalPages = Math.max(1, Math.ceil(educators.length / ITEMS_PER_PAGE));
+    const pageStart = (page - 1) * ITEMS_PER_PAGE;
+    const paginated = educators.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
     return (
         <>
@@ -111,9 +124,8 @@ const EducatorsPage = () => {
                     </div>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        <span className="text-xs text-neutral-400">{educators.length} educador{educators.length > 1 ? "es" : ""}</span>
                         <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            {educators.map((edu) => (
+                            {paginated.map((edu) => (
                                 <ListCardEducator
                                     key={edu.id}
                                     educator={edu}
@@ -122,6 +134,12 @@ const EducatorsPage = () => {
                                 />
                             ))}
                         </div>
+                        <Pagination
+                            page={page}
+                            totalPages={totalPages}
+                            onChange={setPage}
+                            label={`${educators.length} educador${educators.length > 1 ? "es" : ""}`}
+                        />
                     </div>
                 )}
             </section>

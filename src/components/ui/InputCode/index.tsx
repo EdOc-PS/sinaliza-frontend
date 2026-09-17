@@ -12,7 +12,17 @@ export const InputCode = ({ digits, onChange, length = 6 }: InputCodeProps) => {
     const handleChange = (index: number, value: string) => {
         const sanitized = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-        if (sanitized.length > 1) return;
+        // Colar o código completo (ou vários caracteres) preenche a partir da posição atual
+        if (sanitized.length > 1) {
+            const newDigits = [...digits];
+            let filled = index;
+            for (let i = 0; i < sanitized.length && filled < length; i++, filled++) {
+                newDigits[filled] = sanitized[i];
+            }
+            onChange(newDigits);
+            inputRefs.current[Math.min(filled, length - 1)]?.focus();
+            return;
+        }
 
         const newDigits = [...digits];
         newDigits[index] = sanitized;

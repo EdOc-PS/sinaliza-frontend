@@ -11,12 +11,16 @@ import { USERS } from "@routes/users";
 
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
+import Pagination from "@components/ui/Pagination";
 import { ListCardMember, type MemberListItem } from "@components/feature/members/ListCardMember";
 import { PendingApprovalCard } from "@components/feature/members/PendingApprovalCard";
+
+const ITEMS_PER_PAGE = 10;
 
 const MembersPage = () => {
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [page, setPage] = useState(1);
 
     const queryClient = useQueryClient();
 
@@ -25,6 +29,11 @@ const MembersPage = () => {
         const timer = setTimeout(() => setDebouncedSearch(search), 350);
         return () => clearTimeout(timer);
     }, [search]);
+
+    // Nova busca volta para a primeira página
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch]);
 
     // Papel e busca fazem parte da chave: alternar entre abas já visitadas
     // volta instantâneo, sem novo request.
@@ -68,6 +77,10 @@ const MembersPage = () => {
     const pending = members.filter((m) => m.approvalStatus === "PENDING");
     const others = members.filter((m) => m.approvalStatus !== "PENDING");
     const roleLabel = "aluno";
+
+    const totalPages = Math.max(1, Math.ceil(others.length / ITEMS_PER_PAGE));
+    const pageStart = (page - 1) * ITEMS_PER_PAGE;
+    const paginated = others.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
     return (
         <section className="flex flex-col gap-8">
@@ -125,11 +138,8 @@ const MembersPage = () => {
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-neutral-400">{others.length} aluno(s)</span>
-                    </div>
                     <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {others.map((member) => (
+                        {paginated.map((member) => (
                             <ListCardMember
                                 key={member.id}
                                 member={member}
@@ -138,6 +148,12 @@ const MembersPage = () => {
                             />
                         ))}
                     </div>
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        onChange={setPage}
+                        label={`${others.length} aluno(s)`}
+                    />
                 </div>
             )}
         </section>

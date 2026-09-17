@@ -84,6 +84,19 @@ const buildSteps = (user: User): OnboardingStep[] => {
 
     return [
         {
+            title: `Olá, ${user.name.split(" ")[0]}`,
+            subtitle: "Que bom ter você por aqui",
+            body: (
+                <div className="flex flex-col gap-4 text-sm leading-relaxed text-cloud-600">
+                    <p>
+                        Antes de começar, preparamos um tour rápido para você conhecer o Sinaliza
+                        e entender como aproveitar melhor a plataforma.
+                    </p>
+                    <p>Leva menos de um minuto — vamos lá?</p>
+                </div>
+            ),
+        },
+        {
             title: "Bem-vindo ao Sinaliza",
             subtitle: "Um repositório colaborativo de sinais em Libras",
             body: (
