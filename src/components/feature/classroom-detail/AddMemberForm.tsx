@@ -70,7 +70,7 @@ export const AddMemberForm = ({ classroomId, onClose, onSuccess }: AddMemberForm
 
             <div className="flex gap-3 pt-1 justify-end">
                 <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>Cancelar</Button>
-                <Button type="submit" className="w-3/5" disabled={!emailValid || loading} loading={loading} loadingText="Adicionando...">
+                <Button type="submit" className="w-3/5" disabled={!emailValid || loading} loading={loading} loadingText="Adicionando">
                     Adicionar
                 </Button>
             </div>

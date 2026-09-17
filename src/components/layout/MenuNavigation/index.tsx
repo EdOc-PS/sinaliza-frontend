@@ -4,6 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 import { useAuth } from "@context/AuthContext";
 import { Tooltip } from "@components/ui/Tooltip";
+import ConfirmModal from "@components/layout/ConfirmModal";
 
 import {
     FavouriteIcon,
@@ -170,6 +171,7 @@ const MenuNavigation = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+    const [logoutModal, setLogoutModal] = useState(false);
 
     // Seleciona os itens de menu baseado na role do usuário
     // Usuário pode ter várias roles — mescla os itens de menu de todas (sem duplicar por path)
@@ -185,6 +187,7 @@ const MenuNavigation = () => {
     const adminItems = menuItems.filter((item) => item.section === "admin");
 
     const handleLogout = () => {
+        setLogoutModal(false);
         toast.success("Até logo!");
         logout();
         // PrivateRoute detecta user=null e redireciona automaticamente
@@ -282,11 +285,21 @@ const MenuNavigation = () => {
                     <ActionItem
                         icon={Logout01Icon}
                         label="Sair"
-                        onClick={handleLogout}
+                        onClick={() => setLogoutModal(true)}
                         logout
                     />
                 </div>
             </aside>
+
+            <ConfirmModal
+                open={logoutModal}
+                onClose={() => setLogoutModal(false)}
+                onConfirm={handleLogout}
+                icon={Logout01Icon}
+                title="Sair da conta?"
+                description="Você precisará entrar de novo para acessar a plataforma."
+                confirmText="Sair"
+            />
         </>
     );
 };

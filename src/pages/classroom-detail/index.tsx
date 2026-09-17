@@ -238,7 +238,7 @@ const ClassroomDetailPage = () => {
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <HugeiconsIcon icon={UserGroupIcon} size={16} className="text-white/60" />
-                                <span><b className="text-white">{classroom.userCount}</b> alunos</span>
+                                <span><b className="text-white">{classroom.userCount}</b> membros</span>
                             </div>
                             {classroom.classCode && (
                                 <span className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white">
@@ -376,23 +376,17 @@ const ClassroomDetailPage = () => {
                                     </button>
                                 )}
 
-                                {/* Educadores */}
+                                {/* Membros — educadores e alunos numa lista só; o RoleBadge de cada
+                                    linha já distingue quem é quem */}
                                 <MemberSection
-                                    title="Educadores"
+                                    title="Membros"
                                     members={[
                                         // Professor da turma sempre aparece primeiro
                                         { roleInClass: "EDUCATOR", createdAt: "", user: { id: classroom.teacher.id, name: classroom.teacher.name, avatar: classroom.teacher.avatar, role: "EDUCATOR", educatorType: classroom.teacher.educatorType } },
-                                        ...members.filter((m) => m.roleInClass === "EDUCATOR" && m.user.id !== classroom.teacher.id),
+                                        ...members.filter((m) => m.user.id !== classroom.teacher.id),
                                     ]}
                                     onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                     lockedUserIds={[classroom.teacher.id]}
-                                />
-
-                                {/* Alunos */}
-                                <MemberSection
-                                    title="Alunos"
-                                    members={members.filter((m) => m.roleInClass === "STUDENT")}
-                                    onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                 />
 
                                 {!canManage && (
@@ -477,7 +471,7 @@ const ClassroomDetailPage = () => {
                     </>
                 }
                 confirmText="Remover participante"
-                loadingText="Removendo..."
+                loadingText="Removendo"
             />
 
             {/* Modal de confirmar saída da turma */}
@@ -495,7 +489,7 @@ const ClassroomDetailPage = () => {
                     </>
                 }
                 confirmText="Sair da turma"
-                loadingText="Saindo..."
+                loadingText="Saindo"
             />
         </>
     );

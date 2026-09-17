@@ -97,7 +97,7 @@ const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName 
                         className="flex-1"
                         onClick={() => onConfirm(selected)}
                         loading={loading}
-                        loadingText="Enviando..."
+                        loadingText="Enviando"
                     >
                         Enviar para aprovação
                     </Button>

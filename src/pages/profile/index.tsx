@@ -20,6 +20,7 @@ import { HISTORY } from "@routes/history";
 import { useAuth } from "@context/AuthContext";
 
 import Modal from "@components/ui/Modal";
+import ConfirmModal from "@components/layout/ConfirmModal";
 import Spinner from "@components/ui/Spinner";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
@@ -37,11 +38,13 @@ const ProfilePage = () => {
     const { user, logout } = useAuth();
 
     const handleLogout = () => {
+        setLogoutModal(false);
         logout();
         navigate("/auth/login");
     };
 
     const [editModal, setEditModal] = useState(false);
+    const [logoutModal, setLogoutModal] = useState(false);
 
     // Mesmas chaves de /history e /favorites: se o usuário já visitou aquelas
     // telas, estes cards aparecem preenchidos na hora.
@@ -189,13 +192,23 @@ const ProfilePage = () => {
 
                 {/* Sair — no desktop essa ação vive na sidebar, que não existe no mobile */}
                 <button
-                    onClick={handleLogout}
+                    onClick={() => setLogoutModal(true)}
                     className="flex w-full items-center justify-center gap-2 rounded-3xl bg-salmon-100 px-4 py-3 text-sm font-semibold text-salmon-600 transition-colors duration-300 hover:bg-salmon-200 lg:hidden"
                 >
                     <HugeiconsIcon icon={Logout01Icon} size={18} />
                     Sair da conta
                 </button>
             </section>
+
+            <ConfirmModal
+                open={logoutModal}
+                onClose={() => setLogoutModal(false)}
+                onConfirm={handleLogout}
+                icon={Logout01Icon}
+                title="Sair da conta?"
+                description="Você precisará entrar de novo para acessar a plataforma."
+                confirmText="Sair"
+            />
 
             {/* Modal de editar conta */}
             <Modal open={editModal} onClose={() => setEditModal(false)}>

@@ -11,6 +11,7 @@ import {
 } from '@api/requests'
 import { AUTH } from '@routes/auth'
 import { USERS } from '@routes/users'
+import { queryClient } from '@/config/query/queryClient'
 
 const TOKEN_KEY = '@token'
 
@@ -109,6 +110,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     function logout() {
         localStorage.removeItem(TOKEN_KEY)
         setUser(null)
+        // Sem isso, o cache do usuário anterior (turmas, favoritos, etc.) sobrevive
+        // no navegador e aparece pro próximo que logar nessa mesma aba.
+        queryClient.clear()
     }
 
     // Ao montar, tenta recuperar a sessão existente

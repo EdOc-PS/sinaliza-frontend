@@ -231,7 +231,7 @@ const HistoryPage = () => {
                     </>
                 }
                 confirmText="Limpar histórico"
-                loadingText="Limpando..."
+                loadingText="Limpando"
             />
         </section>
     );

@@ -200,7 +200,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
             className="flex-1"
             disabled={!isFormValid || loading}
             loading={loading}
-            loadingText="Salvando..."
+            loadingText="Salvando"
             onClick={handleSubmit}
         >
             Salvar alterações
@@ -359,7 +359,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                             type="submit"
                             className="flex-1"
                             loading={isEditMode && loading}
-                            loadingText="Salvando..."
+                            loadingText="Salvando"
                             disabled={!isStep2Valid() || (isEditMode && loading)}
                         >
                             {isEditMode ? "Salvar alterações" : "Próximo"}
@@ -406,7 +406,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                     <div className="flex gap-3 pt-2">
                         <BackButton onClick={() => setView(3)} />
-                        <Button type="submit" className="flex-1" loading={loading} loadingText="Cadastrando..." disabled={!isStep3Valid || loading}>
+                        <Button type="submit" className="flex-1" loading={loading} loadingText="Cadastrando" disabled={!isStep3Valid || loading}>
                             Cadastrar educador
                         </Button>
                     </div>

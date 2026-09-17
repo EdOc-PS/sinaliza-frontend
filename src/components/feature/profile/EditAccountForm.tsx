@@ -89,7 +89,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
             className="flex-1"
             disabled={!isView0Valid || loading}
             loading={loading}
-            loadingText="Salvando..."
+            loadingText="Salvando"
             onClick={handleSave}
         >
             Salvar alterações
@@ -246,7 +246,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                             disabled={!isView0Valid || loading}
                             onClick={handleSave}
                             loading={loading}
-                            loadingText="Salvando..."
+                            loadingText="Salvando"
                         >
                             Salvar alterações
                         </Button>

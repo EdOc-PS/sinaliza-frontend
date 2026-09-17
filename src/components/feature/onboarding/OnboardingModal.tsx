@@ -232,7 +232,7 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
                                 className="flex-1"
                                 onClick={isLast ? finish : () => setView((v) => v + 1)}
                                 loading={saving}
-                                loadingText="Salvando..."
+                                loadingText="Salvando"
                             >
                                 {isLast ? "Começar" : "Próximo"}
                             </Button>

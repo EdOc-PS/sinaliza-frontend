@@ -116,7 +116,7 @@ export const HandConfigForm = ({ handConfig, onClose, onSuccess }: HandConfigFor
                     className="w-3/5"
                     disabled={!isValid}
                     loading={loading}
-                    loadingText={isEditMode ? "Salvando..." : "Criando..."}
+                    loadingText={isEditMode ? "Salvando" : "Criando"}
                 >
                     {isEditMode ? "Salvar alterações" : "Criar configuração"}
                 </Button>

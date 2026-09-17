@@ -35,7 +35,12 @@ export const JoinClassroomForm = ({ onClose, onSuccess }: JoinClassroomFormProps
             });
 
             if (!response.success) {
-                toast.error(response.message || "Falha ao entrar na turma");
+                // 409 do backend: já está matriculado — é um aviso, não um erro
+                if (response.message?.includes("já está matriculado")) {
+                    toast.info(response.message);
+                } else {
+                    toast.error(response.message || "Falha ao entrar na turma");
+                }
                 return;
             }
 
@@ -93,7 +98,7 @@ export const JoinClassroomForm = ({ onClose, onSuccess }: JoinClassroomFormProps
                     className="flex-1"
                     disabled={!isValid}
                     loading={loading}
-                    loadingText="Entrando..."
+                    loadingText="Entrando"
                 >
                     Entrar na turma
                 </Button>

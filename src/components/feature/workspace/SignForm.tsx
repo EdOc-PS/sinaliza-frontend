@@ -177,7 +177,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
             className="flex-1"
             disabled={!isFormValid}
             loading={loading}
-            loadingText="Salvando..."
+            loadingText="Salvando"
         >
             Salvar alterações
         </Button>
@@ -508,7 +508,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             className="flex-1"
                             disabled={!isMediaValid}
                             loading={loading}
-                            loadingText={isEditMode ? "Salvando..." : "Criando sinal..."}
+                            loadingText={isEditMode ? "Salvando" : "Criando sinal"}
                         >
                             {isEditMode ? "Salvar alterações" : "Criar sinal"}
                         </Button>

@@ -185,7 +185,7 @@ export const ClassroomForm = ({ classroomId, onClose, onSuccess }: ClassroomForm
                     className="w-3/5"
                     disabled={!isValid}
                     loading={loading}
-                    loadingText={isEditMode ? "Salvando..." : "Criando..."}
+                    loadingText={isEditMode ? "Salvando" : "Criando"}
                 >
                     {isEditMode ? "Salvar alterações" : "Criar turma"}
                 </Button>

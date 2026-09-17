@@ -27,7 +27,7 @@ const ConfirmModal = ({
     description,
     icon = Medal06Icon,
     confirmText = "Confirmar",
-    loadingText = "Enviando...",
+    loadingText = "Enviando",
 }: ConfirmModalProps) => {
     return (
         <Modal open={open} onClose={onClose} size="lg">

@@ -258,7 +258,7 @@ export const EssayExampleSection = ({ classroomId, canManage }: EssayExampleSect
                             className="w-3/5"
                             disabled={!formValid || saving}
                             loading={saving}
-                            loadingText="Enviando..."
+                            loadingText="Enviando"
                         >
                             Adicionar exemplo
                         </Button>

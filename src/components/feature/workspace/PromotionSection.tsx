@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -45,19 +46,32 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
     // Participa do spinner unificado da tela (LoadingGroup)
     useReportLoading("promotions", loading);
 
-    const { mutate: reviewMutate, variables: reviewVars, isPending: reviewing } = useMutation({
+    // Mapa (signId -> approve) em vez do estado padrão do useMutation: aprovar/recusar
+    // cards diferentes ao mesmo tempo precisa manter os dois carregando juntos, e o
+    // hook só reflete a variável da chamada mais recente. Guardar `approve` junto
+    // também deixa o spinner no botão certo (Aprovar ou Recusar), não nos dois.
+    const [processing, setProcessing] = useState<Map<string, boolean>>(new Map());
+
+    const { mutate: reviewMutate } = useMutation({
         mutationFn: ({ sign, approve }: { sign: PendingSign; approve: boolean }) =>
             unwrap(PatchRequest(SIGNS.REVIEW_PROMOTION(sign.id), { approve })),
+        onMutate: ({ sign, approve }) => {
+            setProcessing((prev) => new Map(prev).set(sign.id, approve));
+        },
         onSuccess: (_data, { sign, approve }) => {
             toast.success(approve ? `"${sign.name}" agora é público!` : `Promoção de "${sign.name}" recusada`);
             queryClient.invalidateQueries({ queryKey: queryKeys.signs.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.glossary.all });
         },
         onError: (err: Error) => toast.error(err.message),
+        onSettled: (_data, _err, { sign }) => {
+            setProcessing((prev) => {
+                const next = new Map(prev);
+                next.delete(sign.id);
+                return next;
+            });
+        },
     });
-
-    // Qual card está em processamento (para o spinner do botão)
-    const processingId = reviewing ? reviewVars?.sign.id ?? null : null;
 
     const review = (sign: PendingSign, approve: boolean) => reviewMutate({ sign, approve });
 
@@ -85,7 +99,9 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
             ) : (
                 <div className="stagger-children flex flex-col gap-2">
                     {signs.map((sign) => {
-                        const busy = processingId === sign.id;
+                        const busyApprove = processing.get(sign.id) === true;
+                        const busyReject = processing.get(sign.id) === false;
+                        const busy = processing.has(sign.id);
                         const thumb = sign.imgUrl
                             ?? (sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null);
 
@@ -131,7 +147,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                             onClick={() => review(sign, false)}
                                             className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
                                         >
-                                            <HugeiconsIcon icon={Cancel02Icon} size={22} />
+                                            {busyReject ? <Spinner size={18} color="#EEA2A2" /> : <HugeiconsIcon icon={Cancel02Icon} size={22} />}
                                             Recusar
                                         </button>
                                         <button
@@ -140,7 +156,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                             onClick={() => review(sign, true)}
                                             className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
                                         >
-                                            <HugeiconsIcon icon={Tick04Icon} size={22} />
+                                            {busyApprove ? <Spinner size={18} color="#FFFFFF" /> : <HugeiconsIcon icon={Tick04Icon} size={22} />}
                                             Aprovar
                                         </button>
                                     </div>

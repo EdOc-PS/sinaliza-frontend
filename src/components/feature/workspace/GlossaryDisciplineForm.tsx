@@ -97,7 +97,7 @@ export const GlossaryDisciplineForm = ({ discipline, onClose, onSuccess }: Gloss
                     className="w-3/5"
                     disabled={!nameValid || loading}
                     loading={loading}
-                    loadingText={isEditMode ? "Salvando..." : "Criando..."}
+                    loadingText={isEditMode ? "Salvando" : "Criando"}
                 >
                     {isEditMode ? "Salvar alterações" : "Criar disciplina"}
                 </Button>

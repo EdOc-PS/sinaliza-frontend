@@ -27,7 +27,7 @@ const ConfirmDeleteModal = ({
     title,
     description,
     confirmText = "Excluir",
-    loadingText = "Deletando...",
+    loadingText = "Deletando",
 }: ConfirmDeleteModalProps) => {
     return (
         <Modal open={open} onClose={onClose} size="lg">

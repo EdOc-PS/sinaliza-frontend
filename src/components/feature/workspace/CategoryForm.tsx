@@ -69,7 +69,7 @@ export const CategoryForm = ({ onClose, onSuccess }: CategoryFormProps) => {
 
             <div className="flex gap-3 pt-1 justify-end">
                 <Button type="button" variant="outline" className="w-2/5" onClick={onClose}>Cancelar</Button>
-                <Button type="submit" className="w-3/5" disabled={!nameValid || loading} loading={loading} loadingText="Criando...">
+                <Button type="submit" className="w-3/5" disabled={!nameValid || loading} loading={loading} loadingText="Criando">
                     Criar categoria
                 </Button>
             </div>
