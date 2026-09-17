@@ -14,6 +14,7 @@ import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
+import { SignUsageSection, type SignUsage } from "@components/feature/dashboard/SignUsageSection";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
@@ -101,6 +102,14 @@ const ClassroomDetailPage = () => {
         queryKey: queryKeys.classrooms.members(id ?? ""),
         queryFn: () => unwrap(GetRequest<Member[]>(CLASSROOMS.MEMBERS(id!))),
         enabled: !!id && detailView === "settings",
+    });
+
+    // Visualização compacta de uso — só o professor da turma vê
+    const canManageEarly = !!user?.roles?.includes("EDUCATOR") && classroom?.teacher.id === user?.id;
+    const { data: usageStats, isPending: loadingUsage } = useQuery({
+        queryKey: queryKeys.classrooms.usageStats(id ?? ""),
+        queryFn: () => unwrap(GetRequest<{ mostUsed: SignUsage[]; leastUsed: SignUsage[] }>(CLASSROOMS.USAGE_STATS(id!), { limit: 5 })),
+        enabled: !!id && canManageEarly && detailView === "signs",
     });
 
     const invalidateClassroom = () =>
@@ -290,6 +299,15 @@ const ClassroomDetailPage = () => {
                             <h2 className="font-baskerville text-xl text-cloud-500">Sinais cadastrados</h2>
                             {/* <span className="text-xs text-neutral-400">Ordenado por nome</span> */}
                         </div>
+
+                        {/* Uso dos sinais da turma — visível só para o professor dono */}
+                        {canManage && signs.length > 0 && (
+                            <SignUsageSection
+                                mostUsed={usageStats?.mostUsed ?? []}
+                                leastUsed={usageStats?.leastUsed ?? []}
+                                loading={loadingUsage}
+                            />
+                        )}
 
                         {signs.length === 0 ? (
                             <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">

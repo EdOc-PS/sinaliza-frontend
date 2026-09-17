@@ -8,6 +8,7 @@ export const SIGNS = {
     PROMOTE:          (id: string) => `sign/${id}/promote`,
     PROMOTIONS:       ()           => `sign/promotions`,
     REVIEW_PROMOTION: (id: string) => `sign/${id}/promotion`,
+    USAGE_STATS:      ()           => `sign/usage-stats`,
 }
 
 // Glossário global — endpoints públicos (sem autenticação)

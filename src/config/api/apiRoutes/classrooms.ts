@@ -4,6 +4,7 @@ export const CLASSROOMS = {
     JOIN:     ()           => `classrooms/join`,
     FIND_ONE: (id: string) => `classrooms/${id}`,
     SIGNS:           (id: string) => `classrooms/${id}/signs`,
+    USAGE_STATS:     (id: string) => `classrooms/${id}/usage-stats`,
     SIGNS_FAVORITES: (id: string) => `classrooms/${id}/signs/favorites`,
     MEMBERS:         (id: string) => `classrooms/${id}/members`,
     ADD_MEMBER:      (id: string) => `classrooms/${id}/members`,

@@ -30,6 +30,7 @@ const SignDetailPage = lazy(() => import('@/pages/sign-detail'))
 const SearchResultsPage = lazy(() => import('@/pages/search'))
 const GlossaryPage = lazy(() => import('@/pages/glossary'))
 const WorkspacePage = lazy(() => import('@/pages/workspace'))
+const DashboardPage = lazy(() => import('@/pages/dashboard'))
 const EducatorsPage = lazy(() => import('@/pages/educators'))
 const MembersPage = lazy(() => import('@/pages/members'))
 const NotFoundPage = lazy(() => import('@/pages/not-found'))
@@ -90,6 +91,10 @@ const routes: RouteObject[] = [
                     {
                         path: 'workspace',
                         element: suspended(WorkspacePage),
+                    },
+                    {
+                        path: 'dashboard',
+                        element: suspended(DashboardPage),
                     },
                     {
                         path: 'educators',

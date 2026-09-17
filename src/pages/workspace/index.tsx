@@ -1,57 +1,26 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@/config/query/queryKeys";
-
 import { useAuth } from "@context/AuthContext";
 
 import Modal from "@components/ui/Modal";
 import ActionButton from "@components/ui/ActionButton";
-import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
-import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
+import { VisualKeyboard } from "@components/feature/workspace/VisualKeyboard";
 import { CategorySection } from "@components/feature/workspace/CategorySection";
-import { GlossaryDisciplineSection } from "@components/feature/workspace/GlossaryDisciplineSection";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 
 import { LoadingGroup } from "@lib/hooks/useLoadingGroup";
 
 import createSignalImg from "@/assets/images/app/create-signal.png";
-import createHandImg from "@/assets/images/app/create-hand.png";
 
+// Itens exclusivos do gestor (configuração de mão, promoções com poder de
+// aprovar, administração do glossário) vivem no Dashboard — aqui fica só o
+// que educador e gestor usam no dia a dia de criar/organizar sinais.
 const WorkspacePage = () => {
-    const queryClient = useQueryClient();
     const { user } = useAuth();
     const isManager = !!user?.roles?.includes("MANAGER");
     const isEducator = !!user?.roles?.includes("EDUCATOR");
 
-    const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
-    const [editModal, setEditModal] = useState<boolean>(false);
     const [signModal, setSignModal] = useState<boolean>(false);
-    const [handModal, setHandModal] = useState<boolean>(false);
-
-    const handleEditConfig = (config: HandConfigTypeForm) => {
-        setEditingConfig(config);
-        setEditModal(true);
-    };
-
-    const invalidateHandConfigs = () =>
-        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
-
-    const handleEditSuccess = () => {
-        setEditModal(false);
-        setEditingConfig(null);
-        invalidateHandConfigs();
-    };
-
-    const handleEditClose = () => {
-        setEditModal(false);
-        setEditingConfig(null);
-    };
-
-    const handleHandSuccess = () => {
-        setHandModal(false);
-        invalidateHandConfigs();
-    };
 
     return (
         <>
@@ -65,54 +34,28 @@ const WorkspacePage = () => {
                         <p className="text-neutral-600 text-md">Sinais · Configuração de Mão</p>
                     </div>
 
-                    {/* Cards de ação */}
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        {/* Criar novo sinal — ocupa mais espaço quando a config. de mão também aparece */}
-                        <ActionButton
-                            variant="cloud"
-                            image={createSignalImg}
-                            title="Criar novo sinal"
-                            description="Publique um sinal no repositório global"
-                            onClick={() => setSignModal(true)}
-                            className={isManager ? "flex-[1.5]" : "flex-1"}
-                        />
-
-                        {/* Nova configuração de mão — só o gestor cria; educador só visualiza o teclado */}
-                        {isManager && (
-                            <ActionButton
-                                variant="lime"
-                                image={createHandImg}
-                                title="Nova configuração de mão"
-                                description="Adicione ao teclado visual"
-                                onClick={() => setHandModal(true)}
-                                className="flex-1"
-                            />
-                        )}
-                    </div>
+                    <ActionButton
+                        variant="cloud"
+                        image={createSignalImg}
+                        title="Criar novo sinal"
+                        description="Publique um sinal no repositório global"
+                        onClick={() => setSignModal(true)}
+                        className="w-full sm:w-96"
+                    />
                 </div>
 
                 {/* Um spinner só para a tela inteira, em vez de um por card */}
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
                         <div className="bg-white rounded-3xl p-6">
-                            <VisualKeyboard onEdit={handleEditConfig} canManage={isManager} />
+                            <VisualKeyboard canManage={false} />
                         </div>
 
-                        {/* Promoções pendentes — educador visualiza, só gestor aprova/recusa */}
-                        {(isManager || isEducator) && <PromotionSection canReview={isManager} />}
+                        {/* Promoções pendentes — o gestor revisa a partir do Dashboard */}
+                        {isEducator && !isManager && <PromotionSection canReview={false} />}
 
                         {/* Categorias — CRUD para o educador */}
                         <CategorySection />
-
-                        {/* Administração — visível apenas ao gestor, separada do restante do ambiente */}
-                        {isManager && (
-                            <div className="flex flex-col gap-4">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-cloud-400">
-                                    Administração
-                                </p>
-                                <GlossaryDisciplineSection />
-                            </div>
-                        )}
                     </div>
                 </LoadingGroup>
             </section>
@@ -122,23 +65,6 @@ const WorkspacePage = () => {
                 <SignForm
                     onClose={() => setSignModal(false)}
                     onSuccess={() => { setSignModal(false); }}
-                />
-            </Modal>
-
-            {/* Modal criar configuração de mão */}
-            <Modal open={handModal} onClose={() => setHandModal(false)}>
-                <HandConfigForm
-                    onClose={() => setHandModal(false)}
-                    onSuccess={handleHandSuccess}
-                />
-            </Modal>
-
-            {/* Modal de edição */}
-            <Modal open={editModal} onClose={handleEditClose}>
-                <HandConfigForm
-                    handConfig={editingConfig ?? undefined}
-                    onClose={handleEditClose}
-                    onSuccess={handleEditSuccess}
                 />
             </Modal>
         </>

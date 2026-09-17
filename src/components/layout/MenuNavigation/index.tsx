@@ -7,6 +7,7 @@ import { Tooltip } from "@components/ui/Tooltip";
 import ConfirmModal from "@components/layout/ConfirmModal";
 
 import {
+    ChartIcon,
     FavouriteIcon,
     GlobalEducationIcon,
     Time01Icon,
@@ -45,6 +46,7 @@ const menuItemsByRole: Record<string, MenuEntry[]> = {
         { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
         { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
+        { icon: ChartIcon, label: "Dashboard", path: "/dashboard", section: "admin" },
         { icon: UserMultiple02Icon, label: "Educadores", path: "/educators", section: "admin" },
         { icon: StudentsIcon, label: "Alunos", path: "/members", section: "admin" },
     ],
