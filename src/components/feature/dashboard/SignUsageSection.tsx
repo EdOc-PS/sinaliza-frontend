@@ -93,7 +93,7 @@ const SignUsageList = ({ title, icon, iconClassName, barClassName, signs, onProm
     const maxCount = Math.max(1, ...signs.map((s) => s.usageCount));
 
     return (
-        <div className="flex flex-1 flex-col gap-3 rounded-3xl bg-cloud-100 p-4">
+        <div className="flex flex-1 flex-col gap-3">
             <div className="flex items-center gap-2">
                 <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${iconClassName}`}>
                     <HugeiconsIcon icon={icon} size={16} />

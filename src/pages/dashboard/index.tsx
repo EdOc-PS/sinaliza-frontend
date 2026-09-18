@@ -24,19 +24,41 @@ interface UsageStats {
     leastUsed: SignUsage[];
 }
 
-const DashboardPage = () => {
-    const queryClient = useQueryClient();
+interface UsageStatsSectionProps {
+    onPromote: (sign: SignUsage) => void;
+}
 
-    const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
-    const [editModal, setEditModal] = useState(false);
-    const [promoteModal, setPromoteModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
-
+// Componente próprio só para o report de loading acontecer dentro da árvore
+// do LoadingGroup (o hook precisa rodar num descendente do Provider, não no
+// componente que o declara) — assim entra no mesmo spinner único da página.
+const UsageStatsSection = ({ onPromote }: UsageStatsSectionProps) => {
     const { data: usageStats, isPending: loadingUsage } = useQuery({
         queryKey: queryKeys.signs.usageStats(),
         queryFn: () => unwrap(GetRequest<UsageStats>(SIGNS.USAGE_STATS())),
         meta: { errorMessage: "Falha ao carregar estatísticas de uso" },
     });
     useReportLoading("usage-stats", loadingUsage);
+
+    return (
+        <div className="flex flex-col gap-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cloud-400">
+                Sinais mais e menos usados
+            </p>
+            <SignUsageSection
+                mostUsed={usageStats?.mostUsed ?? []}
+                leastUsed={usageStats?.leastUsed ?? []}
+                onPromote={onPromote}
+            />
+        </div>
+    );
+};
+
+const DashboardPage = () => {
+    const queryClient = useQueryClient();
+
+    const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
+    const [editModal, setEditModal] = useState(false);
+    const [promoteModal, setPromoteModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
 
     const handleEditConfig = (config: HandConfigTypeForm) => {
         setEditingConfig(config);
@@ -90,20 +112,10 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-cloud-400">
-                        Sinais mais e menos usados
-                    </p>
-                    <SignUsageSection
-                        mostUsed={usageStats?.mostUsed ?? []}
-                        leastUsed={usageStats?.leastUsed ?? []}
-                        loading={loadingUsage}
-                        onPromote={handlePromoteClick}
-                    />
-                </div>
-
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
+                        <UsageStatsSection onPromote={handlePromoteClick} />
+
                         <div className="bg-white rounded-3xl p-6">
                             <VisualKeyboard onEdit={handleEditConfig} canManage />
                         </div>
