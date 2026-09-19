@@ -18,15 +18,17 @@ const SearchResultsPage = () => {
     const search = params.get("search") ?? "";
     const handConfigId = params.get("handConfigId") ?? "";
     const categoryId = params.get("categoryId") ?? "";
+    const glossaryDisciplineId = params.get("glossaryDisciplineId") ?? "";
 
     // Os parâmetros da URL são a chave: voltar para uma busca já feita é instantâneo
     const { data: signs = [], isPending: loading } = useQuery({
-        queryKey: queryKeys.search.signs({ search, handConfigId, categoryId }),
+        queryKey: queryKeys.search.signs({ search, handConfigId, categoryId, glossaryDisciplineId }),
         queryFn: () => {
             const query: Record<string, string> = {};
             if (search) query.search = search;
             if (handConfigId) query.handConfigId = handConfigId;
             if (categoryId) query.categoryId = categoryId;
+            if (glossaryDisciplineId) query.glossaryDisciplineId = glossaryDisciplineId;
             return unwrap(GetRequest<SignCardData[]>(SEARCH.SIGNS(), query));
         },
         meta: { errorMessage: "Falha na busca" },

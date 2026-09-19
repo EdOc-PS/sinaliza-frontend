@@ -16,6 +16,7 @@ import { useAuth } from "@context/AuthContext"
 const MainLayout = () => {
     const { user } = useAuth()
     const [onboardingOpen, setOnboardingOpen] = useState(false)
+    const [searchOpen, setSearchOpen] = useState(false)
 
     // Primeiro login: abre o tour sozinho. Depois só pelo botão de ajuda.
     useEffect(() => {
@@ -24,22 +25,26 @@ const MainLayout = () => {
 
     return (
         <FABProvider>
-            <MobileHeader />
+            <MobileHeader
+                searchOpen={searchOpen}
+                onToggleSearch={() => setSearchOpen((v) => !v)}
+                onOpenHelp={() => setOnboardingOpen(true)}
+            />
             <MenuNavigation />
 
             <main className="lg:ml-20 min-h-screen pb-28 lg:pb-10">
-                {/* Barra de busca fixa no topo (estilo e-commerce). O botão de ajuda fica fora do
-                    container centralizado, alinhado ao mesmo offset do FAB (right-5 lg:right-10),
-                    em vez de preso à largura do conteúdo. */}
+                {/* Barra de busca fixa no topo (estilo e-commerce). Mesma largura do banner
+                    abaixo (mesmo container/padding) — o botão de ajuda flutua por cima do
+                    canto direito em vez de empurrar a busca para dentro. */}
                 <div className="sticky top-0 z-30 bg-transparent backdrop-blur-sm pb-3">
                     <div className="relative py-3">
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pr-16 lg:pr-24">
-                            <TopSearchBar />
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10">
+                            <TopSearchBar open={searchOpen} onOpenChange={setSearchOpen} />
                         </div>
                         <Tooltip
                             label="Como usar a plataforma"
                             position="right"
-                            className="absolute top-1/2 right-5 lg:right-10 -translate-y-1/2"
+                            className="hidden lg:block absolute top-1/2 right-5 lg:right-10 -translate-y-1/2"
                         >
                             <button
                                 type="button"

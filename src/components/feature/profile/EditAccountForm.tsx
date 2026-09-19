@@ -10,6 +10,8 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { maskPhone } from "@/lib/mask/mask";
 import { PERFIL_FORMULARIOS, getPerfilId } from "@/lib/constants/profileFields";
+import { AVATAR_PRESETS, AVATAR_PRESET_KEYS } from "@/lib/constants/avatars";
+import { getInitials } from "@lib/format/initials";
 
 import Input from "@components/ui/Input";
 import Label from "@components/ui/Label";
@@ -36,6 +38,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
     const [email, setEmail] = useState(user?.email ?? "");
     const [phone, setPhone] = useState(user?.phone ? maskPhone(user.phone) : "");
     const [bio, setBio] = useState(user?.bio ?? "");
+    const [avatar, setAvatar] = useState(user?.avatar ?? "");
 
     const perfilId = user ? getPerfilId(user.roles, user.educatorType) : null;
     const formularioPerfil = perfilId ? PERFIL_FORMULARIOS[perfilId] : null;
@@ -69,6 +72,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                 email: email.trim(),
                 phone: phone.replace(/\D/g, "") || undefined,
                 bio: bio.trim() || undefined,
+                avatar: avatar || undefined,
                 dataProfile: formularioPerfil ? dataProfile : undefined,
             });
             toast.success("Conta atualizada com sucesso!");
@@ -124,6 +128,37 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
             {view === 0 && (
                 <>
                     <div className="space-y-4">
+                        {/* Avatar */}
+                        <div className="flex flex-col gap-2">
+                            <Label isOptional>Avatar:</Label>
+                            <div className="flex flex-wrap gap-2.5">
+                                <button
+                                    type="button"
+                                    onClick={() => setAvatar("")}
+                                    aria-pressed={avatar === ""}
+                                    title="Sem avatar (iniciais)"
+                                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 bg-campfire-100 font-baskerville text-sm font-bold text-campfire-600 transition-colors ${
+                                        avatar === "" ? "border-cloud-500" : "border-transparent hover:border-cloud-300"
+                                    }`}
+                                >
+                                    {getInitials(name || user?.name || "")}
+                                </button>
+                                {AVATAR_PRESET_KEYS.map((key) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => setAvatar(key)}
+                                        aria-pressed={avatar === key}
+                                        className={`h-12 w-12 shrink-0 overflow-hidden rounded-2xl border-2 bg-cloud-100 transition-colors ${
+                                            avatar === key ? "border-cloud-500" : "border-transparent hover:border-cloud-300"
+                                        }`}
+                                    >
+                                        <img src={AVATAR_PRESETS[key]} alt={key} className="h-full w-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="name" isRequired>Seu nome:</Label>
                             <Input

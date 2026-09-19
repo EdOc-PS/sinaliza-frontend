@@ -4,9 +4,7 @@ import {
     ArrowDown01Icon,
     Cancel01Icon,
     FilterIcon,
-    MortarboardIcon,
     Search01Icon,
-    SignLanguageCIcon,
 } from "@hugeicons/core-free-icons";
 
 import type { CategorySlim } from "@lib/constants/category";
@@ -14,8 +12,8 @@ import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
 import Accordion from "@components/ui/Accordion";
 import Input from "@components/ui/Input";
-import HandConfigPicker, { type HandConfig } from "@components/feature/workspace/HandConfigPicker";
-import { GlossaryDisciplineCard } from "./GlossaryDisciplineCard";
+import type { HandConfig } from "@components/feature/workspace/HandConfigPicker";
+import { SignFilterFields } from "./SignFilterFields";
 
 interface GlossaryFiltersProps {
     query: string;
@@ -40,11 +38,6 @@ interface GlossaryFiltersProps {
     searchWrapperClassName?: string;
     placeholder?: string;
 }
-
-const chipClass = (active: boolean) =>
-    `rounded-xl px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
-        active ? "bg-campfire-100 text-campfire-600" : "bg-cloud-100 text-cloud-500 hover:bg-cloud-200"
-    }`;
 
 // Card de filtros dos glossários (logado e público).
 // Fica recolhido por padrão — expande ao clicar na busca ou no botão do canto superior esquerdo.
@@ -127,72 +120,20 @@ export const GlossaryFilters = ({
 
             {/* Acordeão */}
             <Accordion id="glossary-filters-content" open={open}>
-                <div className="flex flex-col gap-5 pt-1">
-                        {/* Categorias */}
-                        {categories.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <span className="px-1 text-sm font-semibold text-cloud-500">Categorias</span>
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => onCategoryChange("")}
-                                        className={chipClass(categoryId === "")}
-                                    >
-                                        Todas
-                                    </button>
-                                    {categories.map((c) => (
-                                        <button
-                                            key={c.id}
-                                            type="button"
-                                            onClick={() => onCategoryChange(categoryId === c.id ? "" : c.id)}
-                                            className={chipClass(categoryId === c.id)}
-                                        >
-                                            {c.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Teclado de configuração de mão */}
-                        <div className="flex flex-col gap-2">
-                            <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                                <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                                Configuração de mão
-                            </span>
-                            <HandConfigPicker
-                                value={handConfigId}
-                                onChange={onHandConfigChange}
-                                configs={handConfigs}
-                                compact
-                                allowDeselect
-                                gridClassName="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-1.5"
-                                itemsPerPage={24}
-                            />
-                        </div>
-
-                        {/* Disciplinas do glossário */}
-                        {disciplines.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                                    <HugeiconsIcon icon={MortarboardIcon} size={18} />
-                                    Disciplinas
-                                </span>
-                                <div className="stagger-children grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                                    {disciplines.map((disc) => (
-                                        <GlossaryDisciplineCard
-                                            key={disc.id}
-                                            discipline={disc}
-                                            selected={glossaryDisciplineId === disc.id}
-                                            onToggle={() =>
-                                                onDisciplineChange(glossaryDisciplineId === disc.id ? "" : disc.id)
-                                            }
-                                            icons={disciplineIcons}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                    )}
+                <div className="pt-1">
+                    <SignFilterFields
+                        categories={categories}
+                        categoryId={categoryId}
+                        onCategoryChange={onCategoryChange}
+                        handConfigId={handConfigId}
+                        onHandConfigChange={onHandConfigChange}
+                        handConfigs={handConfigs}
+                        disciplines={disciplines}
+                        glossaryDisciplineId={glossaryDisciplineId}
+                        onDisciplineChange={onDisciplineChange}
+                        disciplineIcons={disciplineIcons}
+                        disciplineCompact
+                    />
                 </div>
             </Accordion>
         </div>

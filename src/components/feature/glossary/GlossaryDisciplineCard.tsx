@@ -10,6 +10,8 @@ interface GlossaryDisciplineCardProps {
     onToggle: () => void;
     /** Pool de ícones do confete do fundo */
     icons?: Parameters<typeof CardMemphisBackground>[0]["icons"];
+    /** Versão menor (altura/padding/texto reduzidos) — usada no dropdown de busca */
+    compact?: boolean;
 }
 
 // Card de disciplina do glossário — clicar filtra os sinais.
@@ -19,12 +21,13 @@ export const GlossaryDisciplineCard = ({
     selected,
     onToggle,
     icons,
+    compact = false,
 }: GlossaryDisciplineCardProps) => (
     <button
         type="button"
         onClick={onToggle}
         aria-pressed={selected}
-        className="relative h-24 overflow-hidden rounded-2xl text-left transition-transform duration-300 ease-out hover:-translate-y-0.5"
+        className={`relative overflow-hidden rounded-2xl text-left transition-transform duration-300 ease-out hover:-translate-y-0.5 ${compact ? "h-14" : "h-24"}`}
     >
         <CardMemphisBackground
             seed={discipline.id}
@@ -33,14 +36,14 @@ export const GlossaryDisciplineCard = ({
             icons={icons}
         />
 
-        <div className="relative z-10 flex h-full flex-col justify-end p-3">
-            <span className="truncate text-sm font-bold text-white">{discipline.name}</span>
-            <span className="text-xs text-white/80">{discipline._count?.signs ?? 0} sinais</span>
+        <div className={`relative z-10 flex h-full flex-col justify-end ${compact ? "p-2" : "p-3"}`}>
+            <span className={`truncate font-bold text-white ${compact ? "text-xs" : "text-sm"}`}>{discipline.name}</span>
+            {!compact && <span className="text-xs text-white/80">{discipline._count?.signs ?? 0} sinais</span>}
         </div>
 
         {selected && (
             <span className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
-                <HugeiconsIcon icon={Tick04Icon} size={28} strokeWidth={2} className="text-white drop-shadow" />
+                <HugeiconsIcon icon={Tick04Icon} size={compact ? 18 : 28} strokeWidth={2} className="text-white drop-shadow" />
             </span>
         )}
     </button>

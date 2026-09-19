@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from "@components/ui/DropdownMenu";
 import { getInitials } from "@lib/format/initials";
+import { getAvatarUrl } from "@lib/constants/avatars";
 import type { EducatorType, Role } from "@api/requests";
 
 export interface EducatorListItem {
@@ -32,8 +33,8 @@ export const ListCardEducator = ({ educator, onEdit, onDelete }: ListCardEducato
     <div className="flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24">
         {/* Avatar */}
         <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-campfire-100 font-baskerville font-bold text-campfire-600">
-            {educator.avatar ? (
-                <img src={educator.avatar} alt={educator.name} className="h-full w-full object-cover" />
+            {getAvatarUrl(educator.avatar) ? (
+                <img src={getAvatarUrl(educator.avatar)} alt={educator.name} className="h-full w-full object-cover" />
             ) : (
                 getInitials(educator.name)
             )}

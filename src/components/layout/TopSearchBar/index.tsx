@@ -1,38 +1,54 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 
 import Input from "@components/ui/Input";
-import Select from "@components/ui/Select";
-import HandConfigPicker from "@components/feature/workspace/HandConfigPicker";
-import { useQuery } from "@tanstack/react-query";
+import Button from "@components/ui/Button";
+import { SignFilterFields } from "@components/feature/glossary/SignFilterFields";
+import { useQueries } from "@tanstack/react-query";
 import { GetRequest } from "@requests";
 import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import { CATEGORIES } from "@routes/categories";
+import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { CategorySlim } from "@lib/constants/category";
+import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
-const TopSearchBar = () => {
+interface TopSearchBarProps {
+    /** Controlado pelo pai (ex: ícone de busca no header mobile). Sem isso, usa estado interno. */
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}
+
+const TopSearchBar = ({ open: openProp, onOpenChange }: TopSearchBarProps) => {
     const navigate = useNavigate();
     const rootRef = useRef<HTMLDivElement>(null);
 
-    const [open, setOpen] = useState(false);
+    const [openState, setOpenState] = useState(false);
+    const open = openProp ?? openState;
+    const setOpen = onOpenChange ?? setOpenState;
+
     const [search, setSearch] = useState("");
     const [handConfigId, setHandConfigId] = useState("");
     const [categoryId, setCategoryId] = useState("");
+    const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
 
-    const { data: categories = [] } = useQuery({
-        queryKey: queryKeys.categories.list(),
-        queryFn: () => unwrap(GetRequest<CategorySlim[]>(CATEGORIES.LIST())),
-        staleTime: 30 * 60_000,
+    const [categoriesQuery, disciplinesQuery] = useQueries({
+        queries: [
+            {
+                queryKey: queryKeys.categories.list(),
+                queryFn: () => unwrap(GetRequest<CategorySlim[]>(CATEGORIES.LIST())),
+                staleTime: 30 * 60_000,
+            },
+            {
+                queryKey: queryKeys.glossaryDisciplines.list(),
+                queryFn: () => unwrap(GetRequest<GlossaryDisciplineSlim[]>(GLOSSARY_DISCIPLINES.LIST())),
+                staleTime: 30 * 60_000,
+            },
+        ],
     });
-
-    const categoryOptions = [
-        { value: "", label: "Todas as categorias" },
-        ...categories.map((c) => ({ value: c.id, label: c.name })),
-    ];
-
+    const categories = categoriesQuery.data ?? [];
+    const disciplines = disciplinesQuery.data ?? [];
 
     // Fecha o dropdown ao clicar fora
     useEffect(() => {
@@ -43,23 +59,24 @@ const TopSearchBar = () => {
         };
         document.addEventListener("mousedown", handleOutsideClick);
         return () => document.removeEventListener("mousedown", handleOutsideClick);
-    }, []);
+    }, [setOpen]);
 
     const submit = () => {
         const params = new URLSearchParams();
         if (search.trim()) params.set("search", search.trim());
         if (handConfigId) params.set("handConfigId", handConfigId);
         if (categoryId) params.set("categoryId", categoryId);
+        if (glossaryDisciplineId) params.set("glossaryDisciplineId", glossaryDisciplineId);
         setOpen(false);
         navigate(`/search?${params.toString()}`);
     };
 
-    const activeFilters = (handConfigId ? 1 : 0) + (categoryId ? 1 : 0);
+    const activeFilters = (handConfigId ? 1 : 0) + (categoryId ? 1 : 0) + (glossaryDisciplineId ? 1 : 0);
 
     return (
         <div ref={rootRef} className="relative">
-            {/* Campo de texto */}
-            <div className="relative">
+            {/* Campo de texto — só no desktop; no mobile a busca abre pelo ícone do header */}
+            <div className="relative hidden lg:block">
                 <Input
                     icon={Search01Icon}
                     wrapperClassName="bg-white"
@@ -76,42 +93,36 @@ const TopSearchBar = () => {
                 )}
             </div>
 
-            {/* Dropdown com teclado de mão + classe gramatical */}
+            {/* Dropdown com busca (mobile), categoria, teclado de mão e disciplina */}
             {open && (
-                <div className="dropdown-slide absolute left-0 right-0 top-full z-40 mt-2 flex flex-col gap-4 rounded-3xl border-2 border-cloud-400/10 bg-white p-4 shadow-xl">
-                    {/* Teclado de configuração de mão */}
-                    <div className="flex flex-col gap-2">
-                        <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                            <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                            Configuração de mão
-                        </span>
-                        <HandConfigPicker
-                            value={handConfigId}
-                            onChange={setHandConfigId}
-                            compact
-                            allowDeselect
-                            gridClassName="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-1.5"
-                            itemsPerPage={24}
+                <div className="dropdown-slide absolute left-0 right-0 top-full z-40 mt-2 flex flex-col gap-5 rounded-3xl border-2 border-cloud-400/10 bg-white p-4 shadow-xl">
+                    {/* Campo de texto — só no mobile, já que o de cima fica escondido */}
+                    <div className="lg:hidden">
+                        <Input
+                            icon={Search01Icon}
+                            value={search}
+                            onChange={(value) => setSearch(value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+                            placeholder="Buscar sinal..."
+                            autoFocus
                         />
                     </div>
 
-                    {/* Categoria */}
-                    <Select
-                        icon={SignLanguageCIcon}
-                        options={categoryOptions}
-                        value={categoryId}
-                        onChange={setCategoryId}
-                        placeholder="Categoria"
+                    <SignFilterFields
+                        categories={categories}
+                        categoryId={categoryId}
+                        onCategoryChange={setCategoryId}
+                        handConfigId={handConfigId}
+                        onHandConfigChange={setHandConfigId}
+                        disciplines={disciplines}
+                        glossaryDisciplineId={glossaryDisciplineId}
+                        onDisciplineChange={setGlossaryDisciplineId}
+                        disciplineCompact
                     />
 
-                    {/* Botão buscar */}
-                    <button
-                        type="button"
-                        onClick={submit}
-                        className="w-full rounded-2xl bg-cloud-500 py-3 font-bold text-white transition-colors hover:bg-cloud-600"
-                    >
+                    <Button type="button" variant="cloud" className="w-full" onClick={submit}>
                         Buscar
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

@@ -3,6 +3,7 @@ import { Tick04Icon, Cancel02Icon, Mail01Icon, UserTime03Icon } from "@hugeicons
 
 import { RoleBadge } from "@components/ui/RoleBadge";
 import { getInitials } from "@lib/format/initials";
+import { getAvatarUrl } from "@lib/constants/avatars";
 import type { MemberListItem } from "./ListCardMember";
 
 interface PendingApprovalCardProps {
@@ -36,8 +37,8 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                         <div key={member.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
                             <div className="flex min-w-0 flex-1 items-center gap-3">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-bold text-sky-600">
-                                    {member.avatar ? (
-                                        <img src={member.avatar} alt={member.name} className="h-full w-full object-cover" />
+                                    {getAvatarUrl(member.avatar) ? (
+                                        <img src={getAvatarUrl(member.avatar)} alt={member.name} className="h-full w-full object-cover" />
                                     ) : (
                                         getInitials(member.name)
                                     )}

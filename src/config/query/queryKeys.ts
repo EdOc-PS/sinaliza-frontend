@@ -21,8 +21,8 @@ export const queryKeys = {
     },
     search: {
         all: ["search"] as const,
-        signs: (f: { search?: string; handConfigId?: string; categoryId?: string }) =>
-            ["search", "signs", f.search ?? "", f.handConfigId ?? "", f.categoryId ?? ""] as const,
+        signs: (f: { search?: string; handConfigId?: string; categoryId?: string; glossaryDisciplineId?: string }) =>
+            ["search", "signs", f.search ?? "", f.handConfigId ?? "", f.categoryId ?? "", f.glossaryDisciplineId ?? ""] as const,
     },
     signs: {
         all: ["signs"] as const,

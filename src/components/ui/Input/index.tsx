@@ -51,12 +51,12 @@ const Input = ({ className = "", wrapperClassName = "", onChange, icon, type, no
                 }
             `}</style>
 
-            <div className={`flex w-full items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ${wrapperClassName}`}>
+            <div className={`flex w-full items-center gap-2 lg:gap-3 rounded-2xl lg:rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2 py-2 lg:px-2.5 lg:py-2.5 transition-colors focus-within:font-semibold focus-within:border-cloud-500 focus-within:text-cloud-500 ${wrapperClassName}`}>
                 {icon && (
-                    <div className="rounded-2xl bg-cloud-300/80 p-2">
+                    <div className="rounded-xl lg:rounded-2xl bg-cloud-300/80 p-1.5 lg:p-2">
                         <HugeiconsIcon
                             icon={icon}
-                            className="shrink-0 text-cloud-500"
+                            className="shrink-0 w-5 h-5 lg:w-[26px] lg:h-[26px] text-cloud-500"
                             size={26}
                         />
                     </div>
@@ -64,7 +64,7 @@ const Input = ({ className = "", wrapperClassName = "", onChange, icon, type, no
 
                 <input
                     type={inputType}
-                    className={`w-full bg-transparent text-neutral-900 outline-none placeholder:text-neutral-600 ${className}`}
+                    className={`w-full bg-transparent text-sm lg:text-base text-neutral-900 outline-none placeholder:text-neutral-600 ${className}`}
                     onKeyDown={handleKeyDown}
                     onChange={handleInputChange}
                     {...props}
@@ -75,13 +75,13 @@ const Input = ({ className = "", wrapperClassName = "", onChange, icon, type, no
                         {!showPassword ? (
                             <HugeiconsIcon
                                 icon={ViewIcon}
-                                className="shrink-0 text-cloud-500"
+                                className="shrink-0 w-5 h-5 lg:w-[26px] lg:h-[26px] text-cloud-500"
                                 size={26}
                             />
                         ) : (
                             <HugeiconsIcon
                                 icon={ViewOffIcon}
-                                className="shrink-0 text-cloud-500"
+                                className="shrink-0 w-5 h-5 lg:w-[26px] lg:h-[26px] text-cloud-500"
                                 size={26}
                             />
                         )}

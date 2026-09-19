@@ -1,6 +1,7 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { RoleBadge } from "@/components/ui/RoleBadge";
+import { getAvatarUrl } from "@lib/constants/avatars";
 
 export interface Member {
     roleInClass: string;
@@ -38,8 +39,8 @@ export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: 
                         >
                             {/* Avatar */}
                             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cloud-300 text-sm font-semibold text-white overflow-hidden">
-                                {m.user.avatar ? (
-                                    <img src={m.user.avatar} alt={m.user.name} className="h-full w-full object-cover" />
+                                {getAvatarUrl(m.user.avatar) ? (
+                                    <img src={getAvatarUrl(m.user.avatar)} alt={m.user.name} className="h-full w-full object-cover" />
                                 ) : (
                                     m.user.name.charAt(0).toUpperCase()
                                 )}

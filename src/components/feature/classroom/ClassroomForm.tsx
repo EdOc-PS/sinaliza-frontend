@@ -2,6 +2,7 @@ import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
+import InputText from "@components/ui/InputText";
 import Label from "@components/ui/Label";
 import Spinner from "@components/ui/Spinner";
 
@@ -23,6 +24,8 @@ export const PRESET_COLORS = [
     { hex: "#E6AB6E", label: "Campfire" },
     { hex: "#EEA2A2", label: "Salmon" },
     { hex: "#213547", label: "Cloud" },
+    { hex: "#EFB832", label: "Sunflower" },
+    { hex: "#8B5CF6", label: "Violeta" },
 ];
 
 const EMPTY_FORM: CreateClassroomForm = {
@@ -144,19 +147,20 @@ export const ClassroomForm = ({ classroomId, onClose, onSuccess }: ClassroomForm
 
             <div className="flex flex-col gap-1.5">
                 <Label htmlFor="classroom-description" isOptional>Descrição</Label>
-                <Input
+                <InputText
                     id="classroom-description"
                     icon={TextSelectIcon}
                     placeholder="Ex: Turma de Libras para iniciantes"
                     value={form.description}
                     onChange={(v) => handleChange("description", v)}
+                    height={96}
                 />
             </div>
 
             {/* Cor de identificação */}
             <div className="flex flex-col gap-2.5">
                 <Label isRequired>Cor de identificação</Label>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     {PRESET_COLORS.map(({ hex, label }) => (
                         <button
                             key={hex}

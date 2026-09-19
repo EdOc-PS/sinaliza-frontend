@@ -10,6 +10,7 @@ import {
     DropdownMenuItem,
 } from "@components/ui/DropdownMenu";
 import { getInitials } from "@lib/format/initials";
+import { getAvatarUrl } from "@lib/constants/avatars";
 import type { ApprovalStatus, EducatorType, Role } from "@api/requests";
 
 export interface MemberListItem {
@@ -45,8 +46,8 @@ export const ListCardMember = ({ member, onToggleStatus, updatingStatus = false 
         <div className={`flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24 ${!member.status ? "opacity-60" : ""}`}>
             {/* Avatar */}
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-sky-100 font-baskerville font-bold text-sky-600">
-                {member.avatar ? (
-                    <img src={member.avatar} alt={member.name} className="h-full w-full object-cover" />
+                {getAvatarUrl(member.avatar) ? (
+                    <img src={getAvatarUrl(member.avatar)} alt={member.name} className="h-full w-full object-cover" />
                 ) : (
                     getInitials(member.name)
                 )}

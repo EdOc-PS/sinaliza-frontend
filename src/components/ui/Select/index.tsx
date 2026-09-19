@@ -52,12 +52,12 @@ const Select = ({
         <div ref={rootRef} className="relative">
             <div
                 onClick={() => setOpen((current) => !current)}
-                className="cursor-pointer flex items-center gap-3 rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2.5 py-2.5 transition-colors focus-within:border-cloud-500 focus-within:text-cloud-500 focus-within:font-semibold">
+                className="cursor-pointer flex items-center gap-2 lg:gap-3 rounded-2xl lg:rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2 py-2 lg:px-2.5 lg:py-2.5 transition-colors focus-within:border-cloud-500 focus-within:text-cloud-500 focus-within:font-semibold">
                 {icon && (
-                    <div className="rounded-2xl bg-cloud-300/80 p-2">
+                    <div className="rounded-xl lg:rounded-2xl bg-cloud-300/80 p-1.5 lg:p-2">
                         <HugeiconsIcon
                             icon={icon}
-                            className="shrink-0 text-cloud-500"
+                            className="shrink-0 w-5 h-5 lg:w-[26px] lg:h-[26px] text-cloud-500"
                             size={26}
                         />
                     </div>
@@ -67,12 +67,12 @@ const Select = ({
                     id={id}
                     type="button"
                     disabled={disabled}
-                    className="flex cursor-pointer w-full items-center justify-between gap-3 bg-transparent text-left text-neutral-900 outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex cursor-pointer w-full items-center justify-between gap-3 bg-transparent text-left text-sm lg:text-base text-neutral-900 outline-none disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <span className={selectedOption ? "text-neutral-900" : "text-neutral-500"}>
                         {selectedOption?.label ?? placeholder}
                     </span>
-                    <HugeiconsIcon icon={ChevronDown} className={`shrink-0 text-cloud-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`} size={22} />
+                    <HugeiconsIcon icon={ChevronDown} className={`shrink-0 w-4 h-4 lg:w-[22px] lg:h-[22px] text-cloud-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`} size={22} />
                 </button>
             </div>
 
