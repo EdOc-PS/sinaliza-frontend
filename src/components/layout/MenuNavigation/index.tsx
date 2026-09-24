@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 import { useAuth } from "@context/AuthContext";
+import { getAvatarUrl } from "@lib/constants/avatars";
 import { Tooltip } from "@components/ui/Tooltip";
 import ConfirmModal from "@components/layout/ConfirmModal";
 
@@ -117,6 +118,8 @@ interface ActionItemProps {
     sizeClass?: string;
     idleBg?: string;
     logout?: boolean;
+    /** Substitui o ícone por uma imagem (ex: avatar do usuário no botão Perfil) */
+    avatarUrl?: string;
 }
 
 // Botões da seção inferior (Favoritos, Histórico, Perfil, Sair) com bounce no clique e verde ativo
@@ -129,6 +132,7 @@ const ActionItem = ({
     sizeClass = "w-12 h-12 rounded-2xl",
     idleBg = "bg-white hover:bg-cloud-200",
     logout = false,
+    avatarUrl,
 }: ActionItemProps) => {
     const [bouncing, setBouncing] = useState(false);
 
@@ -155,15 +159,19 @@ const ActionItem = ({
         <Tooltip label={label} position="left" bgColor={logout ? "bg-salmon-500" : "bg-cloud-700"}>
             <button
                 onClick={handleClick}
-                className={`flex items-center justify-center transition-all duration-300 ${sizeClass} ${bgClass}`}
+                className={`flex items-center justify-center overflow-hidden transition-all duration-300 ${sizeClass} ${avatarUrl ? "" : bgClass}`}
             >
-                <span className={bouncing ? "icon-bounce" : ""}>
-                    <HugeiconsIcon
-                        icon={icon}
-                        size={size}
-                        className={`transition-colors duration-300 ${iconColor}`}
-                    />
-                </span>
+                {avatarUrl ? (
+                    <img src={avatarUrl} alt={label} className="h-full w-full object-cover" />
+                ) : (
+                    <span className={bouncing ? "icon-bounce" : ""}>
+                        <HugeiconsIcon
+                            icon={icon}
+                            size={size}
+                            className={`transition-colors duration-300 ${iconColor}`}
+                        />
+                    </span>
+                )}
             </button>
         </Tooltip>
     );
@@ -283,6 +291,7 @@ const MenuNavigation = () => {
                         label="Perfil"
                         onClick={handleProfileClick}
                         isActive={isPathActive("/profile")}
+                        avatarUrl={getAvatarUrl(user?.avatar)}
                     />
                     <ActionItem
                         icon={Logout01Icon}

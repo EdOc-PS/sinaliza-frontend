@@ -19,6 +19,7 @@ import { SignCard, type SignCardData } from "@/components/feature/classroom-deta
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
 import { AddMemberForm } from "@/components/feature/classroom-detail/AddMemberForm";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
+import { getAvatarUrl } from "@lib/constants/avatars";
 import { ClassroomForm } from "@components/feature/classroom/ClassroomForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
 
@@ -255,7 +256,14 @@ const ClassroomDetailPage = () => {
                                     Código: <span className="font-mono tracking-wider">{classroom.classCode}</span>
                                 </span>
                             )}
-                            <span className="text-white/60 text-xs">
+                            <span className="flex items-center gap-1.5 text-white/60 text-xs">
+                                {getAvatarUrl(classroom.teacher.avatar) && (
+                                    <img
+                                        src={getAvatarUrl(classroom.teacher.avatar)}
+                                        alt={classroom.teacher.name}
+                                        className="h-4 w-4 rounded-full object-cover"
+                                    />
+                                )}
                                 Prof. {classroom.teacher.name}
                             </span>
                         </div>

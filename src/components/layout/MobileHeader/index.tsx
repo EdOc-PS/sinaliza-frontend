@@ -1,6 +1,8 @@
 import { FavouriteIcon, HelpCircleIcon, Search01Icon, Time01Icon, User03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@context/AuthContext";
+import { getAvatarUrl } from "@lib/constants/avatars";
 
 interface MobileHeaderProps {
     searchOpen?: boolean;
@@ -11,6 +13,8 @@ interface MobileHeaderProps {
 const MobileHeader = ({ searchOpen = false, onToggleSearch, onOpenHelp }: MobileHeaderProps) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
+    const avatarUrl = getAvatarUrl(user?.avatar);
     const isActive = (path: string) => location.pathname === path;
 
     const iconClass = (path: string) =>
@@ -45,10 +49,14 @@ const MobileHeader = ({ searchOpen = false, onToggleSearch, onOpenHelp }: Mobile
 
                 <button
                     onClick={() => navigate("/profile")}
-                    className={`flex items-center justify-center w-11 h-11 rounded-2xl transition-colors ${isActive("/profile") ? "bg-lime-100 text-lime-700" : "bg-white text-cloud-500 hover:bg-cloud-200"
+                    className={`flex items-center justify-center overflow-hidden w-11 h-11 rounded-2xl transition-colors ${avatarUrl ? "" : isActive("/profile") ? "bg-lime-100 text-lime-700" : "bg-white text-cloud-500 hover:bg-cloud-200"
                         }`}
                 >
-                    <HugeiconsIcon icon={User03Icon} size={24} />
+                    {avatarUrl ? (
+                        <img src={avatarUrl} alt="Perfil" className="h-full w-full object-cover" />
+                    ) : (
+                        <HugeiconsIcon icon={User03Icon} size={24} />
+                    )}
                 </button>
             </div>
         </header>

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 import type { ClassroomCardData } from "@pages/classrooms";
 import { CardMemphisBackground } from "./CardMemphisBackground";
+import { getAvatarUrl } from "@lib/constants/avatars";
 
 export interface ClassroomCardProps {
     classroom: ClassroomCardData;
@@ -97,7 +98,14 @@ export const ClassroomCard = ({
                         <h3 className="text-lg font-bold text-cloud-500">
                             {classroom.name}
                         </h3>
-                        <p className="text-xs text-neutral-500">
+                        <p className="flex items-center gap-1.5 text-xs text-neutral-500">
+                            {getAvatarUrl(classroom.teacherAvatar) && (
+                                <img
+                                    src={getAvatarUrl(classroom.teacherAvatar)}
+                                    alt={classroom.teacherName}
+                                    className="h-4 w-4 rounded-full object-cover"
+                                />
+                            )}
                             Prof. {classroom.teacherName}
                         </p>
 

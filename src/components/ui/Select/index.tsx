@@ -69,7 +69,7 @@ const Select = ({
                     disabled={disabled}
                     className="flex cursor-pointer w-full items-center justify-between gap-3 bg-transparent text-left text-sm lg:text-base text-neutral-900 outline-none disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    <span className={selectedOption ? "text-neutral-900" : "text-neutral-500"}>
+                    <span className={selectedOption ? "text-neutral-900" : "text-xs lg:text-sm text-neutral-500"}>
                         {selectedOption?.label ?? placeholder}
                     </span>
                     <HugeiconsIcon icon={ChevronDown} className={`shrink-0 w-4 h-4 lg:w-[22px] lg:h-[22px] text-cloud-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`} size={22} />

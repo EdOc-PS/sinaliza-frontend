@@ -29,6 +29,7 @@ export interface ClassroomCardData {
     id: string;
     name: string;
     teacherName: string;
+    teacherAvatar?: string | null;
     description: string;
     colorBackground: string;
     classCode: string;
