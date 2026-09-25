@@ -13,6 +13,7 @@ import Modal from "@components/ui/Modal";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { GlossaryDisciplineSection } from "@components/feature/workspace/GlossaryDisciplineSection";
+import { CategorySection } from "@components/feature/workspace/CategorySection";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
 import { SignUsageSection, type SignUsage } from "@components/feature/dashboard/SignUsageSection";
@@ -126,6 +127,7 @@ const DashboardPage = () => {
                             <p className="text-xs font-semibold uppercase tracking-wide text-cloud-400">
                                 Administração
                             </p>
+                            <CategorySection />
                             <GlossaryDisciplineSection />
                         </div>
                     </div>

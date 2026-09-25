@@ -26,6 +26,7 @@ import { SignForm } from "@components/feature/workspace/SignForm";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Bookshelf01Icon,
+    ChartIcon,
     Note01Icon,
     TaskDaily01Icon,
     Edit02Icon,
@@ -53,7 +54,7 @@ interface ClassroomDetail {
     teacher: { id: string; name: string; avatar?: string; educatorType?: "TEACHER" | "INTERPRETER" | null };
 }
 
-type DetailView = "signs" | "favorites" | "prompts" | "examples" | "settings";
+type DetailView = "signs" | "usage" | "favorites" | "prompts" | "examples" | "settings";
 
 const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -110,7 +111,7 @@ const ClassroomDetailPage = () => {
     const { data: usageStats, isPending: loadingUsage } = useQuery({
         queryKey: queryKeys.classrooms.usageStats(id ?? ""),
         queryFn: () => unwrap(GetRequest<{ mostUsed: SignUsage[]; leastUsed: SignUsage[] }>(CLASSROOMS.USAGE_STATS(id!), { limit: 5 })),
-        enabled: !!id && canManageEarly && detailView === "signs",
+        enabled: !!id && canManageEarly && detailView === "usage",
     });
 
     const invalidateClassroom = () =>
@@ -276,6 +277,8 @@ const ClassroomDetailPage = () => {
                     onChange={handleTabChange}
                     items={[
                         { key: "signs",     label: "Todos os sinais", icon: Bookshelf01Icon },
+                        // Uso dos sinais — só o professor dono vê essa aba
+                        ...(canManage ? [{ key: "usage" as const, label: "Uso", icon: ChartIcon }] : []),
                         { key: "favorites", label: "Favoritos",       icon: FavouriteIcon },
                         // A turma Contexto ganha as áreas do projeto de redação
                         ...(classroom.isContext
@@ -308,15 +311,6 @@ const ClassroomDetailPage = () => {
                             {/* <span className="text-xs text-neutral-400">Ordenado por nome</span> */}
                         </div>
 
-                        {/* Uso dos sinais da turma — visível só para o professor dono */}
-                        {canManage && signs.length > 0 && (
-                            <SignUsageSection
-                                mostUsed={usageStats?.mostUsed ?? []}
-                                leastUsed={usageStats?.leastUsed ?? []}
-                                loading={loadingUsage}
-                            />
-                        )}
-
                         {signs.length === 0 ? (
                             <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-cloud-300 py-16 text-center">
                                 <HugeiconsIcon icon={SignLanguageCIcon} size={36} className="text-cloud-300" />
@@ -339,6 +333,18 @@ const ClassroomDetailPage = () => {
                                 ))}
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* View: Uso dos sinais — só o professor dono */}
+                {detailView === "usage" && canManage && (
+                    <div className="flex flex-col gap-5">
+                        <h2 className="font-baskerville text-xl text-cloud-500">Uso dos sinais</h2>
+                        <SignUsageSection
+                            mostUsed={usageStats?.mostUsed ?? []}
+                            leastUsed={usageStats?.leastUsed ?? []}
+                            loading={loadingUsage}
+                        />
                     </div>
                 )}
 

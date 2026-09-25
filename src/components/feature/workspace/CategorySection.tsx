@@ -9,6 +9,7 @@ import { type CategorySlim } from "@lib/constants/category";
 
 import ActionButton from "@components/ui/ActionButton";
 import Modal from "@components/ui/Modal";
+import Pagination from "@components/ui/Pagination";
 
 import createCategoryImg from "@/assets/images/app/create-category.webp";
 import Spinner from "@components/ui/Spinner";
@@ -25,10 +26,13 @@ import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 
+const ITEMS_PER_PAGE = 9;
+
 export const CategorySection = () => {
     const queryClient = useQueryClient();
     const [createModal, setCreateModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
+    const [page, setPage] = useState(1);
 
     const { data: categories = [], isPending: loading } = useQuery({
         queryKey: queryKeys.categories.list(),
@@ -39,6 +43,10 @@ export const CategorySection = () => {
 
     // Participa do spinner unificado da tela (LoadingGroup)
     useReportLoading("categories", loading);
+
+    const totalPages = Math.max(1, Math.ceil(categories.length / ITEMS_PER_PAGE));
+    const pageStart = (page - 1) * ITEMS_PER_PAGE;
+    const paginated = categories.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
     const { mutate: deleteItem, isPending: deleting } = useMutation({
         mutationFn: (itemId: string) => unwrap(DeleteRequest(CATEGORIES.DELETE(itemId))),
@@ -92,8 +100,9 @@ export const CategorySection = () => {
                     <p className="text-sm text-neutral-500">Nenhuma categoria cadastrada ainda.</p>
                 </div>
             ) : (
+                <div className="flex flex-col gap-3">
                 <div className="stagger-children grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {categories.map((cat) => (
+                    {paginated.map((cat) => (
                         <div key={cat.id} className="flex items-center gap-3 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 p-3">
                             <span className="flex-1 truncate pl-1 text-sm font-medium text-cloud-500">{cat.name}</span>
 
@@ -115,6 +124,13 @@ export const CategorySection = () => {
                             </DropdownMenu>
                         </div>
                     ))}
+                </div>
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        onChange={setPage}
+                        label={`${categories.length} categoria${categories.length > 1 ? "s" : ""}`}
+                    />
                 </div>
             )}
 

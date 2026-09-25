@@ -32,8 +32,10 @@ interface HandConfigPickerProps {
     configs?: HandConfig[];
 }
 
-const DEFAULT_GRID = "grid grid-cols-8 gap-1.5";
-const DEFAULT_ITEMS_PER_PAGE = 12;
+// Menos colunas no mobile = imagens maiores; a paginação acompanha (8 por
+// página fecha exato em 2 linhas de 4 no mobile e 1 linha de 8 no desktop)
+const DEFAULT_GRID = "grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5";
+const DEFAULT_ITEMS_PER_PAGE = 8;
 
 const HandConfigPicker = ({
     value,

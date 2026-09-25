@@ -5,7 +5,6 @@ import Modal from "@components/ui/Modal";
 import ActionButton from "@components/ui/ActionButton";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard } from "@components/feature/workspace/VisualKeyboard";
-import { CategorySection } from "@components/feature/workspace/CategorySection";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 
 import { LoadingGroup } from "@lib/hooks/useLoadingGroup";
@@ -40,7 +39,7 @@ const WorkspacePage = () => {
                         title="Criar novo sinal"
                         description="Publique um sinal no repositório global"
                         onClick={() => setSignModal(true)}
-                        className="w-full sm:w-96"
+                        className="w-full"
                     />
                 </div>
 
@@ -53,9 +52,6 @@ const WorkspacePage = () => {
 
                         {/* Promoções pendentes — o gestor revisa a partir do Dashboard */}
                         {isEducator && !isManager && <PromotionSection canReview={false} />}
-
-                        {/* Categorias — CRUD para o educador */}
-                        <CategorySection />
                     </div>
                 </LoadingGroup>
             </section>

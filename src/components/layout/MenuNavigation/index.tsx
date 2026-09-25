@@ -211,12 +211,13 @@ const MenuNavigation = () => {
 
     return (
         <>
-            {/* Mobile: menu horizontal inferior (< 992px) — perfil/favoritos/histórico ficam no MobileHeader */}
-            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-center py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-                <div className="bg-white rounded-2xl flex w-full max-w-md justify-around p-0.5">
-                    {menuItems.map((item, index) => (
+            {/* Mobile: menu horizontal inferior (< 992px) — perfil/favoritos/histórico ficam no MobileHeader.
+                Agrupado como no desktop: acessos gerais separados dos administrativos (só gestor). */}
+            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-center gap-2 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+                <div className="bg-white rounded-2xl flex flex-1 max-w-md justify-around p-0.5">
+                    {mainItems.map((item) => (
                         <MenuItem
-                            key={index}
+                            key={item.path}
                             icon={item.icon}
                             label={item.label}
                             shortLabel={item.shortLabel}
@@ -226,6 +227,22 @@ const MenuNavigation = () => {
                         />
                     ))}
                 </div>
+
+                {adminItems.length > 0 && (
+                    <div className="bg-white rounded-2xl flex justify-around p-0.5">
+                        {adminItems.map((item) => (
+                            <MenuItem
+                                key={item.path}
+                                icon={item.icon}
+                                label={item.label}
+                                shortLabel={item.shortLabel}
+                                onClick={() => navigate(item.path)}
+                                isDesktop={false}
+                                isActive={isPathActive(item.path)}
+                            />
+                        ))}
+                    </div>
+                )}
             </nav>
 
             {/* Desktop: menu lateral esquerda (>= 992px) */}
