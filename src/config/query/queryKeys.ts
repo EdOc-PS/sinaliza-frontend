@@ -30,7 +30,10 @@ export const queryKeys = {
         related: (id: string) => ["signs", "related", id] as const,
         options: () => ["signs", "options"] as const,
         promotions: () => ["signs", "promotions"] as const,
-        usageStats: () => ["signs", "usage-stats"] as const,
+    },
+    dashboard: {
+        all: ["dashboard"] as const,
+        overview: () => ["dashboard", "overview"] as const,
     },
     handConfigs: {
         all: ["hand-configs"] as const,

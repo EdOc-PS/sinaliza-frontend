@@ -110,7 +110,7 @@ const ClassroomDetailPage = () => {
     const canManageEarly = !!user?.roles?.includes("EDUCATOR") && classroom?.teacher.id === user?.id;
     const { data: usageStats, isPending: loadingUsage } = useQuery({
         queryKey: queryKeys.classrooms.usageStats(id ?? ""),
-        queryFn: () => unwrap(GetRequest<{ mostUsed: SignUsage[]; leastUsed: SignUsage[] }>(CLASSROOMS.USAGE_STATS(id!), { limit: 5 })),
+        queryFn: () => unwrap(GetRequest<{ mostUsed: SignUsage[] }>(CLASSROOMS.USAGE_STATS(id!), { limit: 10 })),
         enabled: !!id && canManageEarly && detailView === "usage",
     });
 
@@ -341,8 +341,7 @@ const ClassroomDetailPage = () => {
                     <div className="flex flex-col gap-5">
                         <h2 className="font-baskerville text-xl text-cloud-500">Uso dos sinais</h2>
                         <SignUsageSection
-                            mostUsed={usageStats?.mostUsed ?? []}
-                            leastUsed={usageStats?.leastUsed ?? []}
+                            signs={usageStats?.mostUsed ?? []}
                             loading={loadingUsage}
                         />
                     </div>
