@@ -162,7 +162,7 @@ const ActionItem = ({
                 className={`flex items-center justify-center overflow-hidden transition-all duration-300 ${sizeClass} ${avatarUrl ? "bg-white" : bgClass}`}
             >
                 {avatarUrl ? (
-                    <img src={avatarUrl} alt={label} className="h-7 w-7 rounded-full object-cover" />
+                    <img src={avatarUrl} alt={label} className="h-9 w-9 rounded-full object-cover" />
                 ) : (
                     <span className={bouncing ? "icon-bounce" : ""}>
                         <HugeiconsIcon
