@@ -7,6 +7,7 @@ export const SIGNS = {
     DELETE:   (id: string) => `sign/${id}`,
     PROMOTE:          (id: string) => `sign/${id}/promote`,
     PROMOTIONS:       ()           => `sign/promotions`,
+    MINE:             ()           => `sign/mine`,
     REVIEW_PROMOTION: (id: string) => `sign/${id}/promotion`,
 }
 

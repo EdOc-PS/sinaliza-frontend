@@ -30,6 +30,7 @@ export const queryKeys = {
         related: (id: string) => ["signs", "related", id] as const,
         options: () => ["signs", "options"] as const,
         promotions: () => ["signs", "promotions"] as const,
+        mine: () => ["signs", "mine"] as const,
     },
     dashboard: {
         all: ["dashboard"] as const,

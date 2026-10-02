@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@context/AuthContext";
+import { queryKeys } from "@/config/query/queryKeys";
 
 import Modal from "@components/ui/Modal";
 import ActionButton from "@components/ui/ActionButton";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard } from "@components/feature/workspace/VisualKeyboard";
 import { PromotionSection } from "@components/feature/workspace/PromotionSection";
+import { MySignsSection } from "@components/feature/workspace/MySignsSection";
 
 import { LoadingGroup } from "@lib/hooks/useLoadingGroup";
 
@@ -16,6 +19,7 @@ import createSignalImg from "@/assets/images/app/create-signal.png";
 // que educador e gestor usam no dia a dia de criar/organizar sinais.
 const WorkspacePage = () => {
     const { user } = useAuth();
+    const queryClient = useQueryClient();
     const isManager = !!user?.roles?.includes("MANAGER");
     const isEducator = !!user?.roles?.includes("EDUCATOR");
 
@@ -46,6 +50,8 @@ const WorkspacePage = () => {
                 {/* Um spinner só para a tela inteira, em vez de um por card */}
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
+                        <MySignsSection />
+
                         <div className="bg-white rounded-3xl p-6">
                             <VisualKeyboard canManage={false} />
                         </div>
@@ -60,7 +66,10 @@ const WorkspacePage = () => {
             <Modal open={signModal} onClose={() => setSignModal(false)} size="2xl">
                 <SignForm
                     onClose={() => setSignModal(false)}
-                    onSuccess={() => { setSignModal(false); }}
+                    onSuccess={() => {
+                        setSignModal(false);
+                        queryClient.invalidateQueries({ queryKey: queryKeys.signs.mine() });
+                    }}
                 />
             </Modal>
         </>
