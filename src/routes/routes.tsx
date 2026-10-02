@@ -16,6 +16,8 @@ const PublicGlossaryPage = lazy(() => import('@pages/public-glossary'))
 // Auth
 const LoginPage = lazy(() => import('@pages/auth/login'))
 const RegisterPage = lazy(() => import('@pages/auth/register'))
+const ForgotPasswordPage = lazy(() => import('@pages/auth/forgot-password'))
+const ResetPasswordPage = lazy(() => import('@pages/auth/reset-password'))
 const PendingPage = lazy(() => import('@pages/pending'))
 
 // App
@@ -62,6 +64,14 @@ const routes: RouteObject[] = [
             {
                 path: 'register',
                 element: suspended(RegisterPage),
+            },
+            {
+                path: 'forgot-password',
+                element: suspended(ForgotPasswordPage),
+            },
+            {
+                path: 'reset-password',
+                element: suspended(ResetPasswordPage),
             },
         ],
     },

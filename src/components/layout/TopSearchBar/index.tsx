@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 
 import Input from "@components/ui/Input";
@@ -120,7 +121,8 @@ const TopSearchBar = ({ open: openProp, onOpenChange }: TopSearchBarProps) => {
                         disciplineCompact
                     />
 
-                    <Button type="button" variant="cloud" className="w-full" onClick={submit}>
+                    <Button type="button" variant="cloud" className="w-full flex items-center justify-center gap-2" onClick={submit}>
+                        <HugeiconsIcon icon={Search01Icon} size={18} />
                         Buscar
                     </Button>
                 </div>

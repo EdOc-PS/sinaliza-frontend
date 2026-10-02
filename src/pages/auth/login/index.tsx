@@ -100,9 +100,13 @@ const LoginPage = () => {
                                     value={auth.password}
                                     onChange={(value) => setAuth({ ...auth, password: value })}
                                 />
-                                <p className="text-end text-cloud-500/80 text-sm cursor-pointer font-medium hover:text-cloud-500">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/auth/forgot-password')}
+                                    className="self-end text-cloud-500/80 text-sm cursor-pointer font-medium hover:text-cloud-500"
+                                >
                                     Esqueci a minha senha
-                                </p>
+                                </button>
                             </div>
 
                             <Button

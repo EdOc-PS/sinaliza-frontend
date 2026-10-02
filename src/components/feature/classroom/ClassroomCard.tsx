@@ -91,24 +91,25 @@ export const ClassroomCard = ({
                     )}
                 </div>
 
+                {/* Avatar do professor na linha entre o banner e o conteúdo */}
+                {getAvatarUrl(classroom.teacherAvatar) && (
+                    <img
+                        src={getAvatarUrl(classroom.teacherAvatar)}
+                        alt={classroom.teacherName}
+                        className="absolute left-5 top-2/5 -translate-y-1/2 z-10 h-10 w-10 rounded-full object-cover bg-white border-2 border-white"
+                    />
+                )}
+
                 {/* Conteúdo */}
-                <div className="px-5 py-4 flex flex-col justify-between h-3/5 bg-white">
-                    {/* Título e descrição */}
+                <div className="px-5 pt-6 pb-3 flex flex-col justify-between h-3/5 bg-white">
+                    {/* Professor e título */}
                     <div>
+                        <p className="text-xs text-neutral-500">
+                            Prof. {classroom.teacherName}
+                        </p>
                         <h3 className="text-lg font-bold text-cloud-500">
                             {classroom.name}
                         </h3>
-                        <p className="flex items-center gap-1.5 text-xs text-neutral-500">
-                            {getAvatarUrl(classroom.teacherAvatar) && (
-                                <img
-                                    src={getAvatarUrl(classroom.teacherAvatar)}
-                                    alt={classroom.teacherName}
-                                    className="h-4 w-4 rounded-full object-cover"
-                                />
-                            )}
-                            Prof. {classroom.teacherName}
-                        </p>
-
                     </div>
 
                     {/* Footer com código e contagem */}

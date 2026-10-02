@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Search01Icon, Tick04Icon } from "@hugeicons/core-free-icons";
@@ -9,11 +9,13 @@ import { unwrap } from "@/config/query/unwrap";
 import { HAND_CONFIG } from "@routes/handConfigs";
 import Spinner from "@components/ui/Spinner";
 import { Tooltip } from "@components/ui/Tooltip";
+import { sortHandConfigs, HAND_CONFIG_SORT_OPTIONS, type HandConfigSort } from "./VisualKeyboard";
 
 export interface HandConfig {
     id: string;
     name: string;
     imgUrl?: string;
+    createdAt?: string;
 }
 
 interface HandConfigPickerProps {
@@ -51,6 +53,7 @@ const HandConfigPicker = ({
     const [search, setSearch]       = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [sort, setSort] = useState<HandConfigSort>("alpha");
 
     // Debounce da busca (350ms)
     useEffect(() => {
@@ -74,13 +77,14 @@ const HandConfigPicker = ({
     // Nova busca volta para a primeira página
     useEffect(() => {
         setCurrentPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, sort]);
 
     // Com configs vindas do pai, a busca é filtrada localmente
-    const configs = isControlled
+    const unsorted = isControlled
         ? providedConfigs!.filter((c) =>
             !debouncedSearch.trim() || c.name.toLowerCase().includes(debouncedSearch.trim().toLowerCase()))
         : fetchedConfigs;
+    const configs = useMemo(() => sortHandConfigs(unsorted, sort), [unsorted, sort]);
 
     const totalPages = Math.max(1, Math.ceil(configs.length / ITEMS_PER_PAGE));
     const pageStart  = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -161,6 +165,22 @@ const HandConfigPicker = ({
                     </button>
                 </div>
             )}
+
+            {/* Ordenação */}
+            <div className="flex gap-1.5">
+                {HAND_CONFIG_SORT_OPTIONS.map((opt) => (
+                    <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setSort(opt.value)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                            sort === opt.value ? "bg-campfire-100 text-campfire-500" : "text-cloud-500 hover:bg-neutral-100"
+                        }`}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
 
             {/* Grid de imagens */}
             {loading ? (

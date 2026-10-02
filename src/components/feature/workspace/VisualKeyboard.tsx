@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon, Clapping02Icon } from "@hugeicons/core-free-icons";
@@ -26,7 +26,22 @@ export interface HandConfigTypeForm {
     id?: string;
     name: string;
     imgUrl?: string;
+    createdAt?: string;
 }
+
+export type HandConfigSort = "alpha" | "recent";
+
+/** Ordem alfabética natural (CM 2 antes de CM 21) ou mais recentes primeiro */
+export const sortHandConfigs = <T extends { name: string; createdAt?: string }>(items: T[], sort: HandConfigSort): T[] =>
+    [...items].sort((a, b) =>
+        sort === "recent"
+            ? (b.createdAt ?? "").localeCompare(a.createdAt ?? "")
+            : a.name.localeCompare(b.name, "pt-BR", { numeric: true, sensitivity: "base" }));
+
+export const HAND_CONFIG_SORT_OPTIONS: { value: HandConfigSort; label: string }[] = [
+    { value: "alpha", label: "A–Z" },
+    { value: "recent", label: "Recentes" },
+];
 
 const ITEMS_PER_PAGE = 18;
 
@@ -48,6 +63,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [sort, setSort] = useState<HandConfigSort>("alpha");
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; configId?: string; configName?: string }>(
         { open: false }
     );
@@ -60,7 +76,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
         return () => clearTimeout(timer);
     }, [search]);
 
-    const { data: handConfigs = [], isPending: loading, isFetched } = useQuery({
+    const { data: fetchedConfigs = [], isPending: loading, isFetched } = useQuery({
         queryKey: queryKeys.handConfigs.list(debouncedSearch),
         queryFn: () => unwrap(GetRequest<HandConfigTypeForm[]>(
             HAND_CONFIG.FIND_ALL(),
@@ -68,6 +84,8 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
         )),
         meta: { errorMessage: "Falha ao obter configurações de mão" },
     });
+
+    const handConfigs = useMemo(() => sortHandConfigs(fetchedConfigs, sort), [fetchedConfigs, sort]);
 
     // Marca que já houve uma carga (usado para o LoadingGroup abaixo).
     // Em efeito, não no render: mutar ref durante o render é inseguro.
@@ -78,7 +96,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
     // Nova busca volta para a primeira página
     useEffect(() => {
         setCurrentPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, sort]);
 
     // O pai ainda sinaliza atualização por prop (ex: após criar pelo FAB)
     useEffect(() => {
@@ -146,6 +164,22 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                                 placeholder="Buscar..."
                                 className="w-full pl-8 pr-3 py-1.5 rounded-xl border-2 border-neutral-200 text-sm text-cloud-700 placeholder:text-neutral-400 hover:border-cloud-400 focus:border-cloud-400 focus:outline-none transition-all"
                             />
+                        </div>
+
+                        {/* Ordenação */}
+                        <div className="flex rounded-xl border-2 border-neutral-200 overflow-hidden">
+                            {HAND_CONFIG_SORT_OPTIONS.map((opt) => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => setSort(opt.value)}
+                                    className={`px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                                        sort === opt.value ? "bg-campfire-100 text-campfire-500" : "text-cloud-700 hover:bg-neutral-100"
+                                    }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
                         </div>
 
                         {/* Setas de navegação */}

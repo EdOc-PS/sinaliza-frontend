@@ -159,10 +159,10 @@ const ActionItem = ({
         <Tooltip label={label} position="left" bgColor={logout ? "bg-salmon-500" : "bg-cloud-700"}>
             <button
                 onClick={handleClick}
-                className={`flex items-center justify-center overflow-hidden transition-all duration-300 ${sizeClass} ${avatarUrl ? "" : bgClass}`}
+                className={`flex items-center justify-center overflow-hidden transition-all duration-300 ${sizeClass} ${avatarUrl ? "bg-white" : bgClass}`}
             >
                 {avatarUrl ? (
-                    <img src={avatarUrl} alt={label} className="h-full w-full object-cover" />
+                    <img src={avatarUrl} alt={label} className="h-7 w-7 rounded-full object-cover" />
                 ) : (
                     <span className={bouncing ? "icon-bounce" : ""}>
                         <HugeiconsIcon
