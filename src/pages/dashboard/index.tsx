@@ -170,12 +170,11 @@ const DashboardPage = () => {
 
                         <PromotionSection canReview />
 
-                        <div className="bg-white rounded-3xl p-6">
-                            <VisualKeyboard onEdit={handleEditConfig} canManage />
-                        </div>
-
                         <div className="flex flex-col gap-4">
                             <SectionLabel>Administração</SectionLabel>
+                            <div className="bg-white rounded-3xl p-6">
+                                <VisualKeyboard onEdit={handleEditConfig} canManage />
+                            </div>
                             <CategorySection />
                             <GlossaryDisciplineSection />
                         </div>

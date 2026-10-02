@@ -70,6 +70,12 @@ export const FAB = () => {
         openForm(form);
     };
 
+    // Config. de mão: fica na tela atual e só o teclado visual se atualiza
+    const handleHandConfigSuccess = () => {
+        closeForm();
+        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+    };
+
     const handleSuccess = () => {
         closeForm();
         const currentPath = location.pathname;
@@ -166,7 +172,7 @@ export const FAB = () => {
 
             {/* Modal: Criar configuração de mão */}
             <Modal open={activeForm === "create-hand-config"} onClose={closeForm}>
-                <HandConfigForm onClose={closeForm} onSuccess={handleSuccess} />
+                <HandConfigForm onClose={closeForm} onSuccess={handleHandConfigSuccess} />
             </Modal>
 
             {/* Modal: Criar sinal */}
