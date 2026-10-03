@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-export type FABForm = "create-class" | "join-class" | "create-hand-config" | "create-signal" | null;
+export type FABForm = "create-class" | "join-class" | "create-hand-config" | "create-signal" | "create-category" | "create-glossary-discipline" | null;
 
 interface FABContextValue {
     activeForm: FABForm;

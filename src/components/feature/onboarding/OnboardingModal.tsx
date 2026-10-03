@@ -48,8 +48,8 @@ interface NavEntry {
 const NAV_ENTRIES: NavEntry[] = [
     { icon: LibrariesIcon, label: "Turmas", description: "Suas turmas. Entre com um código de convite ou, se for educador, crie as suas." },
     { icon: GlobalEducationIcon, label: "Glossário", description: "Sinais aprovados pela instituição, abertos a todos." },
-    { icon: PencilIcon, label: "Ambiente de Trabalho", description: "Cadastre sinais, configurações de mão e categorias.", roles: ["EDUCATOR"] },
-    { icon: ChartIcon, label: "Dashboard", description: "Sinais mais e menos usados, promoções e administração do glossário.", roles: ["MANAGER"], admin: true },
+    { icon: PencilIcon, label: "Ambiente de Trabalho", description: "Seus sinais e o teclado de mãos. Para o gestor, também aprovação de promoções, categorias e disciplinas.", roles: ["EDUCATOR"] },
+    { icon: ChartIcon, label: "Métricas", description: "Gráficos de uso da plataforma e sinais candidatos a ir para o glossário.", roles: ["MANAGER"], admin: true },
     { icon: UserMultiple02Icon, label: "Educadores", description: "Cadastre e gerencie professores e intérpretes.", roles: ["MANAGER"], admin: true },
     { icon: StudentsIcon, label: "Alunos", description: "Aprove as contas de alunos que pediram acesso.", roles: ["MANAGER"], admin: true },
     { icon: FavouriteIcon, label: "Favoritos", description: "Os sinais que você salvou para rever depois." },

@@ -30,7 +30,7 @@ interface MenuItemProps {
     isActive?: boolean;
 }
 
-// `section: "admin"` separa os acessos de gestão dos acessos gerais no menu lateral
+// `section: "admin"` separa as áreas de trabalho/gestão (2º grupo) do acesso geral (Turmas, Glossário)
 type MenuEntry = { icon: typeof Home06Icon; label: string; path: string; shortLabel?: string; section?: "admin" };
 
 const menuItemsByRole: Record<string, MenuEntry[]> = {
@@ -41,13 +41,13 @@ const menuItemsByRole: Record<string, MenuEntry[]> = {
     EDUCATOR: [
         { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho", section: "admin" },
     ],
     MANAGER: [
         { icon: LibrariesIcon, label: "Turmas", path: "/classrooms" },
         { icon: GlobalEducationIcon, label: "Glossário", path: "/glossary" },
-        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho" },
-        { icon: ChartIcon, label: "Dashboard", path: "/dashboard", section: "admin" },
+        { icon: PencilIcon, label: "Ambiente de Trabalho", path: "/workspace", shortLabel: "Trabalho", section: "admin" },
+        { icon: ChartIcon, label: "Métricas", path: "/dashboard", section: "admin" },
         { icon: UserMultiple02Icon, label: "Educadores", path: "/educators", section: "admin" },
         { icon: StudentsIcon, label: "Alunos", path: "/members", section: "admin" },
     ],

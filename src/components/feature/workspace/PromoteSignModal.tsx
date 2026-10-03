@@ -12,7 +12,7 @@ import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 import Modal from "@components/ui/Modal";
 import Button from "@components/ui/Button";
 import Label from "@components/ui/Label";
-import MultiSelect from "@components/ui/MultiSelect";
+import { GlossaryDisciplineCard } from "@components/feature/glossary/GlossaryDisciplineCard";
 
 interface PromoteSignModalProps {
     open: boolean;
@@ -42,10 +42,11 @@ const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName 
         if (open) setSelected([]);
     }, [open]);
 
-    const options = disciplines.map((d) => ({ value: d.id, label: d.name }));
+    const toggle = (id: string) =>
+        setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
     return (
-        <Modal open={open} onClose={onClose} size="lg">
+        <Modal open={open} onClose={onClose} size="2xl">
             <div className="flex flex-col gap-6 items-center">
                 {/* Ícone */}
                 <div className="flex justify-center pt-2">
@@ -70,20 +71,36 @@ const PromoteSignModal = ({ open, onClose, onConfirm, loading = false, signName 
                     normalmente nas turmas.
                 </p>
 
-                {/* Associação a disciplinas do glossário (opcional) */}
-                <div className="flex w-full flex-col gap-1.5">
-                    <Label htmlFor="promote-glossary-disciplines" isOptional>
-                        Disciplinas do glossário
-                    </Label>
-                    <MultiSelect
-                        id="promote-glossary-disciplines"
-                        icon={MortarboardIcon}
-                        options={options}
-                        value={selected}
-                        onChange={setSelected}
-                        placeholder={options.length ? "Associe a uma ou mais disciplinas" : "Nenhuma disciplina cadastrada"}
-                        disabled={options.length === 0}
-                    />
+                {/* Associação a disciplinas do glossário (opcional) — cards sempre visíveis,
+                    sem dropdown, para não abrir rolagem dentro do modal */}
+                <div className="flex w-full flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                        <Label isOptional>Disciplinas do glossário</Label>
+                    </div>
+                    {disciplines.length === 0 ? (
+                        <p className="flex items-center gap-2 rounded-2xl bg-cloud-100 px-4 py-3 text-sm text-neutral-500">
+                            <HugeiconsIcon icon={MortarboardIcon} size={18} className="text-cloud-400" />
+                            Nenhuma disciplina cadastrada no glossário.
+                        </p>
+                    ) : (
+                        <>
+                            <p className="text-xs text-neutral-500">
+                                Toque para associar o sinal a uma ou mais disciplinas
+                                {selected.length > 0 && ` · ${selected.length} selecionada${selected.length > 1 ? "s" : ""}`}
+                            </p>
+                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                {disciplines.map((d) => (
+                                    <GlossaryDisciplineCard
+                                        key={d.id}
+                                        discipline={d}
+                                        selected={selected.includes(d.id)}
+                                        onToggle={() => toggle(d.id)}
+                                        compact
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Ações */}

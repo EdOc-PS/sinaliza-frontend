@@ -5,12 +5,13 @@ import { useAuth } from "@context/AuthContext";
 import { getAvatarUrl } from "@lib/constants/avatars";
 
 interface MobileHeaderProps {
+    showSearch?: boolean;
     searchOpen?: boolean;
     onToggleSearch?: () => void;
     onOpenHelp?: () => void;
 }
 
-const MobileHeader = ({ searchOpen = false, onToggleSearch, onOpenHelp }: MobileHeaderProps) => {
+const MobileHeader = ({ showSearch = true, searchOpen = false, onToggleSearch, onOpenHelp }: MobileHeaderProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -29,6 +30,7 @@ const MobileHeader = ({ searchOpen = false, onToggleSearch, onOpenHelp }: Mobile
             {/* Buscar + Ajuda · Favoritos + Histórico (agrupados) · Perfil (separado, maior) */}
             <div className="flex items-center gap-2">
                 <div className="flex items-center rounded-2xl bg-white p-0.5">
+                    {showSearch && (
                     <button
                         onClick={onToggleSearch}
                         aria-label="Buscar sinal"
@@ -36,6 +38,7 @@ const MobileHeader = ({ searchOpen = false, onToggleSearch, onOpenHelp }: Mobile
                     >
                         <HugeiconsIcon icon={Search01Icon} size={20} />
                     </button>
+                    )}
                     <button onClick={onOpenHelp} aria-label="Ajuda: como usar a plataforma" className="flex items-center justify-center w-10 h-10 rounded-xl text-cloud-500 transition-colors hover:bg-cloud-200">
                         <HugeiconsIcon icon={HelpCircleIcon} size={20} />
                     </button>

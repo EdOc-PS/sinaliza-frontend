@@ -12,11 +12,20 @@ import { ClassroomForm } from "@components/feature/classroom/ClassroomForm";
 import { JoinClassroomForm } from "@components/feature/classroom/JoinClassroomForm";
 import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
 import { SignForm } from "@components/feature/workspace/SignForm";
+import { CategoryForm } from "@components/feature/workspace/CategoryForm";
+import { GlossaryDisciplineForm } from "@components/feature/workspace/GlossaryDisciplineForm";
 import { queryKeys } from "@/config/query/queryKeys";
 import createClassImg from "@/assets/images/app/create-class.png";
 import joinClassImg from "@/assets/images/app/join-class.png";
 import createHandImg from "@/assets/images/app/create-hand.png";
 import createSignalImg from "@/assets/images/app/create-signal.png";
+import createCategoryImg from "@/assets/images/app/create-category.webp";
+
+const FabIcon = ({ src, bg }: { src: string; bg: string }) => (
+    <span className={`flex items-center justify-center w-9 h-9 rounded-xl ${bg}`}>
+        <img src={src} alt="" className="w-6 h-6" />
+    </span>
+);
 
 interface FABActionProps {
     icon: React.ReactNode;
@@ -56,6 +65,7 @@ export const FAB = () => {
     const [open, setOpen] = useState(false);
 
     const isEducator = !!user?.roles?.includes("EDUCATOR");
+    const isManager = !!user?.roles?.includes("MANAGER");
 
     const handleFABClick = () => {
         if (!isEducator) {
@@ -70,10 +80,11 @@ export const FAB = () => {
         openForm(form);
     };
 
-    // Config. de mão: fica na tela atual e só o teclado visual se atualiza
-    const handleHandConfigSuccess = () => {
+    // Config. de mão, categoria e disciplina: ficam na tela atual e só a lista
+    // correspondente se atualiza
+    const closeAndInvalidate = (queryKey: readonly unknown[]) => () => {
         closeForm();
-        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
+        queryClient.invalidateQueries({ queryKey });
     };
 
     const handleSuccess = () => {
@@ -98,48 +109,50 @@ export const FAB = () => {
             <div className="fixed bottom-30 lg:bottom-10 right-5 lg:right-10 z-40 flex flex-col items-end gap-3">
                 {isEducator && (
                     <div className="flex flex-col items-end gap-2.5">
+                        {/* Ações do gestor (cadastros administrativos) ficam no topo */}
+                        {isManager && (
+                            <>
+                                <FABAction
+                                    visible={open}
+                                    delay="300ms"
+                                    icon={<FabIcon src={createClassImg} bg="bg-sunflower-100" />}
+                                    label="Criar disciplina do glossário"
+                                    onClick={() => handleOpenForm("create-glossary-discipline")}
+                                />
+                                <FABAction
+                                    visible={open}
+                                    delay="240ms"
+                                    icon={<FabIcon src={createCategoryImg} bg="bg-campfire-100" />}
+                                    label="Criar categoria"
+                                    onClick={() => handleOpenForm("create-category")}
+                                />
+                                <FABAction
+                                    visible={open}
+                                    delay="180ms"
+                                    icon={<FabIcon src={createHandImg} bg="bg-lime-100" />}
+                                    label="Criar configuração de mão"
+                                    onClick={() => handleOpenForm("create-hand-config")}
+                                />
+                            </>
+                        )}
                         <FABAction
                             visible={open}
-                            delay="180ms"
-                            icon={
-                                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src={createClassImg} alt="" className="w-6 h-6" />
-                                </span>
-                            }
+                            delay="120ms"
+                            icon={<FabIcon src={createClassImg} bg="bg-lime-100" />}
                             label="Criar uma turma"
                             onClick={() => handleOpenForm("create-class")}
                         />
                         <FABAction
                             visible={open}
-                            delay="120ms"
-                            icon={
-                                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-100">
-                                    <img src={joinClassImg} alt="" className="w-6 h-6" />
-                                </span>
-                            }
+                            delay="60ms"
+                            icon={<FabIcon src={joinClassImg} bg="bg-sky-100" />}
                             label="Participar de uma turma"
                             onClick={() => handleOpenForm("join-class")}
                         />
                         <FABAction
                             visible={open}
-                            delay="60ms"
-                            icon={
-                                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-lime-100">
-                                    <img src={createHandImg} alt="" className="w-6 h-6" />
-                                </span>
-                            }
-                            label="Criar configuração de mão"
-                            onClick={() => handleOpenForm("create-hand-config")}
-                        />
-
-                        <FABAction
-                            visible={open}
                             delay="0ms"
-                            icon={
-                                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-salmon-100">
-                                    <img src={createSignalImg} alt="" className="w-6 h-6" />
-                                </span>
-                            }
+                            icon={<FabIcon src={createSignalImg} bg="bg-salmon-100" />}
                             label="Criar sinal"
                             onClick={() => handleOpenForm("create-signal")}
                         />
@@ -170,10 +183,20 @@ export const FAB = () => {
                 <JoinClassroomForm onClose={closeForm} onSuccess={handleSuccess} />
             </Modal>
 
-            {/* Modal: Criar configuração de mão */}
-            <Modal open={activeForm === "create-hand-config"} onClose={closeForm}>
-                <HandConfigForm onClose={closeForm} onSuccess={handleHandConfigSuccess} />
-            </Modal>
+            {/* Modais exclusivos do gestor */}
+            {isManager && (
+                <>
+                    <Modal open={activeForm === "create-hand-config"} onClose={closeForm}>
+                        <HandConfigForm onClose={closeForm} onSuccess={closeAndInvalidate(queryKeys.handConfigs.all)} />
+                    </Modal>
+                    <Modal open={activeForm === "create-category"} onClose={closeForm} size="2xl">
+                        <CategoryForm onClose={closeForm} onSuccess={closeAndInvalidate(queryKeys.categories.all)} />
+                    </Modal>
+                    <Modal open={activeForm === "create-glossary-discipline"} onClose={closeForm} size="2xl">
+                        <GlossaryDisciplineForm onClose={closeForm} onSuccess={closeAndInvalidate(queryKeys.glossaryDisciplines.all)} />
+                    </Modal>
+                </>
+            )}
 
             {/* Modal: Criar sinal */}
             <Modal open={activeForm === "create-signal"} onClose={closeForm} size="3xl">

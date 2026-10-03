@@ -10,6 +10,8 @@ import {
     PlayIcon,
     PlaySquareIcon,
     SignLanguageCIcon,
+    StarIcon,
+    Time01Icon,
 } from "@hugeicons/core-free-icons";
 import {
     DropdownMenu,
@@ -33,6 +35,8 @@ export interface SignCardData {
     videoUrl: string | null;
     anotherUrl: string | null;
     createdAt: string;
+    /** Situação no glossário global — PUBLIC mostra a estrela e esconde "Promover" */
+    globalStatus?: "PRIVATE" | "PENDING" | "PUBLIC" | "REJECTED";
 }
 
 // Item extra de dropdown específico de uma tela (ex: "Remover do histórico")
@@ -87,6 +91,10 @@ export const SignCard = ({
     const youtubeId = sign.anotherUrl ? getYouTubeId(sign.anotherUrl) : null;
     const youtubeThumbnail = !sign.videoUrl && sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null;
     const hasVideo = !!sign.videoUrl || !!youtubeId;
+    const isPublic = sign.globalStatus === "PUBLIC";
+    const isPending = sign.globalStatus === "PENDING";
+    // Já público ou aguardando o gestor: não faz sentido promover de novo
+    const canPromote = !isPublic && !isPending;
 
     const clearTimers = () => {
         if (hoverTimer.current) { clearTimeout(hoverTimer.current); hoverTimer.current = null; }
@@ -214,6 +222,19 @@ export const SignCard = ({
                         </div>
                     )}
 
+                    {/* Situação no glossário (canto superior direito) */}
+                    {(isPublic || isPending) && (
+                        <span
+                            title={isPublic ? "Sinal promovido ao glossário global" : "Aguardando aprovação do gestor"}
+                            className={`absolute top-2 right-2 z-10 flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold shadow-sm ${
+                                isPublic ? "bg-sunflower-400 text-white" : "bg-white/90 text-sunflower-700"
+                            }`}
+                        >
+                            <HugeiconsIcon icon={isPublic ? StarIcon : Time01Icon} size={13} className={isPublic ? "fill-white" : ""} />
+                            {isPublic ? "No glossário" : "Em análise"}
+                        </span>
+                    )}
+
                     {/* Duração */}
                     {duration && !playing && (
                         <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-medium text-white">
@@ -283,12 +304,14 @@ export const SignCard = ({
                                         >
                                             Editar
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            icon={<HugeiconsIcon icon={Medal06Icon} size={18} />}
-                                            onSelect={() => onPromote?.()}
-                                        >
-                                            Promover
-                                        </DropdownMenuItem>
+                                        {canPromote && (
+                                            <DropdownMenuItem
+                                                icon={<HugeiconsIcon icon={Medal06Icon} size={18} />}
+                                                onSelect={() => onPromote?.()}
+                                            >
+                                                Promover
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             variant="danger"

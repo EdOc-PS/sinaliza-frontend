@@ -18,12 +18,6 @@ import { GetRequest, PatchRequest } from "@requests";
 import { SIGNS } from "@routes/signs";
 import { DASHBOARD } from "@routes/dashboard";
 
-import Modal from "@components/ui/Modal";
-import { HandConfigForm } from "@components/feature/workspace/HandConfigForm";
-import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
-import { GlossaryDisciplineSection } from "@components/feature/workspace/GlossaryDisciplineSection";
-import { CategorySection } from "@components/feature/workspace/CategorySection";
-import { PromotionSection } from "@components/feature/workspace/PromotionSection";
 import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
 import { SignUsageSection } from "@components/feature/dashboard/SignUsageSection";
 import { KpiCard } from "@components/feature/dashboard/KpiCard";
@@ -108,28 +102,7 @@ const OverviewSection = ({ onPromote }: OverviewSectionProps) => {
 const DashboardPage = () => {
     const queryClient = useQueryClient();
 
-    const [editingConfig, setEditingConfig] = useState<HandConfigTypeForm | null>(null);
-    const [editModal, setEditModal] = useState(false);
     const [promoteModal, setPromoteModal] = useState<{ open: boolean; signId?: string; name?: string }>({ open: false });
-
-    const handleEditConfig = (config: HandConfigTypeForm) => {
-        setEditingConfig(config);
-        setEditModal(true);
-    };
-
-    const invalidateHandConfigs = () =>
-        queryClient.invalidateQueries({ queryKey: queryKeys.handConfigs.all });
-
-    const handleEditSuccess = () => {
-        setEditModal(false);
-        setEditingConfig(null);
-        invalidateHandConfigs();
-    };
-
-    const handleEditClose = () => {
-        setEditModal(false);
-        setEditingConfig(null);
-    };
 
     const { mutate: promoteSign, isPending: promoting } = useMutation({
         mutationFn: (glossaryDisciplineIds: string[]) =>
@@ -158,8 +131,8 @@ const DashboardPage = () => {
                             <HugeiconsIcon icon={ChartIcon} size={26} className="text-campfire-600" />
                         </div>
                         <div>
-                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Dashboard</h1>
-                            <p className="text-sm text-neutral-500">Uso da plataforma e administração do gestor</p>
+                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Métricas</h1>
+                            <p className="text-sm text-neutral-500">Uso da plataforma e sinais que merecem ir para o glossário</p>
                         </div>
                     </div>
                 </div>
@@ -167,29 +140,9 @@ const DashboardPage = () => {
                 <LoadingGroup>
                     <div className="flex flex-col gap-10">
                         <OverviewSection onPromote={handlePromoteClick} />
-
-                        <PromotionSection canReview />
-
-                        <div className="flex flex-col gap-4">
-                            <SectionLabel>Administração</SectionLabel>
-                            <div className="bg-white rounded-3xl p-6">
-                                <VisualKeyboard onEdit={handleEditConfig} canManage />
-                            </div>
-                            <CategorySection />
-                            <GlossaryDisciplineSection />
-                        </div>
                     </div>
                 </LoadingGroup>
             </section>
-
-            {/* Modal de edição de configuração de mão */}
-            <Modal open={editModal} onClose={handleEditClose}>
-                <HandConfigForm
-                    handConfig={editingConfig ?? undefined}
-                    onClose={handleEditClose}
-                    onSuccess={handleEditSuccess}
-                />
-            </Modal>
 
             {/* Modal de promoção de sinal */}
             <PromoteSignModal

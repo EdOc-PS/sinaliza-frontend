@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { HelpCircleIcon } from "@hugeicons/core-free-icons"
 
@@ -17,6 +17,15 @@ const MainLayout = () => {
     const { user } = useAuth()
     const [onboardingOpen, setOnboardingOpen] = useState(false)
     const [searchOpen, setSearchOpen] = useState(false)
+    const { pathname } = useLocation()
+
+    // A busca de sinais só existe em Turmas (e nos resultados dela)
+    const showSearch = pathname.startsWith("/classrooms") || pathname.startsWith("/search")
+
+    // Trocar de tela fecha o dropdown de busca
+    useEffect(() => {
+        setSearchOpen(false)
+    }, [pathname])
 
     // Primeiro login: abre o tour sozinho. Depois só pelo botão de ajuda.
     useEffect(() => {
@@ -26,6 +35,7 @@ const MainLayout = () => {
     return (
         <FABProvider>
             <MobileHeader
+                showSearch={showSearch}
                 searchOpen={searchOpen}
                 onToggleSearch={() => setSearchOpen((v) => !v)}
                 onOpenHelp={() => setOnboardingOpen(true)}
@@ -38,8 +48,8 @@ const MainLayout = () => {
                     canto direito em vez de empurrar a busca para dentro. */}
                 <div className="sticky top-0 z-30 bg-transparent backdrop-blur-sm pb-3">
                     <div className="relative py-3">
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10">
-                            <TopSearchBar open={searchOpen} onOpenChange={setSearchOpen} />
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 lg:min-h-11">
+                            {showSearch && <TopSearchBar open={searchOpen} onOpenChange={setSearchOpen} />}
                         </div>
                         <Tooltip
                             label="Como usar a plataforma"
