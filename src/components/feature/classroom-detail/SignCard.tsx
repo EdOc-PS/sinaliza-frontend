@@ -313,6 +313,17 @@ export const SignCard = ({
                                     </DropdownMenuItem>
                                 )}
 
+                                {/* Qualquer educador pode pedir a promoção — o pai só passa
+                                    onPromote para educadores */}
+                                {canPromote && onPromote && (
+                                    <DropdownMenuItem
+                                        icon={<HugeiconsIcon icon={Medal06Icon} size={18} />}
+                                        onSelect={() => onPromote()}
+                                    >
+                                        Promover
+                                    </DropdownMenuItem>
+                                )}
+
                                 {canManage && (
                                     <>
                                         <DropdownMenuItem
@@ -321,14 +332,6 @@ export const SignCard = ({
                                         >
                                             Editar
                                         </DropdownMenuItem>
-                                        {canPromote && (
-                                            <DropdownMenuItem
-                                                icon={<HugeiconsIcon icon={Medal06Icon} size={18} />}
-                                                onSelect={() => onPromote?.()}
-                                            >
-                                                Promover
-                                            </DropdownMenuItem>
-                                        )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             variant="danger"

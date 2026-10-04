@@ -61,6 +61,8 @@ const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
     const isManager = !!user?.roles?.includes("MANAGER");
+    // Qualquer educador (inclusive gestor) pode pedir a promoção de um sinal
+    const isEducator = isManager || !!user?.roles?.includes("EDUCATOR");
     const unpromote = useUnpromoteSign();
     const navigate = useNavigate();
 
@@ -113,6 +115,9 @@ const ClassroomDetailPage = () => {
         queryFn: () => unwrap(GetRequest<Member[]>(CLASSROOMS.MEMBERS(id!))),
         enabled: !!id && detailView === "settings",
     });
+    // Quem herda a turma se o dono sair: educador matriculado há mais tempo
+    // (a API devolve os membros em ordem de entrada — mesma regra do backend)
+    const heir = members.find((m) => m.roleInClass === "EDUCATOR" && m.user.id !== classroom?.teacher.id);
 
     // Visualização compacta de uso — só o professor da turma vê
     const canManageEarly = !!user?.roles?.includes("EDUCATOR") && classroom?.teacher.id === user?.id;
@@ -336,7 +341,7 @@ const ClassroomDetailPage = () => {
                                         onClick={() => navigate(`/signs/${sign.slug}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
-                                        onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onPromote={isEducator ? () => setPromoteModal({ open: true, signId: sign.id, name: sign.name }) : undefined}
                                         onUnpromote={isManager ? () => unpromote.ask(sign) : undefined}
                                     />
                                 ))}
@@ -388,7 +393,7 @@ const ClassroomDetailPage = () => {
                                         onClick={() => navigate(`/signs/${sign.slug}`)}
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
-                                        onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onPromote={isEducator ? () => setPromoteModal({ open: true, signId: sign.id, name: sign.name }) : undefined}
                                         onUnpromote={isManager ? () => unpromote.ask(sign) : undefined}
                                     />
                                 ))}
@@ -430,7 +435,9 @@ const ClassroomDetailPage = () => {
                                     lockedUserIds={[classroom.teacher.id]}
                                 />
 
-                                {!canManage && (
+                                {/* Dono só sai se houver outro educador para herdar a turma —
+                                    sendo o único, o botão nem aparece */}
+                                {(!canManage || heir) && (
                                     <button
                                         onClick={() => setLeaveModal(true)}
                                         className="flex items-center justify-center gap-2 self-start rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-4 py-2 text-sm font-medium text-salmon-600"
@@ -528,7 +535,10 @@ const ClassroomDetailPage = () => {
                     <>
                         Você deixará de ter acesso aos sinais e materiais de{" "}
                         <span className="font-semibold text-salmon-600 italic">{classroom.name}</span>.
-                        Para voltar, será necessário um novo convite.
+                        {canManage && heir && (
+                            <> A turma passará a ser gerenciada por <b>{heir.user.name}</b>.</>
+                        )}
+                        {" "}Para voltar, será necessário um novo convite.
                     </>
                 }
                 confirmText="Sair da turma"
