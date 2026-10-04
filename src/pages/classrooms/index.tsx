@@ -18,6 +18,15 @@ import { ClassroomCard } from "@components/feature/classroom/ClassroomCard";
 import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@/components/layout/ConfirmDeleteModal";
+import {
+    SignFiltersCard,
+    EMPTY_SIGN_FILTERS,
+    countActiveFilters,
+    filtersToParams,
+    type SignFilters,
+} from "@components/feature/glossary/SignFiltersCard";
+import { useSignFilterOptions } from "@components/feature/glossary/useSignFilterOptions";
+import { useNavigate } from "react-router-dom";
 
 export interface CreateClassroomForm {
     name: string;
@@ -34,6 +43,8 @@ export interface ClassroomCardData {
     colorBackground: string;
     classCode: string;
     userCount: number;
+    /** Sinais criados desde a última visita do usuário à turma */
+    newSignsCount?: number;
     canManage: boolean;
     /** Turma automática de redação — não pode ser editada nem excluída, nem pelo gestor dono */
     isContext: boolean;
@@ -42,6 +53,14 @@ export interface ClassroomCardData {
 const ClassroomsPage = () => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const { categories, disciplines } = useSignFilterOptions();
+
+    // Busca de sinais das turmas: os resultados abrem em /search
+    const handleSearch = (filters: SignFilters) => {
+        if (!filters.query.trim() && countActiveFilters(filters) === 0) return;
+        navigate(`/search?${new URLSearchParams(filtersToParams(filters)).toString()}`);
+    };
 
     const [editModal, setEditModal] = useState<{ open: boolean; classroomId?: string }>({ open: false });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; classroomId?: string; name?: string }>({ open: false });
@@ -84,6 +103,15 @@ const ClassroomsPage = () => {
                     </p>
                     <p className="text-neutral-600 text-md">Bem-vindo de volta!</p>
                 </div>
+
+                <SignFiltersCard
+                    value={EMPTY_SIGN_FILTERS}
+                    onApply={handleSearch}
+                    categories={categories}
+                    disciplines={disciplines}
+                    subtitle="Procure entre os sinais de todas as suas turmas."
+                    placeholder="Buscar sinal..."
+                />
 
                 {/* Lista de turmas */}
                 <div className="flex flex-col gap-6">

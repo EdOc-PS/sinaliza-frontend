@@ -17,6 +17,7 @@ import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
+import { useUnpromoteSign } from "@components/feature/workspace/useUnpromoteSign";
 import { SignForm } from "@components/feature/workspace/SignForm";
 import { VisualKeyboard, type HandConfigTypeForm } from "@components/feature/workspace/VisualKeyboard";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
@@ -38,6 +39,7 @@ import {
     SignLanguageCIcon,
     SpeechIcon,
     Time01Icon,
+    Cancel02Icon,
 } from "@hugeicons/core-free-icons";
 
 interface SignDetail {
@@ -63,6 +65,8 @@ const SignDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const isManager = !!user?.roles?.includes("MANAGER");
+    const unpromote = useUnpromoteSign();
 
     const queryClient = useQueryClient();
 
@@ -330,6 +334,17 @@ const SignDetailPage = () => {
                                 </button>
                             </>
                         )}
+
+                        {/* Gestor pode tirar do glossário qualquer sinal público, não só os próprios */}
+                        {isManager && sign.globalStatus === "PUBLIC" && (
+                            <button
+                                onClick={() => unpromote.ask(sign)}
+                                className="flex items-center justify-center gap-2 rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-3.5 py-2 text-sm font-medium text-salmon-600"
+                            >
+                                <HugeiconsIcon icon={Cancel02Icon} size={18} />
+                                Remover do glossário
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -427,6 +442,8 @@ const SignDetailPage = () => {
             </Modal>
 
             {/* Modal de confirmar promoção */}
+            {unpromote.modal}
+
             <PromoteSignModal
                 open={promoteModal}
                 onClose={() => setPromoteModal(false)}

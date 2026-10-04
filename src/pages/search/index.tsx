@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -10,29 +11,37 @@ import { SEARCH } from "@routes/search";
 
 import Spinner from "@components/ui/Spinner";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
+import {
+    SignFiltersCard,
+    filtersFromParams,
+    filtersToParams,
+    type SignFilters,
+} from "@components/feature/glossary/SignFiltersCard";
+import { useSignFilterOptions } from "@components/feature/glossary/useSignFilterOptions";
 
 const SearchResultsPage = () => {
     const navigate = useNavigate();
-    const [params] = useSearchParams();
+    const [params, setParams] = useSearchParams();
+    const { categories, disciplines } = useSignFilterOptions();
 
-    const search = params.get("search") ?? "";
-    const handConfigId = params.get("handConfigId") ?? "";
-    const categoryId = params.get("categoryId") ?? "";
-    const glossaryDisciplineId = params.get("glossaryDisciplineId") ?? "";
+    // A URL é a fonte da verdade: dá para voltar/compartilhar a busca
+    const paramsKey = params.toString();
+    const filters = useMemo(() => filtersFromParams(new URLSearchParams(paramsKey)), [paramsKey]);
+    const apiParams = filtersToParams(filters);
+    const search = filters.query;
 
-    // Os parâmetros da URL são a chave: voltar para uma busca já feita é instantâneo
     const { data: signs = [], isPending: loading } = useQuery({
-        queryKey: queryKeys.search.signs({ search, handConfigId, categoryId, glossaryDisciplineId }),
-        queryFn: () => {
-            const query: Record<string, string> = {};
-            if (search) query.search = search;
-            if (handConfigId) query.handConfigId = handConfigId;
-            if (categoryId) query.categoryId = categoryId;
-            if (glossaryDisciplineId) query.glossaryDisciplineId = glossaryDisciplineId;
-            return unwrap(GetRequest<SignCardData[]>(SEARCH.SIGNS(), query));
-        },
+        queryKey: queryKeys.search.signs({
+            search,
+            handConfigId: apiParams.handConfigId,
+            categoryId: apiParams.categoryId,
+            glossaryDisciplineId: apiParams.glossaryDisciplineId,
+        }),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(SEARCH.SIGNS(), apiParams)),
         meta: { errorMessage: "Falha na busca" },
     });
+
+    const handleApply = (next: SignFilters) => setParams(filtersToParams(next));
 
     return (
         <section className="flex flex-col gap-6">
@@ -52,6 +61,15 @@ const SearchResultsPage = () => {
                     <HugeiconsIcon icon={HandPointingLeft02Icon} size={26} />
                 </button>
             </div>
+
+            <SignFiltersCard
+                value={filters}
+                onApply={handleApply}
+                categories={categories}
+                disciplines={disciplines}
+                subtitle="Refine a busca entre os sinais das suas turmas."
+                defaultOpen
+            />
 
             {/* Resultados */}
             {loading ? (

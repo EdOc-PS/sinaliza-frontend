@@ -23,7 +23,13 @@ import useScrollReveal from "@lib/hooks/useScrollReveal";
 import Spinner from "@components/ui/Spinner";
 import { type HandConfig } from "@components/feature/workspace/HandConfigPicker";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
-import GlossaryFilters from "@components/feature/glossary/GlossaryFilters";
+import {
+    SignFiltersCard,
+    EMPTY_SIGN_FILTERS,
+    countActiveFilters,
+    filtersToParams,
+    type SignFilters,
+} from "@components/feature/glossary/SignFiltersCard";
 import { SignCard, type SignCardData } from "@components/feature/classroom-detail/SignCard";
 import LandingHeader from "@components/feature/landing/LandingHeader";
 import LandingFooter from "@components/feature/landing/LandingFooter";
@@ -43,10 +49,8 @@ const PublicGlossaryPage = () => {
     const navigate = useNavigate();
     useScrollReveal();
 
-    const [query, setQuery] = useState("");
-    const [categoryId, setCategoryId] = useState("");
-    const [handConfigId, setHandConfigId] = useState("");
-    const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
+    const [filters, setFilters] = useState<SignFilters>(EMPTY_SIGN_FILTERS);
+    const query = filters.query;
 
     // Filtros vêm de um endpoint público único (/category e /hand-config exigem token)
     const { data: filterData } = useQuery({
@@ -59,15 +63,11 @@ const PublicGlossaryPage = () => {
     const handConfigs = filterData?.handConfigs ?? [];
     const disciplines = filterData?.glossaryDisciplines ?? [];
 
+    // A busca textual é aplicada no cliente — fica fora dos parâmetros da API
+    const { search: _search, ...apiParams } = filtersToParams(filters);
     const { data: signs = [], isPending: loading } = useQuery({
-        queryKey: queryKeys.glossary.list({ categoryId, handConfigId, glossaryDisciplineId }),
-        queryFn: () => {
-            const params: Record<string, string> = {};
-            if (categoryId) params.categoryId = categoryId;
-            if (handConfigId) params.handConfigId = handConfigId;
-            if (glossaryDisciplineId) params.glossaryDisciplineId = glossaryDisciplineId;
-            return unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined));
-        },
+        queryKey: queryKeys.glossary.list(apiParams),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(apiParams).length ? apiParams : undefined)),
         meta: { errorMessage: "Falha ao carregar o repositório" },
     });
 
@@ -76,7 +76,7 @@ const PublicGlossaryPage = () => {
         ? signs.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase()))
         : signs;
 
-    const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
+    const hasFilters = countActiveFilters(filters) > 0 || !!query.trim();
 
     return (
         <div className="min-h-screen bg-cloud-100">
@@ -119,18 +119,12 @@ const PublicGlossaryPage = () => {
                     </div>
 
                     {/* Filtros */}
-                    <GlossaryFilters
-                        query={query}
-                        onQueryChange={setQuery}
+                    <SignFiltersCard
+                        value={filters}
+                        onApply={setFilters}
                         categories={categories}
-                        categoryId={categoryId}
-                        onCategoryChange={setCategoryId}
-                        handConfigId={handConfigId}
-                        onHandConfigChange={setHandConfigId}
                         handConfigs={handConfigs}
                         disciplines={disciplines}
-                        glossaryDisciplineId={glossaryDisciplineId}
-                        onDisciplineChange={setGlossaryDisciplineId}
                         disciplineIcons={GLOSSARY_ICONS}
                         searchWrapperClassName="bg-cloud-100"
                         placeholder="Buscar no repositório..."

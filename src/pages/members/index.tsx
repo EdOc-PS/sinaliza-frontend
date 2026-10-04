@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, UserGroupIcon, StudentsIcon} from "@hugeicons/core-free-icons";
+import { Search01Icon, UserGroupIcon, StudentsIcon, UserBlock01Icon, UserCheck01Icon } from "@hugeicons/core-free-icons";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query/queryKeys";
@@ -12,15 +12,19 @@ import { USERS } from "@routes/users";
 import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
 import Pagination from "@components/ui/Pagination";
+import NavTabs from "@components/ui/NavTabs";
 import { ListCardMember, type MemberListItem } from "@components/feature/members/ListCardMember";
 import { PendingApprovalCard } from "@components/feature/members/PendingApprovalCard";
 
 const ITEMS_PER_PAGE = 10;
 
+type MembersTab = "active" | "blocked";
+
 const MembersPage = () => {
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [page, setPage] = useState(1);
+    const [tab, setTab] = useState<MembersTab>("active");
 
     const queryClient = useQueryClient();
 
@@ -30,10 +34,10 @@ const MembersPage = () => {
         return () => clearTimeout(timer);
     }, [search]);
 
-    // Nova busca volta para a primeira página
+    // Nova busca ou troca de aba volta para a primeira página
     useEffect(() => {
         setPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, tab]);
 
     // Papel e busca fazem parte da chave: alternar entre abas já visitadas
     // volta instantâneo, sem novo request.
@@ -67,16 +71,22 @@ const MembersPage = () => {
         mutationFn: (member: MemberListItem) =>
             unwrap(PatchRequest(USERS.STATUS(member.id), { status: !member.status })),
         onSuccess: (_data, member) => {
-            toast.success(member.status ? "Conta desativada." : "Conta reativada.");
+            toast.success(member.status ? "Aluno bloqueado." : "Aluno desbloqueado.");
             queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
         },
         onError: (err: Error) => toast.error("Falha ao atualizar: " + err.message),
     });
     const updatingStatusId = updatingStatus ? statusVars?.id ?? null : null;
 
+    // Bloqueado = recusado na aprovação ou conta desativada pelo gestor
+    const isBlocked = (m: MemberListItem) => m.approvalStatus === "REJECTED" || !m.status;
+
     const pending = members.filter((m) => m.approvalStatus === "PENDING");
-    const others = members.filter((m) => m.approvalStatus !== "PENDING");
-    const roleLabel = "aluno";
+    const reviewed = members.filter((m) => m.approvalStatus !== "PENDING");
+    const activeMembers = reviewed.filter((m) => !isBlocked(m));
+    const blockedMembers = reviewed.filter(isBlocked);
+    const others = tab === "active" ? activeMembers : blockedMembers;
+    const roleLabel = tab === "active" ? "aluno ativo" : "aluno bloqueado";
 
     const totalPages = Math.max(1, Math.ceil(others.length / ITEMS_PER_PAGE));
     const pageStart = (page - 1) * ITEMS_PER_PAGE;
@@ -119,6 +129,16 @@ const MembersPage = () => {
                 />
             )}
 
+            {/* Abas: ativos x bloqueados */}
+            <NavTabs<MembersTab>
+                items={[
+                    { key: "active", label: `Ativos (${activeMembers.length})`, icon: UserCheck01Icon },
+                    { key: "blocked", label: `Bloqueados (${blockedMembers.length})`, icon: UserBlock01Icon },
+                ]}
+                active={tab}
+                onChange={setTab}
+            />
+
             {/* Lista */}
             {loading ? (
                 <div className="flex items-center justify-center py-20">
@@ -132,7 +152,11 @@ const MembersPage = () => {
                             {debouncedSearch ? "Nenhum resultado encontrado" : `Nenhum ${roleLabel} por aqui`}
                         </p>
                         <p className="mt-1 text-xs text-neutral-400">
-                            {debouncedSearch ? `Nada corresponde a "${debouncedSearch}".` : "As contas aprovadas aparecerão nesta lista."}
+                            {debouncedSearch
+                                ? `Nada corresponde a "${debouncedSearch}".`
+                                : tab === "active"
+                                    ? "As contas aprovadas aparecerão nesta lista."
+                                    : "Contas recusadas ou bloqueadas aparecerão aqui."}
                         </p>
                     </div>
                 </div>
@@ -144,7 +168,8 @@ const MembersPage = () => {
                                 key={member.id}
                                 member={member}
                                 onToggleStatus={statusMutate}
-                                updatingStatus={updatingStatusId === member.id}
+                                onApprove={(m) => handleApproval(m, "APPROVED")}
+                                updatingStatus={updatingStatusId === member.id || processingId === member.id}
                             />
                         ))}
                     </div>

@@ -21,8 +21,16 @@ import type { CategorySlim } from "@lib/constants/category";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 
 import Spinner from "@components/ui/Spinner";
+import { useAuth } from "@context/AuthContext";
+import { useUnpromoteSign } from "@components/feature/workspace/useUnpromoteSign";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
-import GlossaryFilters from "@components/feature/glossary/GlossaryFilters";
+import {
+    SignFiltersCard,
+    EMPTY_SIGN_FILTERS,
+    countActiveFilters,
+    filtersToParams,
+    type SignFilters,
+} from "@components/feature/glossary/SignFiltersCard";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 
 // Confete de educação/globo
@@ -30,10 +38,11 @@ const GLOSSARY_ICONS = [GlobalEducationIcon, GlobalEducationIcon, GlobeIcon, Boo
 
 const GlossaryPage = () => {
     const navigate = useNavigate();
-    const [query, setQuery] = useState("");
-    const [categoryId, setCategoryId] = useState("");
-    const [handConfigId, setHandConfigId] = useState("");
-    const [glossaryDisciplineId, setGlossaryDisciplineId] = useState("");
+    const { user } = useAuth();
+    const isManager = !!user?.roles?.includes("MANAGER");
+    const unpromote = useUnpromoteSign();
+    const [filters, setFilters] = useState<SignFilters>(EMPTY_SIGN_FILTERS);
+    const query = filters.query;
 
     // Opções dos filtros — mudam pouco, por isso o staleTime alto
     const [categoriesQuery, disciplinesQuery] = useQueries({
@@ -57,15 +66,11 @@ const GlossaryPage = () => {
 
     // Sinais — os filtros fazem parte da chave, então trocar um deles refaz a
     // busca sozinho (e volta instantâneo de um filtro já visitado).
+    // A busca textual é aplicada no cliente — fica fora dos parâmetros da API
+    const { search: _search, ...apiParams } = filtersToParams(filters);
     const { data: signs = [], isPending: loading } = useQuery({
-        queryKey: queryKeys.glossary.list({ categoryId, handConfigId, glossaryDisciplineId }),
-        queryFn: () => {
-            const params: Record<string, string> = {};
-            if (categoryId) params.categoryId = categoryId;
-            if (handConfigId) params.handConfigId = handConfigId;
-            if (glossaryDisciplineId) params.glossaryDisciplineId = glossaryDisciplineId;
-            return unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(params).length ? params : undefined));
-        },
+        queryKey: queryKeys.glossary.list(apiParams),
+        queryFn: () => unwrap(GetRequest<SignCardData[]>(GLOSSARY.LIST(), Object.keys(apiParams).length ? apiParams : undefined)),
         meta: { errorMessage: "Falha ao carregar o glossário" },
     });
 
@@ -75,7 +80,7 @@ const GlossaryPage = () => {
         : signs;
 
 
-    const hasFilters = !!categoryId || !!handConfigId || !!glossaryDisciplineId || !!query.trim();
+    const hasFilters = countActiveFilters(filters) > 0 || !!query.trim();
 
     return (
         <section className="flex flex-col gap-8">
@@ -105,18 +110,13 @@ const GlossaryPage = () => {
             </div>
 
             {/* Filtros */}
-            <GlossaryFilters
-                query={query}
-                onQueryChange={setQuery}
+            <SignFiltersCard
+                value={filters}
+                onApply={setFilters}
                 categories={categories}
-                categoryId={categoryId}
-                onCategoryChange={setCategoryId}
-                handConfigId={handConfigId}
-                onHandConfigChange={setHandConfigId}
                 disciplines={disciplines}
-                glossaryDisciplineId={glossaryDisciplineId}
-                onDisciplineChange={setGlossaryDisciplineId}
                 disciplineIcons={GLOSSARY_ICONS}
+                placeholder="Buscar no glossário..."
             />
 
             {/* Conteúdo */}
@@ -143,12 +143,15 @@ const GlossaryPage = () => {
                     {filtered.map((sign) => (
                         <SignCard
                             key={sign.id}
-                            sign={sign}
+                            sign={{ ...sign, globalStatus: "PUBLIC" }}
+                            hideStatusBadge
                             onClick={() => navigate(`/signs/${sign.slug}`)}
+                            onUnpromote={isManager ? () => unpromote.ask(sign) : undefined}
                         />
                     ))}
                 </div>
             )}
+            {unpromote.modal}
         </section>
     );
 };

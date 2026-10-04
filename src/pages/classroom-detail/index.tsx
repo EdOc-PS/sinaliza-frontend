@@ -14,6 +14,7 @@ import Spinner from "@components/ui/Spinner";
 import Modal from "@components/ui/Modal";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import PromoteSignModal from "@components/feature/workspace/PromoteSignModal";
+import { useUnpromoteSign } from "@components/feature/workspace/useUnpromoteSign";
 import { SignUsageSection, type SignUsage } from "@components/feature/dashboard/SignUsageSection";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
 import { MemberSection, type Member } from "@/components/feature/classroom-detail/MemberSection";
@@ -59,6 +60,8 @@ type DetailView = "signs" | "usage" | "favorites" | "prompts" | "examples" | "se
 const ClassroomDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
+    const isManager = !!user?.roles?.includes("MANAGER");
+    const unpromote = useUnpromoteSign();
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
@@ -82,7 +85,12 @@ const ClassroomDetailPage = () => {
             },
             {
                 queryKey: queryKeys.classrooms.signs(id ?? ""),
-                queryFn: () => unwrap(GetRequest<SignCardData[]>(CLASSROOMS.SIGNS(id!))),
+                queryFn: async () => {
+                    const data = await unwrap(GetRequest<SignCardData[]>(CLASSROOMS.SIGNS(id!)));
+                    // O backend marca a turma como vista aqui — a bolinha de sinais novos zera
+                    queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.mine() });
+                    return data;
+                },
                 enabled: !!id,
                 meta: { errorMessage: "Falha ao carregar os sinais" },
             },
@@ -329,6 +337,7 @@ const ClassroomDetailPage = () => {
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
                                         onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onUnpromote={isManager ? () => unpromote.ask(sign) : undefined}
                                     />
                                 ))}
                             </div>
@@ -380,6 +389,7 @@ const ClassroomDetailPage = () => {
                                         onEdit={() => setEditSignModal({ open: true, signId: sign.id })}
                                         onDelete={() => setDeleteSignModal({ open: true, signId: sign.id, name: sign.name })}
                                         onPromote={() => setPromoteModal({ open: true, signId: sign.id, name: sign.name })}
+                                        onUnpromote={isManager ? () => unpromote.ask(sign) : undefined}
                                     />
                                 ))}
                             </div>
@@ -471,6 +481,8 @@ const ClassroomDetailPage = () => {
             />
 
             {/* Modal de confirmar promoção de sinal */}
+            {unpromote.modal}
+
             <PromoteSignModal
                 open={promoteModal.open}
                 onClose={() => setPromoteModal({ open: false })}

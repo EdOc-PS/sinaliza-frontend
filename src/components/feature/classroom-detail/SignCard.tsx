@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
+    Cancel02Icon,
     DeleteIcon,
     Edit02Icon,
     FavouriteIcon,
@@ -56,9 +57,13 @@ interface SignCardProps {
     onEdit?: () => void;
     onDelete?: () => void;
     onPromote?: () => void;
+    /** Só o gestor recebe: tira um sinal público do glossário global */
+    onUnpromote?: () => void;
     actions?: SignCardAction[];
     /** Glossário público (sem login): esconde o menu de ações e o clique abre o vídeo */
     publicMode?: boolean;
+    /** Esconde o selo "No glossário"/"Em análise" (ex: no próprio glossário, onde todos são públicos) */
+    hideStatusBadge?: boolean;
 }
 
 // Delay do hover (desktop) e do long-press (mobile) para iniciar a reprodução
@@ -74,8 +79,10 @@ export const SignCard = ({
     onEdit,
     onDelete,
     onPromote,
+    onUnpromote,
     actions,
     publicMode = false,
+    hideStatusBadge = false,
 }: SignCardProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const hoverTimer = useRef<number | null>(null);
@@ -223,7 +230,7 @@ export const SignCard = ({
                     )}
 
                     {/* Situação no glossário (canto superior direito) */}
-                    {(isPublic || isPending) && (
+                    {!hideStatusBadge && (isPublic || isPending) && (
                         <span
                             title={isPublic ? "Sinal promovido ao glossário global" : "Aguardando aprovação do gestor"}
                             className={`absolute top-2 right-2 z-10 flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold shadow-sm ${
@@ -295,6 +302,16 @@ export const SignCard = ({
                                         {action.label}
                                     </DropdownMenuItem>
                                 ))}
+
+                                {isPublic && onUnpromote && (
+                                    <DropdownMenuItem
+                                        variant="danger"
+                                        icon={<HugeiconsIcon icon={Cancel02Icon} size={18} />}
+                                        onSelect={() => onUnpromote()}
+                                    >
+                                        Remover do glossário
+                                    </DropdownMenuItem>
+                                )}
 
                                 {canManage && (
                                     <>

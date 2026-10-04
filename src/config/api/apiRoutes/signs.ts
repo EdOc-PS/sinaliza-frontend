@@ -9,6 +9,7 @@ export const SIGNS = {
     PROMOTIONS:       ()           => `sign/promotions`,
     MINE:             ()           => `sign/mine`,
     REVIEW_PROMOTION: (id: string) => `sign/${id}/promotion`,
+    UNPROMOTE:        (id: string) => `sign/${id}/unpromote`,
 }
 
 // Glossário global — endpoints públicos (sem autenticação)

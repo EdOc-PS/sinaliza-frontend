@@ -16,40 +16,39 @@ const chipClass = (active: boolean) =>
 const HAND_CONFIG_GRID = "grid grid-cols-9 gap-1.5";
 const HAND_CONFIG_ITEMS_PER_PAGE = 18;
 
+const toggleId = (list: string[], id: string) =>
+    list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+
 interface SignFilterFieldsProps {
     categories: CategorySlim[];
-    categoryId: string;
-    onCategoryChange: (id: string) => void;
+    categoryIds: string[];
+    onCategoryIdsChange: (ids: string[]) => void;
 
-    handConfigId: string;
-    onHandConfigChange: (id: string) => void;
+    handConfigIds: string[];
+    onHandConfigIdsChange: (ids: string[]) => void;
     /** Configurações já carregadas — usado no glossário público, cujo endpoint de mãos exige token */
     handConfigs?: HandConfig[];
 
     disciplines: GlossaryDisciplineSlim[];
-    glossaryDisciplineId: string;
-    onDisciplineChange: (id: string) => void;
+    glossaryDisciplineIds: string[];
+    onDisciplineIdsChange: (ids: string[]) => void;
     /** Pool de ícones do confete dos cards de disciplina */
     disciplineIcons?: IconSvgElement[];
-    /** Cards de disciplina menores — usado no dropdown de busca */
-    disciplineCompact?: boolean;
 }
 
-// Blocos de filtro (categoria, configuração de mão, disciplina) compartilhados
-// entre o GlossaryFilters e o dropdown do TopSearchBar — mesmo componente,
-// mesmo visual, em vez de duas implementações divergentes.
+// Blocos de filtro (categoria, configuração de mão, disciplina), todos com
+// múltipla seleção. Usado pelo SignFiltersCard (glossários e busca em Turmas).
 export const SignFilterFields = ({
     categories,
-    categoryId,
-    onCategoryChange,
-    handConfigId,
-    onHandConfigChange,
+    categoryIds,
+    onCategoryIdsChange,
+    handConfigIds,
+    onHandConfigIdsChange,
     handConfigs,
     disciplines,
-    glossaryDisciplineId,
-    onDisciplineChange,
+    glossaryDisciplineIds,
+    onDisciplineIdsChange,
     disciplineIcons,
-    disciplineCompact = false,
 }: SignFilterFieldsProps) => (
     <div className="flex flex-col gap-5">
         {/* Categorias */}
@@ -59,8 +58,8 @@ export const SignFilterFields = ({
                 <div className="flex flex-wrap gap-2">
                     <button
                         type="button"
-                        onClick={() => onCategoryChange("")}
-                        className={chipClass(categoryId === "")}
+                        onClick={() => onCategoryIdsChange([])}
+                        className={chipClass(categoryIds.length === 0)}
                     >
                         Todas
                     </button>
@@ -68,8 +67,9 @@ export const SignFilterFields = ({
                         <button
                             key={c.id}
                             type="button"
-                            onClick={() => onCategoryChange(categoryId === c.id ? "" : c.id)}
-                            className={chipClass(categoryId === c.id)}
+                            aria-pressed={categoryIds.includes(c.id)}
+                            onClick={() => onCategoryIdsChange(toggleId(categoryIds, c.id))}
+                            className={chipClass(categoryIds.includes(c.id))}
                         >
                             {c.name}
                         </button>
@@ -85,11 +85,10 @@ export const SignFilterFields = ({
                 Configuração de mão
             </span>
             <HandConfigPicker
-                value={handConfigId}
-                onChange={onHandConfigChange}
+                selectedIds={handConfigIds}
+                onToggle={(id) => onHandConfigIdsChange(toggleId(handConfigIds, id))}
                 configs={handConfigs}
                 compact
-                allowDeselect
                 gridClassName={HAND_CONFIG_GRID}
                 itemsPerPage={HAND_CONFIG_ITEMS_PER_PAGE}
             />
@@ -102,17 +101,15 @@ export const SignFilterFields = ({
                     <HugeiconsIcon icon={MortarboardIcon} size={18} />
                     Disciplinas
                 </span>
-                <div className={`stagger-children grid gap-3 ${disciplineCompact ? "grid-cols-3 sm:grid-cols-4 lg:grid-cols-6" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+                <div className="stagger-children grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                     {disciplines.map((disc) => (
                         <GlossaryDisciplineCard
                             key={disc.id}
                             discipline={disc}
-                            selected={glossaryDisciplineId === disc.id}
-                            onToggle={() =>
-                                onDisciplineChange(glossaryDisciplineId === disc.id ? "" : disc.id)
-                            }
+                            selected={glossaryDisciplineIds.includes(disc.id)}
+                            onToggle={() => onDisciplineIdsChange(toggleId(glossaryDisciplineIds, disc.id))}
                             icons={disciplineIcons}
-                            compact={disciplineCompact}
+                            compact
                         />
                     ))}
                 </div>

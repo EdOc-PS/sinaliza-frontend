@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Mail01Icon, MoreVerticalIcon, UserBlock01Icon, UserCheck01Icon } from "@hugeicons/core-free-icons";
+import { Mail01Icon, MoreVerticalIcon, Tick04Icon, UserBlock01Icon, UserCheck01Icon } from "@hugeicons/core-free-icons";
 
 import { RoleBadge } from "@components/ui/RoleBadge";
 import Spinner from "@components/ui/Spinner";
@@ -36,10 +36,12 @@ interface ListCardMemberProps {
     member: MemberListItem;
     /** Ausente = card sem ação de gerenciar (ex: tela sem gestor) */
     onToggleStatus?: (member: MemberListItem) => void;
+    /** Gestor revê uma recusa — só aparece para contas REJECTED */
+    onApprove?: (member: MemberListItem) => void;
     updatingStatus?: boolean;
 }
 
-export const ListCardMember = ({ member, onToggleStatus, updatingStatus = false }: ListCardMemberProps) => {
+export const ListCardMember = ({ member, onToggleStatus, onApprove, updatingStatus = false }: ListCardMemberProps) => {
     const status = member.approvalStatus ? STATUS_META[member.approvalStatus] : null;
 
     return (
@@ -74,7 +76,7 @@ export const ListCardMember = ({ member, onToggleStatus, updatingStatus = false 
                     )}
                     {!member.status && (
                         <span className="flex items-center gap-1 rounded-lg bg-neutral-200 px-2 py-0.5 text-[11px] font-semibold text-neutral-600">
-                            Desativado
+                            Bloqueado
                         </span>
                     )}
                 </div>
@@ -95,22 +97,31 @@ export const ListCardMember = ({ member, onToggleStatus, updatingStatus = false 
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {member.status ? (
+                                {onApprove && member.approvalStatus === "REJECTED" && (
+                                    <DropdownMenuItem
+                                        icon={<HugeiconsIcon icon={Tick04Icon} size={18} />}
+                                        onSelect={() => onApprove(member)}
+                                    >
+                                        Aprovar conta
+                                    </DropdownMenuItem>
+                                )}
+                                {/* Recusado só sai do bloqueio sendo aprovado (item acima) */}
+                                {member.approvalStatus !== "REJECTED" && (member.status ? (
                                     <DropdownMenuItem
                                         variant="danger"
                                         icon={<HugeiconsIcon icon={UserBlock01Icon} size={18} />}
                                         onSelect={() => onToggleStatus(member)}
                                     >
-                                        Desativar conta
+                                        Bloquear aluno
                                     </DropdownMenuItem>
                                 ) : (
                                     <DropdownMenuItem
                                         icon={<HugeiconsIcon icon={UserCheck01Icon} size={18} />}
                                         onSelect={() => onToggleStatus(member)}
                                     >
-                                        Reativar conta
+                                        Desbloquear aluno
                                     </DropdownMenuItem>
-                                )}
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     )}

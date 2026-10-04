@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react"
-import { Outlet, useLocation } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { HelpCircleIcon } from "@hugeicons/core-free-icons"
 
 import MenuNavigation from "@components/layout/MenuNavigation"
 import MobileHeader from "@components/layout/MobileHeader"
-import TopSearchBar from "@components/layout/TopSearchBar"
 import { Tooltip } from "@components/ui/Tooltip"
 import { FAB } from "@components/layout/FAB"
 import { OnboardingModal } from "@components/feature/onboarding/OnboardingModal"
@@ -16,16 +15,6 @@ import { useAuth } from "@context/AuthContext"
 const MainLayout = () => {
     const { user } = useAuth()
     const [onboardingOpen, setOnboardingOpen] = useState(false)
-    const [searchOpen, setSearchOpen] = useState(false)
-    const { pathname } = useLocation()
-
-    // A busca de sinais só existe em Turmas (e nos resultados dela)
-    const showSearch = pathname.startsWith("/classrooms") || pathname.startsWith("/search")
-
-    // Trocar de tela fecha o dropdown de busca
-    useEffect(() => {
-        setSearchOpen(false)
-    }, [pathname])
 
     // Primeiro login: abre o tour sozinho. Depois só pelo botão de ajuda.
     useEffect(() => {
@@ -34,38 +23,23 @@ const MainLayout = () => {
 
     return (
         <FABProvider>
-            <MobileHeader
-                showSearch={showSearch}
-                searchOpen={searchOpen}
-                onToggleSearch={() => setSearchOpen((v) => !v)}
-                onOpenHelp={() => setOnboardingOpen(true)}
-            />
+            <MobileHeader onOpenHelp={() => setOnboardingOpen(true)} />
             <MenuNavigation />
 
             <main className="lg:ml-20 min-h-screen pb-28 lg:pb-10">
-                {/* Barra de busca fixa no topo (estilo e-commerce). Mesma largura do banner
-                    abaixo (mesmo container/padding) — o botão de ajuda flutua por cima do
-                    canto direito em vez de empurrar a busca para dentro. */}
-                <div className="sticky top-0 z-30 bg-transparent backdrop-blur-sm pb-3">
-                    <div className="relative py-3">
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 lg:min-h-11">
-                            {showSearch && <TopSearchBar open={searchOpen} onOpenChange={setSearchOpen} />}
-                        </div>
-                        <Tooltip
-                            label="Como usar a plataforma"
-                            position="right"
-                            className="hidden lg:block absolute top-1/2 right-5 lg:right-10 -translate-y-1/2"
+                {/* Topo do desktop: só o botão de ajuda. A busca de sinais agora é um
+                    card dentro de Turmas e do Glossário, não mais uma barra fixa. */}
+                <div className="hidden lg:flex justify-end px-10 pt-5 pb-2">
+                    <Tooltip label="Como usar a plataforma" position="right">
+                        <button
+                            type="button"
+                            onClick={() => setOnboardingOpen(true)}
+                            aria-label="Ajuda: como usar a plataforma"
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
                         >
-                            <button
-                                type="button"
-                                onClick={() => setOnboardingOpen(true)}
-                                aria-label="Ajuda: como usar a plataforma"
-                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
-                            >
-                                <HugeiconsIcon icon={HelpCircleIcon} size={22} />
-                            </button>
-                        </Tooltip>
-                    </div>
+                            <HugeiconsIcon icon={HelpCircleIcon} size={22} />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 lg:pb-10">

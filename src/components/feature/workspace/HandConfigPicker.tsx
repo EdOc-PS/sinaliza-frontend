@@ -19,8 +19,11 @@ export interface HandConfig {
 }
 
 interface HandConfigPickerProps {
-    value: string;
-    onChange: (id: string) => void;
+    value?: string;
+    onChange?: (id: string) => void;
+    /** Modo múltipla seleção (filtros): quando informado, ignora value/onChange */
+    selectedIds?: string[];
+    onToggle?: (id: string) => void;
     gridClassName?: string;
     itemsPerPage?: number;
     /** Estilo compacto (igual ao VisualKeyboard): busca/setas menores e cards menores */
@@ -40,8 +43,10 @@ const DEFAULT_GRID = "grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5";
 const DEFAULT_ITEMS_PER_PAGE = 8;
 
 const HandConfigPicker = ({
-    value,
+    value = "",
     onChange,
+    selectedIds,
+    onToggle,
     gridClassName = DEFAULT_GRID,
     itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
     compact = false,
@@ -90,7 +95,13 @@ const HandConfigPicker = ({
     const pageStart  = (currentPage - 1) * ITEMS_PER_PAGE;
     const paginated  = configs.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
-    const selectedConfig = configs.find((c) => c.id === value);
+    const isMulti = selectedIds !== undefined;
+    const isSelected = (id: string) => (isMulti ? selectedIds.includes(id) : value === id);
+    const handleSelect = (id: string) => {
+        if (isMulti) onToggle?.(id);
+        else onChange?.(allowDeselect && value === id ? "" : id);
+    };
+    const selectedConfig = isMulti ? undefined : configs.find((c) => c.id === value);
 
     return (
         <div className="flex flex-col gap-3">
@@ -195,12 +206,12 @@ const HandConfigPicker = ({
             ) : (
                 <div className={gridClassName}>
                     {paginated.map((config) => {
-                        const selected = value === config.id;
+                        const selected = isSelected(config.id);
                         return (
                             <Tooltip key={config.id} label={config.name} position="top" className="relative">
                                 <button
                                     type="button"
-                                    onClick={() => onChange(allowDeselect && selected ? "" : config.id)}
+                                    onClick={() => handleSelect(config.id)}
                                     className={`relative aspect-square w-full ${compact ? "rounded-xl" : "rounded-2xl"} overflow-hidden border-2 transition-all flex items-center justify-center bg-white ${
                                         selected
                                             ? "border-campfire-500 ring-1 ring-campfire-300"
@@ -228,6 +239,11 @@ const HandConfigPicker = ({
             {selectedConfig && (
                 <p className="text-xs text-cloud-500 pl-1">
                     Selecionada: <strong className="text-campfire-600">{selectedConfig.name}</strong>
+                </p>
+            )}
+            {isMulti && selectedIds.length > 0 && (
+                <p className="text-xs text-cloud-500 pl-1">
+                    <strong className="text-campfire-600">{selectedIds.length}</strong> selecionada{selectedIds.length > 1 ? "s" : ""}
                 </p>
             )}
         </div>
