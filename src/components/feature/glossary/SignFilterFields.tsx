@@ -1,5 +1,5 @@
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { MortarboardIcon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
+import { MortarboardIcon, SignLanguageCIcon, TagsIcon } from "@hugeicons/core-free-icons";
 
 import type { CategorySlim } from "@lib/constants/category";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
@@ -18,6 +18,15 @@ const HAND_CONFIG_ITEMS_PER_PAGE = 18;
 
 const toggleId = (list: string[], id: string) =>
     list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+
+// Título de seção: ícone + texto + linha separadora ocupando o resto
+const SectionTitle = ({ icon, children }: { icon: IconSvgElement; children: React.ReactNode }) => (
+    <div className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
+        <HugeiconsIcon icon={icon} size={18} />
+        <span className="shrink-0">{children}</span>
+        <span className="h-px flex-1 bg-cloud-200" aria-hidden />
+    </div>
+);
 
 interface SignFilterFieldsProps {
     categories: CategorySlim[];
@@ -54,7 +63,7 @@ export const SignFilterFields = ({
         {/* Categorias */}
         {categories.length > 0 && (
             <div className="flex flex-col gap-2">
-                <span className="px-1 text-sm font-semibold text-cloud-500">Categorias</span>
+                <SectionTitle icon={TagsIcon}>Categorias</SectionTitle>
                 <div className="flex flex-wrap gap-2">
                     <button
                         type="button"
@@ -80,10 +89,7 @@ export const SignFilterFields = ({
 
         {/* Teclado de configuração de mão */}
         <div className="flex flex-col gap-2">
-            <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                <HugeiconsIcon icon={SignLanguageCIcon} size={18} />
-                Configuração de mão
-            </span>
+            <SectionTitle icon={SignLanguageCIcon}>Configuração de mão</SectionTitle>
             <HandConfigPicker
                 selectedIds={handConfigIds}
                 onToggle={(id) => onHandConfigIdsChange(toggleId(handConfigIds, id))}
@@ -97,10 +103,7 @@ export const SignFilterFields = ({
         {/* Disciplinas do glossário */}
         {disciplines.length > 0 && (
             <div className="flex flex-col gap-2">
-                <span className="flex items-center gap-2 px-1 text-sm font-semibold text-cloud-500">
-                    <HugeiconsIcon icon={MortarboardIcon} size={18} />
-                    Disciplinas
-                </span>
+                <SectionTitle icon={MortarboardIcon}>Disciplinas</SectionTitle>
                 <div className="stagger-children grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                     {disciplines.map((disc) => (
                         <GlossaryDisciplineCard

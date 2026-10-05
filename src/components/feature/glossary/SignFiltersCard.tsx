@@ -126,10 +126,16 @@ export const SignFiltersCard = ({
                     <p className="truncate text-sm text-neutral-500">{subtitle}</p>
                 </div>
 
-                {appliedCount > 0 && (
-                    <span className="shrink-0 rounded-xl bg-campfire-100 px-2.5 py-1.5 text-xs font-semibold text-campfire-600">
-                        {appliedCount} filtro{appliedCount > 1 ? "s" : ""}
-                    </span>
+                {/* Limpar fica como badge no cabeçalho, só quando há algo para limpar */}
+                {hasAnything && (
+                    <button
+                        type="button"
+                        onClick={clear}
+                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-campfire-100 px-2.5 py-1.5 text-xs font-semibold text-campfire-600 transition-colors hover:bg-campfire-200"
+                    >
+                        <HugeiconsIcon icon={FilterRemoveIcon} size={14} />
+                        Limpar{appliedCount > 0 ? ` (${appliedCount})` : ""}
+                    </button>
                 )}
             </div>
 
@@ -161,23 +167,9 @@ export const SignFiltersCard = ({
                 </div>
             </Accordion>
 
-            {/* Ações */}
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    icon={FilterRemoveIcon}
-                    onClick={clear}
-                    disabled={!hasAnything}
-                    className="sm:w-48"
-                >
-                    Limpar filtros
-                </Button>
-                <Button type="button" size="sm" icon={Search01Icon} onClick={apply} className="sm:w-48">
-                    Pesquisar{draftCount > 0 ? ` (${draftCount})` : ""}
-                </Button>
-            </div>
+            <Button type="button" size="sm" icon={Search01Icon} onClick={apply} className="w-full">
+                Pesquisar{draftCount > 0 ? ` (${draftCount})` : ""}
+            </Button>
         </div>
     );
 };
