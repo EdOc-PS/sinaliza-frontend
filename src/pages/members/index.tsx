@@ -137,6 +137,7 @@ const MembersPage = () => {
                 ]}
                 active={tab}
                 onChange={setTab}
+                fullWidth
             />
 
             {/* Lista */}

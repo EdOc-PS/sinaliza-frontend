@@ -239,7 +239,8 @@ export const SignCard = ({
                                 isPublic ? "bg-sunflower-400 text-white" : "bg-white/90 text-sunflower-700"
                             }`}
                         >
-                            <HugeiconsIcon icon={isPublic ? StarIcon : Time01Icon} size={15} className={isPublic ? "fill-white" : ""} />
+                            {/* block: o svg inline herda a linha de base do texto e fica deslocado */}
+                            <HugeiconsIcon icon={isPublic ? StarIcon : Time01Icon} size={15} className={`block shrink-0 ${isPublic ? "fill-white" : ""}`} />
                         </span>
                     )}
 

@@ -142,17 +142,14 @@ export const SignFiltersCard = ({
 
                 {/* Limpar fica no cabeçalho, só quando há algo para limpar */}
                 {hasAnything && (
-                    <Button
+                    <button
                         type="button"
-                        variant="outline"
-                        size="sm"
-                        icon={FilterRemoveIcon}
-                        iconSize={16}
                         onClick={clear}
-                        className="shrink-0"
+                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-campfire-100 px-2.5 py-1.5 text-xs font-semibold text-campfire-600 transition-colors hover:bg-campfire-200"
                     >
-                        Limpar{appliedCount > 0 ? ` (${appliedCount})` : ""}
-                    </Button>
+                        <HugeiconsIcon icon={FilterRemoveIcon} size={14} />
+                        Limpar
+                    </button>
                 )}
             </div>
 

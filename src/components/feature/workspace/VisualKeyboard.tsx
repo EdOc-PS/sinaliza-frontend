@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight, Edit02Icon, DeleteIcon, Search01Icon, Clapping02Icon } from "@hugeicons/core-free-icons";
@@ -109,12 +109,15 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
 
     const selectMode = !!onSelectConfig;
     // No modo seleção ou sem permissão de gestão não há card "+", só os itens reais
-    const totalItems = selectMode || !canManage ? handConfigs.length : handConfigs.length + 1;
+    const hasPlusCard = !selectMode && canManage;
+    const totalItems = hasPlusCard ? handConfigs.length + 1 : handConfigs.length;
     const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
-    const pageStart = (currentPage - 1) * ITEMS_PER_PAGE;
-    const pageEnd = currentPage * ITEMS_PER_PAGE;
-    const paginatedConfigs = handConfigs.slice(pageStart, Math.min(pageEnd, handConfigs.length));
-    const showPlusCard = !selectMode && canManage && pageEnd > handConfigs.length;
+    // O "+" é o primeiro item da página 1: as configs andam uma posição para frente
+    const offset = hasPlusCard ? 1 : 0;
+    const pageStart = Math.max(0, (currentPage - 1) * ITEMS_PER_PAGE - offset);
+    const pageEnd = currentPage * ITEMS_PER_PAGE - offset;
+    const paginatedConfigs = handConfigs.slice(pageStart, pageEnd);
+    const showPlusCard = hasPlusCard && currentPage === 1;
 
     const handleDeleteClick = (configId: string, configName: string) => {
         setDeleteModal({ open: true, configId, configName });
@@ -225,6 +228,18 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                     </div>
                 ) : (
                     <div className="stagger-children grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2">
+                        {/* Card "+" — sempre o primeiro item */}
+                        {showPlusCard && (
+                            <Tooltip label="Nova configuração de mão" position="top">
+                                <button
+                                    onClick={() => openForm("create-hand-config")}
+                                    className="w-full aspect-square bg-lime-100/60 border-2 border-dashed border-lime-400 rounded-xl flex items-center justify-center hover:bg-lime-100 hover:border-lime-500 transition-all hover:-translate-y-1 duration-300"
+                                >
+                                    <img src={createHandImg} alt="" className="w-8 h-8 sm:w-10 sm:h-10" />
+                                </button>
+                            </Tooltip>
+                        )}
+
                         {paginatedConfigs.map((config) => (
                             <Tooltip key={config.name} label={config.name} position="top">
                                 {selectMode ? (
@@ -300,17 +315,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                             </Tooltip>
                         ))}
 
-                        {/* Card "+" */}
-                        {showPlusCard && (
-                            <Tooltip label="Nova configuração de mão" position="top">
-                                <button
-                                    onClick={() => openForm("create-hand-config")}
-                                    className="w-full aspect-square bg-lime-50 border-2 border-dashed border-lime-400 rounded-xl flex items-center justify-center hover:bg-lime-100 hover:border-lime-500 transition-all hover:-translate-y-1 duration-300"
-                                >
-                                    <img src={createHandImg} alt="" className="w-8 h-8 sm:w-10 sm:h-10" />
-                                </button>
-                            </Tooltip>
-                        )}
+
                     </div>
                 )}
 

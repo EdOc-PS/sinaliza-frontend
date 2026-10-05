@@ -77,7 +77,7 @@ export const MySignsSection = () => {
                     </div>
                 </div>
                 {signs.length > 0 && (
-                    <div className="sm:w-64">
+                    <div className="sm:w-80 lg:w-96">
                         <Input icon={Search01Icon} value={search} onChange={handleSearch} placeholder="Buscar nos meus sinais..." />
                     </div>
                 )}

@@ -39,7 +39,7 @@ const SignUsageRow = ({ sign, maxCount }: { sign: SignUsage; maxCount: number })
 
     return (
         <div
-            className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white p-3 transition-colors hover:bg-cloud-100/60"
+            className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-transparent transition-all hover:-translate-y-0.5 hover:bg-campfire-100/40 hover:ring-campfire-200"
             onClick={() => navigate(`/signs/${sign.slug}`)}
         >
             <SignThumb sign={sign} />

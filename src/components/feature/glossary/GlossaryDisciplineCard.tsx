@@ -34,6 +34,7 @@ export const GlossaryDisciplineCard = ({
             color={getGlossaryDisciplineColor(discipline.id)}
             rounded="rounded-2xl"
             icons={icons}
+            density="low"
         />
 
         <div className={`relative z-10 flex h-full flex-col justify-end ${compact ? "p-2" : "p-3"}`}>

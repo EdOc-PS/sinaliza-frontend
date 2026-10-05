@@ -1,3 +1,4 @@
+import Button from "@components/ui/Button";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ import {
     Note01Icon,
     TaskDaily01Icon,
     Edit02Icon,
+    CopyIcon,
     FavouriteIcon,
     HandPointingLeft02Icon,
     Logout03Icon,
@@ -157,6 +159,12 @@ const ClassroomDetailPage = () => {
     });
     const handleLeave = () => leaveClassroom();
 
+    const handleCopyCode = () => {
+        if (!classroom?.classCode) return;
+        navigator.clipboard.writeText(classroom.classCode)
+            .then(() => toast.success("Código copiado para a área de transferência!"));
+    };
+
     const { mutate: promoteSign, isPending: promoting } = useMutation({
         mutationFn: (glossaryDisciplineIds: string[]) =>
             unwrap(PatchRequest(SIGNS.PROMOTE(promoteModal.signId!), { glossaryDisciplineIds })),
@@ -228,17 +236,6 @@ const ClassroomDetailPage = () => {
                         <HugeiconsIcon icon={HandPointingLeft02Icon} size={18} />
                         Voltar
                     </button>
-
-                    {/* Contexto é automática e do sistema — nem o gestor dono edita */}
-                    {canManage && !classroom.isContext && (
-                        <button
-                            onClick={() => setEditModal(true)}
-                            className="flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"
-                        >
-                            <HugeiconsIcon icon={Edit02Icon} size={18} />
-                            Editar
-                        </button>
-                    )}
                 </div>
 
                 <div className="relative z-10 flex flex-col justify-between h-full p-6 sm:p-8" style={{ minHeight: 220 }}>
@@ -411,16 +408,32 @@ const ClassroomDetailPage = () => {
                             </div>
                         ) : (
                             <>
-                                {/* Ação: adicionar participante (apenas educador) */}
-                                {canManage && (
-                                    <button
-                                        onClick={() => setAddMemberModal(true)}
-                                        className="flex items-center justify-center gap-2 self-start rounded-2xl bg-cloud-500 hover:bg-cloud-600 transition-colors px-4 py-2.5 text-sm font-semibold text-white"
-                                    >
-                                        <HugeiconsIcon icon={UserAdd01Icon} size={18} />
-                                        Adicionar participante
-                                    </button>
-                                )}
+                                {/* Ações da turma, juntas acima dos membros */}
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {canManage && (
+                                        <Button size="sm" icon={UserAdd01Icon} iconSize={18} onClick={() => setAddMemberModal(true)}>
+                                            Adicionar participante
+                                        </Button>
+                                    )}
+                                    {/* Contexto é automática e do sistema — nem o gestor dono edita */}
+                                    {canManage && !classroom.isContext && (
+                                        <Button size="sm" variant="outline" icon={Edit02Icon} iconSize={18} onClick={() => setEditModal(true)}>
+                                            Editar turma
+                                        </Button>
+                                    )}
+                                    {classroom.classCode && (
+                                        <Button size="sm" variant="outline" icon={CopyIcon} iconSize={18} onClick={handleCopyCode}>
+                                            Copiar código
+                                        </Button>
+                                    )}
+                                    {/* Dono só sai se houver outro educador para herdar a turma —
+                                        sendo o único, o botão nem aparece */}
+                                    {(!canManage || heir) && (
+                                        <Button size="sm" variant="salmon" icon={Logout03Icon} iconSize={18} onClick={() => setLeaveModal(true)}>
+                                            Sair da turma
+                                        </Button>
+                                    )}
+                                </div>
 
                                 {/* Membros — educadores e alunos numa lista só; o RoleBadge de cada
                                     linha já distingue quem é quem */}
@@ -434,18 +447,6 @@ const ClassroomDetailPage = () => {
                                     onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                     lockedUserIds={[classroom.teacher.id]}
                                 />
-
-                                {/* Dono só sai se houver outro educador para herdar a turma —
-                                    sendo o único, o botão nem aparece */}
-                                {(!canManage || heir) && (
-                                    <button
-                                        onClick={() => setLeaveModal(true)}
-                                        className="flex items-center justify-center gap-2 self-start rounded-2xl bg-salmon-100 hover:bg-salmon-200 transition-colors px-4 py-2 text-sm font-medium text-salmon-600"
-                                    >
-                                        <HugeiconsIcon icon={Logout03Icon} size={18} />
-                                        Sair da turma
-                                    </button>
-                                )}
                             </>
                         )}
                     </div>

@@ -1,3 +1,4 @@
+import { Tooltip } from "@components/ui/Tooltip";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { RoleBadge } from "@/components/ui/RoleBadge";
@@ -54,14 +55,16 @@ export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: 
 
                             {/* Remover (apenas educador, exceto usuários bloqueados) */}
                             {onRemove && !lockedUserIds.includes(m.user.id) && (
-                                <button
-                                    type="button"
-                                    onClick={() => onRemove(m)}
-                                    title="Remover da turma"
-                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-salmon-100 hover:text-salmon-600"
-                                >
-                                    <HugeiconsIcon icon={Delete02Icon} size={18} />
-                                </button>
+                                <Tooltip label="Remover da turma" position="top">
+                                    <button
+                                        type="button"
+                                        onClick={() => onRemove(m)}
+                                        aria-label="Remover da turma"
+                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-cloud-400 transition-colors hover:bg-salmon-100 hover:text-salmon-600"
+                                    >
+                                        <HugeiconsIcon icon={Delete02Icon} size={18} />
+                                    </button>
+                                </Tooltip>
                             )}
                         </div>
                     ))}

@@ -129,10 +129,15 @@ interface CardMemphisBackgroundProps {
     rounded?: string;
     /** Pool de ícones do confete. Repita um ícone para dar mais peso a ele (ex: corações em Favoritos). */
     icons?: (typeof BookIcon)[];
+    /** "low" = poucos itens no fundo (cards pequenos, ex: disciplinas do glossário) */
+    density?: "normal" | "low";
 }
 
-export const CardMemphisBackground = ({ seed, color, rounded = "rounded-t-3xl", icons: iconPool = ICON_POOL }: CardMemphisBackgroundProps) => {
-    const { icons, shapes } = generateItems(seed, iconPool);
+export const CardMemphisBackground = ({ seed, color, rounded = "rounded-t-3xl", icons: iconPool = ICON_POOL, density = "normal" }: CardMemphisBackgroundProps) => {
+    const generated = generateItems(seed, iconPool);
+    // Densidade baixa: 2 ícones e 2 formas, em vez de 7 + 8
+    const icons = density === "low" ? generated.icons.slice(0, 2) : generated.icons;
+    const shapes = density === "low" ? generated.shapes.slice(0, 2) : generated.shapes;
 
     return (
         <div

@@ -12,15 +12,17 @@ interface NavTabsProps<T extends string> {
     endItems?: NavTabItem<T>[];
     active: T;
     onChange: (key: T) => void;
+    /** Abas dividem toda a largura igualmente (ex: Ativos | Bloqueados) */
+    fullWidth?: boolean;
 }
 
-function NavTabs<T extends string>({ items, endItems, active, onChange }: NavTabsProps<T>) {
+function NavTabs<T extends string>({ items, endItems, active, onChange, fullWidth = false }: NavTabsProps<T>) {
     const renderTab = (item: NavTabItem<T>) => (
         <button
             key={item.key}
             type="button"
             onClick={() => onChange(item.key)}
-            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-3xl px-3 py-2.5 text-sm font-semibold transition-colors sm:px-5 sm:py-3 ${
+            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-3xl px-3 py-2.5 text-sm font-semibold transition-colors sm:px-5 sm:py-3 ${fullWidth ? "flex-1 justify-center" : ""} ${
                 active === item.key
                     ? "bg-campfire-100 text-campfire-500"
                     : "text-neutral-400 hover:text-cloud-500 hover:bg-cloud-100"
@@ -33,7 +35,7 @@ function NavTabs<T extends string>({ items, endItems, active, onChange }: NavTab
 
     return (
         <div className="bg-white rounded-3xl px-1 py-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-1">
+            <div className={`flex items-center gap-1 ${fullWidth ? "flex-1" : ""}`}>
                 {items.map(renderTab)}
             </div>
             {endItems && endItems.length > 0 && (
