@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { ArrowDown01Icon, FilterIcon, FilterRemoveIcon, Search01Icon } from "@hugeicons/core-free-icons";
 
@@ -66,6 +66,8 @@ interface SignFiltersCardProps {
     /** Fundo do campo de busca (o card é branco em ambas as telas) */
     searchWrapperClassName?: string;
     defaultOpen?: boolean;
+    /** Área de resultados — ao pesquisar, a tela desliza até ela */
+    resultsRef?: RefObject<HTMLElement | null>;
 }
 
 // Card de busca de sinais usado no glossário (logado e público) e em Turmas.
@@ -83,6 +85,7 @@ export const SignFiltersCard = ({
     placeholder = "Buscar sinal...",
     searchWrapperClassName,
     defaultOpen = false,
+    resultsRef,
 }: SignFiltersCardProps) => {
     const [open, setOpen] = useState(defaultOpen);
     const [draft, setDraft] = useState<SignFilters>(value);
@@ -96,7 +99,18 @@ export const SignFiltersCard = ({
     const draftCount = countActiveFilters(draft);
     const hasAnything = draftCount > 0 || !!draft.query.trim() || appliedCount > 0 || !!value.query.trim();
 
-    const apply = () => onApply(draft);
+    // Sem texto nem filtro no rascunho, Pesquisar fica desabilitado
+    const canSearch = draftCount > 0 || !!draft.query.trim();
+
+    // Depois de pesquisar, desliza até os resultados (quando a tela informa onde ficam)
+    const scrollToResults = () =>
+        requestAnimationFrame(() => resultsRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+
+    const apply = () => {
+        if (!canSearch) return;
+        onApply(draft);
+        scrollToResults();
+    };
     const clear = () => {
         setDraft(EMPTY_SIGN_FILTERS);
         onApply(EMPTY_SIGN_FILTERS);
@@ -126,16 +140,19 @@ export const SignFiltersCard = ({
                     <p className="truncate text-sm text-neutral-500">{subtitle}</p>
                 </div>
 
-                {/* Limpar fica como badge no cabeçalho, só quando há algo para limpar */}
+                {/* Limpar fica no cabeçalho, só quando há algo para limpar */}
                 {hasAnything && (
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
+                        size="sm"
+                        icon={FilterRemoveIcon}
+                        iconSize={16}
                         onClick={clear}
-                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-campfire-100 px-2.5 py-1.5 text-xs font-semibold text-campfire-600 transition-colors hover:bg-campfire-200"
+                        className="shrink-0"
                     >
-                        <HugeiconsIcon icon={FilterRemoveIcon} size={14} />
                         Limpar{appliedCount > 0 ? ` (${appliedCount})` : ""}
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -167,7 +184,7 @@ export const SignFiltersCard = ({
                 </div>
             </Accordion>
 
-            <Button type="button" size="sm" icon={Search01Icon} onClick={apply} className="w-full">
+            <Button type="button" size="sm" icon={Search01Icon} onClick={apply} disabled={!canSearch} className="w-full disabled:cursor-not-allowed disabled:opacity-50">
                 Pesquisar{draftCount > 0 ? ` (${draftCount})` : ""}
             </Button>
         </div>

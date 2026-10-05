@@ -45,17 +45,6 @@ export const ClassroomCard = ({
                 {/* Header com Memphis background */}
                 <div className="relative flex justify-end items-start px-4 h-2/5 py-3">
                     <CardMemphisBackground seed={classroom.id} color={classroom.colorBackground} />
-
-                    {/* Bolinha de sinais novos desde a última visita */}
-                    {!!classroom.newSignsCount && (
-                        <span
-                            title={`${classroom.newSignsCount} sinal(is) novo(s)`}
-                            className="absolute left-4 top-3 z-10 flex h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-salmon-500 px-2 text-xs font-bold text-white ring-2 ring-white"
-                        >
-                            {classroom.newSignsCount > 99 ? "99+" : classroom.newSignsCount}
-                            <span className="hidden sm:inline">{classroom.newSignsCount === 1 ? "novo" : "novos"}</span>
-                        </span>
-                    )}
                     {classroom.canManage && (
                         <div onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
@@ -131,10 +120,21 @@ export const ClassroomCard = ({
                             <span className="text-xs font-mono font-semibold">{classroom.classCode}</span>
                         </div>
 
-                        {/* Contagem de usuários */}
-                        <div className="flex items-center gap-1.5 text-gray-700">
-                            <HugeiconsIcon icon={UserGroupIcon} size={16} />
-                            <span className="text-sm font-semibold">{classroom.userCount}</span>
+                        {/* Sinais novos desde a última visita + contagem de usuários */}
+                        <div className="flex items-center gap-2.5">
+                            {!!classroom.newSignsCount && (
+                                <span
+                                    title={`${classroom.newSignsCount} sinal(is) novo(s) desde sua última visita`}
+                                    className="rounded-full bg-salmon-500 px-2 py-0.5 text-xs font-bold text-white"
+                                >
+                                    {classroom.newSignsCount > 99 ? "99+" : classroom.newSignsCount}{" "}
+                                    {classroom.newSignsCount === 1 ? "novo" : "novos"}
+                                </span>
+                            )}
+                            <div className="flex items-center gap-1.5 text-gray-700">
+                                <HugeiconsIcon icon={UserGroupIcon} size={16} />
+                                <span className="text-sm font-semibold">{classroom.userCount}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

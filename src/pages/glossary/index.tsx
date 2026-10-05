@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -42,6 +42,7 @@ const GlossaryPage = () => {
     const isManager = !!user?.roles?.includes("MANAGER");
     const unpromote = useUnpromoteSign();
     const [filters, setFilters] = useState<SignFilters>(EMPTY_SIGN_FILTERS);
+    const resultsRef = useRef<HTMLDivElement>(null);
     const query = filters.query;
 
     // Opções dos filtros — mudam pouco, por isso o staleTime alto
@@ -117,9 +118,11 @@ const GlossaryPage = () => {
                 disciplines={disciplines}
                 disciplineIcons={GLOSSARY_ICONS}
                 placeholder="Buscar no glossário..."
+                resultsRef={resultsRef}
             />
 
-            {/* Conteúdo */}
+            {/* Conteúdo — âncora para o deslize automático ao pesquisar */}
+            <div ref={resultsRef} className="-mb-8 scroll-mt-6" />
             {loading ? (
                 <div className="flex items-center justify-center py-20">
                     <Spinner size={32} color="#6B7280" />

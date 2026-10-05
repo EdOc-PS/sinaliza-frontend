@@ -26,10 +26,10 @@ const MainLayout = () => {
             <MobileHeader onOpenHelp={() => setOnboardingOpen(true)} />
             <MenuNavigation />
 
-            <main className="lg:ml-20 min-h-screen pb-28 lg:pb-10">
-                {/* Topo do desktop: só o botão de ajuda. A busca de sinais agora é um
-                    card dentro de Turmas e do Glossário, não mais uma barra fixa. */}
-                <div className="hidden lg:flex justify-end px-10 pt-5 pb-2">
+            <main className="relative lg:ml-20 min-h-screen pb-28 lg:pb-10">
+                {/* Botão de ajuda flutua no canto — não ocupa uma faixa própria,
+                    então o conteúdo começa logo no topo da página */}
+                <div className="hidden lg:block absolute right-10 top-5 z-20">
                     <Tooltip label="Como usar a plataforma" position="right">
                         <button
                             type="button"
@@ -42,7 +42,7 @@ const MainLayout = () => {
                     </Tooltip>
                 </div>
 
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 lg:pb-10">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 lg:pt-5 lg:pb-10">
                     <Outlet />
                 </div>
             </main>

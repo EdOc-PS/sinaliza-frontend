@@ -229,16 +229,17 @@ export const SignCard = ({
                         </div>
                     )}
 
-                    {/* Situação no glossário (canto superior direito) */}
+                    {/* Situação no glossário (canto superior direito) — só o ícone;
+                        o texto fica no tooltip */}
                     {!hideStatusBadge && (isPublic || isPending) && (
                         <span
-                            title={isPublic ? "Sinal promovido ao glossário global" : "Aguardando aprovação do gestor"}
-                            className={`absolute top-2 right-2 z-10 flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold shadow-sm ${
+                            title={isPublic ? "No glossário global" : "Em análise pelo gestor"}
+                            aria-label={isPublic ? "No glossário global" : "Em análise pelo gestor"}
+                            className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm ${
                                 isPublic ? "bg-sunflower-400 text-white" : "bg-white/90 text-sunflower-700"
                             }`}
                         >
-                            <HugeiconsIcon icon={isPublic ? StarIcon : Time01Icon} size={13} className={isPublic ? "fill-white" : ""} />
-                            {isPublic ? "No glossário" : "Em análise"}
+                            <HugeiconsIcon icon={isPublic ? StarIcon : Time01Icon} size={15} className={isPublic ? "fill-white" : ""} />
                         </span>
                     )}
 
