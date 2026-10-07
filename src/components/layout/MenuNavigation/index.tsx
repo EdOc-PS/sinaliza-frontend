@@ -94,14 +94,14 @@ const MenuItem = ({ icon, label, shortLabel, onClick, isDesktop = false, isActiv
         <Tooltip label={label} position="left">
             <button
                 onClick={handleClick}
-                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
+                className={`flex items-center justify-center w-10 h-10 xl:w-12 xl:h-12 rounded-2xl transition-all duration-300 ${isActive ? "bg-lime-100/80" : "hover:bg-cloud-200"
                     }`}
             >
                 <span className={bouncing ? "icon-bounce" : ""}>
                     <HugeiconsIcon
                         icon={icon}
                         size={24}
-                        className={`transition-colors duration-300 ${isActive ? "text-lime-700" : "text-cloud-500"}`}
+                        className={`w-5 h-5 xl:w-6 xl:h-6 transition-colors duration-300 ${isActive ? "text-lime-700" : "text-cloud-500"}`}
                     />
                 </span>
             </button>
@@ -129,7 +129,7 @@ const ActionItem = ({
     onClick,
     isActive = false,
     size = 24,
-    sizeClass = "w-12 h-12 rounded-2xl",
+    sizeClass = "w-10 h-10 xl:w-12 xl:h-12 rounded-2xl",
     idleBg = "bg-white hover:bg-cloud-200",
     logout = false,
     avatarUrl,
@@ -162,13 +162,13 @@ const ActionItem = ({
                 className={`flex items-center justify-center overflow-hidden transition-all duration-300 ${sizeClass} ${avatarUrl ? "bg-white" : bgClass}`}
             >
                 {avatarUrl ? (
-                    <img src={avatarUrl} alt={label} className="h-9 w-9 rounded-full object-cover" />
+                    <img src={avatarUrl} alt={label} className="h-7 w-7 xl:h-9 xl:w-9 rounded-full object-cover" />
                 ) : (
                     <span className={bouncing ? "icon-bounce" : ""}>
                         <HugeiconsIcon
                             icon={icon}
                             size={size}
-                            className={`transition-colors duration-300 ${iconColor}`}
+                            className={`${size <= 20 ? "w-4 h-4 xl:w-5 xl:h-5" : "w-5 h-5 xl:w-6 xl:h-6"} transition-colors duration-300 ${iconColor}`}
                         />
                     </span>
                 )}
@@ -211,9 +211,9 @@ const MenuNavigation = () => {
 
     return (
         <>
-            {/* Mobile: menu horizontal inferior (< 992px) — perfil/favoritos/histórico ficam no MobileHeader.
+            {/* Mobile: menu horizontal inferior (< 768px) — perfil/favoritos/histórico ficam no MobileHeader.
                 Agrupado como no desktop: acessos gerais separados dos administrativos (só gestor). */}
-            <nav className="px-4 fixed bottom-0 left-0 right-0 lg:hidden bg-cloud-100 flex items-center justify-center gap-2 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+            <nav className="px-4 fixed bottom-0 left-0 right-0 md:hidden bg-cloud-100 flex items-center justify-center gap-2 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
                 <div className="bg-white rounded-2xl flex flex-1 max-w-md justify-around p-0.5">
                     {mainItems.map((item) => (
                         <MenuItem
@@ -245,12 +245,12 @@ const MenuNavigation = () => {
                 )}
             </nav>
 
-            {/* Desktop: menu lateral esquerda (>= 992px) */}
-            <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-20 bg-cloud-100 flex-col items-center pb-8 pt-4 gap-4 z-40">
+            {/* Tablet+: menu lateral esquerda (>= 768px), compacto abaixo de xl */}
+            <aside className="hidden md:flex fixed left-0 top-0 h-screen w-16 xl:w-20 bg-cloud-100 flex-col items-center pb-4 pt-3 gap-2 xl:pb-8 xl:pt-4 xl:gap-4 z-40">
                 {/* Logo */}
-                <img src="/logo/logo-simples.png" alt="Logo" className="w-12 h-12 mb-2" />
+                <img src="/logo/logo-simples.png" alt="Logo" className="w-9 h-9 xl:w-12 xl:h-12 xl:mb-2" />
                 {/* Acessos gerais */}
-                <div className="bg-white rounded-2xl flex flex-col gap-2">
+                <div className="bg-white rounded-2xl flex flex-col gap-1 xl:gap-2">
                     {mainItems.map((item) => (
                         <MenuItem
                             key={item.path}
@@ -265,7 +265,7 @@ const MenuNavigation = () => {
 
                 {/* Acessos administrativos — só o gestor tem */}
                 {adminItems.length > 0 && (
-                    <div className="bg-white rounded-2xl flex flex-col gap-2">
+                    <div className="bg-white rounded-2xl flex flex-col gap-1 xl:gap-2">
                         {adminItems.map((item) => (
                             <MenuItem
                                 key={item.path}
@@ -280,13 +280,13 @@ const MenuNavigation = () => {
                 )}
 
                 {/* Perfil */}
-                <div className="flex flex-col items-center gap-4 mt-auto">
+                <div className="flex flex-col items-center gap-2 xl:gap-4 mt-auto">
                     <div className="flex flex-col items-center rounded-xl bg-white">
                         <ActionItem
                             icon={FavouriteIcon}
                             label="Favoritos"
                             size={20}
-                            sizeClass="w-10 h-10 rounded-xl"
+                            sizeClass="w-8 h-8 xl:w-10 xl:h-10 rounded-xl"
                             idleBg="hover:bg-cloud-200"
                             onClick={() => navigate("/favorites")}
                             isActive={isPathActive("/favorites")}
@@ -296,7 +296,7 @@ const MenuNavigation = () => {
                             icon={Time01Icon}
                             label="Histórico"
                             size={20}
-                            sizeClass="w-10 h-10 rounded-xl"
+                            sizeClass="w-8 h-8 xl:w-10 xl:h-10 rounded-xl"
                             idleBg="hover:bg-cloud-200"
                             onClick={() => navigate("/history")}
                             isActive={isPathActive("/history")}

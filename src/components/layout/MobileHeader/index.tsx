@@ -20,7 +20,7 @@ const MobileHeader = ({ onOpenHelp }: MobileHeaderProps) => {
         }`;
 
     return (
-        <header className="lg:hidden bg-cloud-100 p-4 flex items-center justify-between">
+        <header className="md:hidden bg-cloud-100 p-4 flex items-center justify-between">
             {/* Logo */}
             <img src="/logo/logo-simples.png" alt="Logo" className="w-10 h-10" />
 

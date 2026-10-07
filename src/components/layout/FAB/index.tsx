@@ -106,7 +106,7 @@ export const FAB = () => {
 
     return (
         <>
-            <div className="fixed bottom-30 lg:bottom-10 right-5 lg:right-10 z-40 flex flex-col items-end gap-3">
+            <div className="fixed bottom-30 md:bottom-10 right-5 md:right-8 xl:right-10 z-40 flex flex-col items-end gap-3">
                 {isEducator && (
                     <div className="flex flex-col items-end gap-2.5">
                         {/* Ações do gestor (cadastros administrativos) ficam no topo */}

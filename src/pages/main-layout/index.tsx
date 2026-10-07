@@ -26,10 +26,10 @@ const MainLayout = () => {
             <MobileHeader onOpenHelp={() => setOnboardingOpen(true)} />
             <MenuNavigation />
 
-            <main className="relative lg:ml-20 min-h-screen pb-28 lg:pb-10">
+            <main className="relative md:ml-16 xl:ml-20 min-h-screen pb-28 md:pb-10">
                 {/* Botão de ajuda flutua no canto — não ocupa uma faixa própria,
                     então o conteúdo começa logo no topo da página */}
-                <div className="hidden lg:block absolute right-10 top-5 z-20">
+                <div className="hidden md:block absolute right-10 top-5 z-20">
                     <Tooltip label="Como usar a plataforma" position="right">
                         <button
                             type="button"
@@ -42,7 +42,7 @@ const MainLayout = () => {
                     </Tooltip>
                 </div>
 
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 lg:pt-5 lg:pb-10">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 md:pt-5 md:pb-10">
                     <Outlet />
                 </div>
             </main>
