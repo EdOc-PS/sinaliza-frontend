@@ -35,6 +35,12 @@ export function getAPIClient(): AxiosInstance {
     timeout: 15000,
   });
 
+  // A requisição que falhou usou o token que está salvo agora?
+  const isCurrentToken = (config?: InternalAxiosRequestConfig) => {
+    const sent = String(config?.headers?.Authorization ?? '').replace(/^Bearer\s+/, '');
+    return !!sent && sent === localStorage.getItem('@token');
+  };
+
   // Pega o token mais recente do localStorage antes de sair.
   api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     // Verificar se localStorage
@@ -64,7 +70,10 @@ export function getAPIClient(): AxiosInstance {
         }
       }
 
-      if (error.response?.status === 401 && typeof window !== 'undefined') {
+      // Só derruba a sessão se o 401 veio do token que ainda está salvo. Uma
+      // requisição lenta com um token antigo (ex: /auth/me com o servidor
+      // acordando) não pode apagar o token novo de um login feito no meio-tempo.
+      if (error.response?.status === 401 && typeof window !== 'undefined' && isCurrentToken(config)) {
         const message = (error.response?.data as { message?: string } | undefined)?.message || '';
         if (message.includes('Token') || message.includes('token')) {
           localStorage.clear();

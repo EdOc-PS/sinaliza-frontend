@@ -56,6 +56,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             const response = await GetRequest<User>(AUTH.ME())
 
+            // Login feito enquanto o /auth/me ainda carregava (servidor acordando):
+            // esta resposta é do token antigo e não pode sobrescrever a sessão nova
+            if (localStorage.getItem(TOKEN_KEY) !== token) return
+
             if (response.success && response.object) {
                 setUser(response.object)
             } else {
@@ -64,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         } catch (error) {
             console.error('Erro ao buscar usuário:', error)
-            setUser(null)
+            if (localStorage.getItem(TOKEN_KEY) === token) setUser(null)
         } finally {
             setInitialized(true)
         }

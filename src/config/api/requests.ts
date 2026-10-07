@@ -112,15 +112,22 @@ export type LoginResponse = {
 
 function handleError<T>(error: unknown): APIResponse<T> {
   if (typeof error === 'object' && error !== null && 'response' in error) {
-    const axiosError = error as { response: { status: number; data: { message?: string; errors?: Record<string, string[]> } } };
+    const axiosError = error as {
+      response: { status: number; data: { message?: string; errors?: Record<string, string[]> } };
+      config?: { headers?: Record<string, unknown> };
+    };
     const { status, data } = axiosError.response;
+    // Token usado nesta requisição ainda é o salvo? (ver client.ts — evita que
+    // uma resposta atrasada de um token antigo apague a sessão nova)
+    const sentToken = String(axiosError.config?.headers?.Authorization ?? '').replace(/^Bearer\s+/, '');
+    const usedCurrentToken = typeof window !== 'undefined' && !!sentToken && sentToken === localStorage.getItem('@token');
 
     switch (status) {
       case 400:
         return { success: false, message: data.message ?? 'Requisição inválida.', errors: data.errors };
       case 401:
         const isExpiredSession = !data.message || data.message.includes('Sessão') || data.message.includes('token');
-        if (isExpiredSession && typeof window !== 'undefined') {
+        if (isExpiredSession && usedCurrentToken) {
           localStorage.clear();
         }
         return { success: false, message: data.message ?? 'Acesso não autorizado.' };
