@@ -14,6 +14,7 @@ import { USERS } from '@routes/users'
 import { queryClient } from '@/config/query/queryClient'
 
 const TOKEN_KEY = '@token'
+const RETRY_ME_DELAY_MS = 5000
 
 // ─────────────────────────────────────────────
 // Tipos do contexto
@@ -62,16 +63,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (response.success && response.object) {
                 setUser(response.object)
-            } else {
-                localStorage.removeItem(TOKEN_KEY)
+            } else if (!localStorage.getItem(TOKEN_KEY)) {
+                // handleError só limpa o storage em 401 de sessão: token inválido de verdade
                 setUser(null)
+            } else {
+                // Falha de rede/502/500 (servidor acordando ou fora do ar): o token
+                // continua válido, então não desloga — tenta de novo mantendo o loading
+                setTimeout(retryGetUser, RETRY_ME_DELAY_MS)
+                return
             }
         } catch (error) {
             console.error('Erro ao buscar usuário:', error)
-            if (localStorage.getItem(TOKEN_KEY) === token) setUser(null)
-        } finally {
-            setInitialized(true)
+            if (localStorage.getItem(TOKEN_KEY) === token) {
+                setTimeout(retryGetUser, RETRY_ME_DELAY_MS)
+                return
+            }
         }
+        setInitialized(true)
+    }
+
+    function retryGetUser() {
+        getUser()
     }
 
     // Autentica o usuário e salva o token
