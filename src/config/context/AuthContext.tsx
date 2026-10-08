@@ -88,6 +88,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Autentica o usuário e salva o token
     async function login(credentials: LoginPayload) {
+        // Descarta o token antigo antes de logar: senão um /auth/me lento desse
+        // token (servidor acordando) volta 401 no meio do login, o client.ts vê
+        // que é o token salvo e recarrega a página em /auth/login
+        localStorage.removeItem(TOKEN_KEY)
+
         const response = await PostRequest<LoginResponse>(AUTH.LOGIN(), credentials)
 
         if (!response.success || !response.object) {
@@ -97,6 +102,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { access_token, user } = response.object
         localStorage.setItem(TOKEN_KEY, access_token)
         setUser(user)
+        // O getUser do token antigo sai sem marcar initialized; sem isso a
+        // PrivateRoute ficaria presa no spinner
+        setInitialized(true)
         return user
     }
 
