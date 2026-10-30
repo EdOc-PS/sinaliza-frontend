@@ -33,6 +33,7 @@ import approveImg from '@/assets/images/approve.png'
 import studentImg from '@/assets/images/student.png'
 import educatorImg from '@/assets/images/educator.png'
 import interpreterImg from '@/assets/images/interpreter.png'
+import { LIMITS } from "@lib/validation/limits";
 
 // Mapa de imagem por perfil — evita caminho dinâmico (`/src/assets/...${id}.png`),
 // que só funciona em dev (Vite serve /src direto); em produção precisa de import estático.
@@ -202,7 +203,7 @@ const RegisterPage = () => {
                                             id="nome"
                                             icon={LocationUser01Icon}
                                             placeholder="Digite seu nome"
-                                            value={user.nome}
+                                            maxLength={LIMITS.NAME} value={user.nome}
                                             noSpecialChars
                                             onChange={(value) => handleUserChange('nome', value)}
                                         />
@@ -219,7 +220,7 @@ const RegisterPage = () => {
                                             id="email"
                                             icon={MailOpenLoveIcon}
                                             placeholder="usuario@example.com"
-                                            value={user.email}
+                                            maxLength={LIMITS.EMAIL} value={user.email}
                                             onChange={(value) => handleUserChange('email', value)}
                                         />
                                         {user.email.trim() !== '' && !emailValido && (
@@ -237,7 +238,7 @@ const RegisterPage = () => {
                                             id="phone"
                                             icon={SmartPhone01Icon}
                                             placeholder="(31) 99999-9999"
-                                            value={user.phone}
+                                            maxLength={LIMITS.PHONE} value={user.phone}
                                             onChange={(value) => handleUserChange('phone', maskPhone(value))}
                                         />
                                     </div>
@@ -343,7 +344,7 @@ const RegisterPage = () => {
                                                     icon={campo.icon}
                                                     type={campo.type}
                                                     placeholder={campo.placeholder}
-                                                    value={user.dadosPerfil[campo.id] || ''}
+                                                    maxLength={LIMITS.PROFILE_FIELD} value={user.dadosPerfil[campo.id] || ''}
                                                     noSpecialChars={campo.noSpecialChars}
                                                     onChange={(value) =>
                                                         handleDataProfileChange(campo.id, value)
@@ -389,7 +390,7 @@ const RegisterPage = () => {
                                         id="bio"
                                         icon={PenTool03Icon}
                                         placeholder="Escreva uma breve descrição sobre você, seus interesses e o que espera encontrar na plataforma."
-                                        value={user.bio}
+                                        maxLength={LIMITS.BIO} value={user.bio}
                                         onChange={(value) => handleUserChange('bio', value)}
                                     />
                                 </div>
@@ -426,7 +427,7 @@ const RegisterPage = () => {
                                             icon={CirclePasswordIcon}
                                             type="password"
                                             placeholder="Escreva sua melhor senha"
-                                            value={user.senha}
+                                            maxLength={LIMITS.PASSWORD} value={user.senha}
                                             onChange={(value) => handleUserChange('senha', value)}
                                         />
                                         {user.senha.trim() !== '' && !senhaValida && (
@@ -443,7 +444,7 @@ const RegisterPage = () => {
                                             icon={CirclePasswordIcon}
                                             type="password"
                                             placeholder="Repita a senha"
-                                            value={user.confirmarSenha}
+                                            maxLength={LIMITS.PASSWORD} value={user.confirmarSenha}
                                             onChange={(value) => handleUserChange('confirmarSenha', value)}
                                         />
                                     </div>

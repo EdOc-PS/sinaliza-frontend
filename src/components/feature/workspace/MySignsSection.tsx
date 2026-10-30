@@ -14,6 +14,7 @@ import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 import Input from "@components/ui/Input";
 import Pagination from "@components/ui/Pagination";
 import { SignThumb } from "@components/feature/dashboard/SignUsageSection";
+import { LIMITS } from "@lib/validation/limits";
 
 type GlobalStatus = "PRIVATE" | "PENDING" | "PUBLIC" | "REJECTED";
 
@@ -78,7 +79,7 @@ export const MySignsSection = () => {
                 </div>
                 {signs.length > 0 && (
                     <div className="sm:w-80 lg:w-96">
-                        <Input icon={Search01Icon} value={search} onChange={handleSearch} placeholder="Buscar nos meus sinais..." />
+                        <Input icon={Search01Icon} maxLength={LIMITS.SEARCH} value={search} onChange={handleSearch} placeholder="Buscar nos meus sinais..." />
                     </div>
                 )}
             </div>

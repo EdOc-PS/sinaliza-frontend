@@ -1,77 +1,101 @@
 import { Link } from "react-router-dom";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Github01Icon, MortarboardIcon } from "@hugeicons/core-free-icons";
 
 import logo from "@/assets/images/logo/logo-simples.png";
 
-const socials = [
-    { icon: Github01Icon, label: "GitHub — EdOc-ps", href: "https://github.com/EdOc-ps" },
-    { icon: MortarboardIcon, label: "IFMG — Campus Ouro Branco", href: "https://www.ifmg.edu.br/ourobranco" },
+interface FooterLink {
+    label: string;
+    to: string;
+    external?: boolean;
+}
+
+const columns: { title: string; links: FooterLink[] }[] = [
+    {
+        title: "Plataforma",
+        links: [
+            { label: "Repositório", to: "/public-glossary" },
+            { label: "Como funciona", to: "/#como-funciona" },
+            { label: "Recursos", to: "/#recursos" },
+            { label: "Para quem é", to: "/#para-quem" },
+        ],
+    },
+    {
+        title: "Conta",
+        links: [
+            { label: "Solicitar entrada", to: "/auth/register" },
+            { label: "Entrar", to: "/auth/login" },
+            { label: "Esqueci a senha", to: "/auth/forgot-password" },
+        ],
+    },
+    {
+        title: "Projeto",
+        links: [
+            { label: "Sobre o TCC", to: "/#sobre" },
+            { label: "IFMG Ouro Branco", to: "https://www.ifmg.edu.br/ourobranco", external: true },
+            { label: "GitHub", to: "https://github.com/EdOc-ps", external: true },
+        ],
+    },
 ];
 
-// Rodapé institucional — landing e repositório público
+const linkClass = "text-sm text-cloud-500 transition-colors duration-300 ease-out hover:text-campfire-600";
+
+function FooterAnchor({ label, to, external }: FooterLink) {
+    if (external) {
+        return <a href={to} target="_blank" rel="noopener noreferrer" className={linkClass}>{label}</a>;
+    }
+    if (to.includes("#")) {
+        return <a href={to} className={linkClass}>{label}</a>;
+    }
+    return <Link to={to} className={linkClass}>{label}</Link>;
+}
+
+// Rodapé público — colunas de links, wordmark gigante sumindo e linha de base
 export const LandingFooter = () => (
-    <footer className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="overflow-hidden bg-cloud-100">
+        <div className="mx-auto max-w-6xl px-4 pt-20 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-[2fr_1fr_1fr_1fr]">
                 {/* Marca */}
-                <div className="flex flex-col gap-4">
+                <div className="col-span-2 flex flex-col gap-4 md:col-span-1">
                     <div className="flex items-center gap-1.5">
-                        <img src={logo} alt="" className="h-9 w-9" />
-                        <span className="font-baskerville text-xl font-bold text-cloud-500">Sinaliza</span>
+                        <img src={logo} alt="" className="h-8 w-8" />
+                        <span className="font-baskerville text-lg font-bold text-cloud-600">Sinaliza</span>
                     </div>
-                    <p className="max-w-xs text-sm leading-relaxed text-cloud-400">
-                        Repositório colaborativo de Libras para intérpretes, alunos e professores.
+                    <p className="max-w-xs text-sm leading-relaxed text-cloud-500/75">
+                        Repositório de sinais em Libras para intérpretes, alunos e professores do IFMG.
                     </p>
-                    <div className="flex gap-2">
-                        {socials.map(({ icon, label, href }) => (
-                            <a
-                                key={label}
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title={label}
-                                aria-label={label}
-                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-cloud-100 text-cloud-400 transition-all duration-300 ease-out hover:bg-cloud-200 hover:text-cloud-600"
-                            >
-                                <HugeiconsIcon icon={icon} size={20} />
-                            </a>
+                    <span className="flex items-center gap-2 text-xs text-cloud-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-lime-500" />
+                        Repositório público no ar
+                    </span>
+                </div>
+
+                {columns.map((col) => (
+                    <div key={col.title} className="flex flex-col gap-3.5">
+                        <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cloud-400">
+                            {col.title}
+                        </h3>
+                        {col.links.map((link) => (
+                            <FooterAnchor key={link.label} {...link} />
                         ))}
                     </div>
-                </div>
-
-                {/* Plataforma */}
-                <div className="flex flex-col gap-3">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-cloud-500">Plataforma</h3>
-                    <Link to="/public-glossary" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Repositório</Link>
-                    <a href="/#como-funciona" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Como funciona</a>
-                    <a href="/#recursos" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Recursos</a>
-                    <a href="/#para-quem" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Para quem é</a>
-                </div>
-
-                {/* Conta */}
-                <div className="flex flex-col gap-3">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-cloud-500">Conta</h3>
-                    <Link to="/auth/register" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Solicitar entrada</Link>
-                    <Link to="/auth/login" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Entrar</Link>
-                </div>
-
-                {/* Projeto */}
-                <div className="flex flex-col gap-3">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-cloud-500">Projeto</h3>
-                    <a href="/#sobre" className="text-sm text-cloud-400 transition-colors duration-300 ease-out hover:text-campfire-600">Sobre o TCC</a>
-                    <span className="text-sm text-cloud-400">IFMG — Campus Ouro Branco</span>
-                </div>
+                ))}
             </div>
+        </div>
 
-            {/* Base */}
-            <div className="mt-12 flex flex-col gap-2 border-t border-cloud-300 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-cloud-400">
-                    © {new Date().getFullYear()} Sinaliza. Trabalho de Conclusão de Curso.
-                </p>
-                <p className="text-xs text-cloud-400">
-                    Desenvolvido por <span className="font-semibold text-cloud-500">Eduardo Octavio</span>
-                </p>
+        {/* Wordmark gigante — sai do fluxo das colunas e some em degradê */}
+        <div aria-hidden className="mx-auto mt-16 max-w-7xl select-none px-2 sm:mt-20">
+            <p className="footer-wordmark text-center font-baskerville text-[22vw] leading-[0.8] tracking-tight xl:text-[17rem]">
+                Sinaliza
+            </p>
+        </div>
+
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-3 border-t border-cloud-300/70 py-6 text-xs text-cloud-400 sm:flex-row sm:items-center sm:justify-between">
+                <p>© {new Date().getFullYear()} Sinaliza · Feito por Eduardo Octavio no IFMG</p>
+                <div className="flex gap-5">
+                    <Link to="/public-glossary" className="transition-colors duration-300 ease-out hover:text-cloud-600">Repositório</Link>
+                    <a href="/#sobre" className="transition-colors duration-300 ease-out hover:text-cloud-600">Sobre</a>
+                    <Link to="/auth/login" className="transition-colors duration-300 ease-out hover:text-cloud-600">Entrar</Link>
+                </div>
             </div>
         </div>
     </footer>

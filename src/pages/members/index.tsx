@@ -15,6 +15,7 @@ import Pagination from "@components/ui/Pagination";
 import NavTabs from "@components/ui/NavTabs";
 import { ListCardMember, type MemberListItem } from "@components/feature/members/ListCardMember";
 import { PendingApprovalCard } from "@components/feature/members/PendingApprovalCard";
+import { LIMITS } from "@lib/validation/limits";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -111,7 +112,7 @@ const MembersPage = () => {
                     <div className="flex-1">
                         <Input
                             icon={Search01Icon}
-                            value={search}
+                            maxLength={LIMITS.SEARCH} value={search}
                             onChange={setSearch}
                             placeholder="Buscar por nome ou email..."
                         />

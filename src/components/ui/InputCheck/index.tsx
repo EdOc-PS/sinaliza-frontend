@@ -8,15 +8,19 @@ interface CheckInputProps {
     placeholder?: string;
     tags: string[];
     onChange: (tags: string[]) => void;
+    /** Tamanho máximo de cada tag */
+    maxTagLength?: number;
+    /** Quantidade máxima de tags */
+    maxTags?: number;
 }
 
-const InputCheck = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter...", tags, onChange }: CheckInputProps) => {
+const InputCheck = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter...", tags, onChange, maxTagLength = 30, maxTags = 15 }: CheckInputProps) => {
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
 
     const addTag = (raw: string) => {
         const trimmed = raw.trim().toLowerCase();
-        if (!trimmed || tags.includes(trimmed)) return;
+        if (!trimmed || tags.includes(trimmed) || tags.length >= maxTags) return;
         onChange([...tags, trimmed]);
         setInputValue("");
     };
@@ -70,7 +74,9 @@ const InputCheck = ({ id, icon, placeholder = "Adicionar tag e pressionar Enter.
                 id={id}
                 type="text"
                 value={inputValue}
-                placeholder={tags.length === 0 ? placeholder : ""}
+                maxLength={maxTagLength}
+                disabled={tags.length >= maxTags}
+                placeholder={tags.length >= maxTags ? `Limite de ${maxTags} tags` : tags.length === 0 ? placeholder : ""}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={() => { if (inputValue.trim()) addTag(inputValue); }}

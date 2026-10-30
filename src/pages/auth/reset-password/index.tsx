@@ -11,6 +11,7 @@ import { PostRequest } from '@requests'
 import { AUTH } from '@routes/auth'
 import logoImg from '@/assets/images/logo/logo-simples.png'
 import securityImg from '@/assets/images/security.png'
+import { LIMITS } from "@lib/validation/limits";
 
 const ResetPasswordPage = () => {
     const navigate = useNavigate()
@@ -84,7 +85,7 @@ const ResetPasswordPage = () => {
                                         type="password"
                                         icon={CirclePasswordIcon}
                                         placeholder="Sua nova senha"
-                                        value={password}
+                                        maxLength={LIMITS.PASSWORD} value={password}
                                         onChange={setPassword}
                                         autoFocus
                                     />
@@ -100,7 +101,7 @@ const ResetPasswordPage = () => {
                                         type="password"
                                         icon={CirclePasswordIcon}
                                         placeholder="Repita a nova senha"
-                                        value={confirm}
+                                        maxLength={LIMITS.PASSWORD} value={confirm}
                                         onChange={setConfirm}
                                     />
                                     {confirm !== '' && !matches && (

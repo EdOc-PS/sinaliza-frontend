@@ -1,12 +1,14 @@
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
     FavouriteIcon,
+    Key02Icon,
     Search01Icon,
     TagsIcon,
     Video01Icon,
     WheelchairIcon,
-    Key02Icon,
 } from "@hugeicons/core-free-icons";
+
+import WordReveal from "./WordReveal";
 
 interface Feature {
     title: string;
@@ -18,68 +20,63 @@ interface Feature {
 const features: Feature[] = [
     {
         title: "Vídeos em Libras",
-        description: "Cada sinal possui vídeo demonstrativo, imagem ilustrativa e descrição do movimento.",
+        description: "Cada sinal tem vídeo, imagem ilustrativa e descrição do movimento.",
         icon: Video01Icon,
-        iconClass: "bg-salmon-100 text-salmon-600",
+        iconClass: "text-salmon-600",
     },
     {
-        title: "Busca visual por mão",
-        description: "Encontre um sinal pela configuração de mão, mesmo sem saber a palavra em português.",
+        title: "Busca pela mão",
+        description: "Encontre um sinal pela configuração de mão, mesmo sem saber a palavra.",
         icon: Search01Icon,
-        iconClass: "bg-sky-100 text-sky-600",
+        iconClass: "text-sky-600",
     },
     {
         title: "Categorias e disciplinas",
         description: "Sinais organizados por tipo (verbo, animal) e por área do conhecimento.",
         icon: TagsIcon,
-        iconClass: "bg-campfire-100 text-campfire-600",
+        iconClass: "text-campfire-600",
     },
     {
         title: "Favoritos e histórico",
-        description: "Salve os sinais que mais usa e retome rapidamente o que acessou recentemente.",
+        description: "Guarde os sinais que mais usa e volte ao que viu por último.",
         icon: FavouriteIcon,
-        iconClass: "bg-lime-100 text-lime-700",
+        iconClass: "text-lime-700",
     },
     {
         title: "Turmas por convite",
-        description: "Professores criam turmas e alunos entram com um código de 6 dígitos, sem burocracia.",
+        description: "O professor cria a turma e os alunos entram com um código de 6 dígitos.",
         icon: Key02Icon,
-        iconClass: "bg-sunflower-100 text-sunflower-700",
+        iconClass: "text-sunflower-700",
     },
     {
-        title: "Design acessível",
-        description: "Interface mobile-first pensada para inclusão, com foco em contraste e navegação simples.",
+        title: "Feito para o celular",
+        description: "Interface pensada para abrir na sala de aula, com contraste e navegação simples.",
         icon: WheelchairIcon,
-        iconClass: "bg-cloud-200 text-cloud-600",
+        iconClass: "text-cloud-500",
     },
 ];
 
-// "Recursos" — grid de funcionalidades
+// "Recursos" — título fixo à esquerda e lista em duas colunas com linhas finas
 export const LandingFeatures = () => (
-    <section id="recursos" className="bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="reveal mx-auto max-w-2xl text-center">
-                <span className="text-xs font-bold uppercase tracking-widest text-lime-600">Recursos</span>
-                <h2 className="mt-3 font-baskerville text-3xl font-bold leading-tight text-cloud-500 sm:text-4xl">
-                    Tudo que você precisa
-                    <br />
-                    em um só lugar
+    <section id="recursos" className="bg-cloud-100 py-24 sm:py-32">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[4fr_8fr] lg:gap-16 lg:px-8">
+            <div>
+                <h2 className="reveal font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl lg:sticky lg:top-28">
+                    <WordReveal lines={[["O", "que", "vem"], ["junto."]]} />
                 </h2>
-                <p className="mt-4 text-base text-cloud-400">
-                    A plataforma foi pensada para ser simples de usar e poderosa para quem ensina e
-                    aprende Libras.
-                </p>
             </div>
 
-            <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-10 sm:grid-cols-2">
                 {features.map((feature, i) => (
-                    <div key={feature.title} className="reveal" style={{ transitionDelay: `${(i % 3) * 90}ms` }}>
-                        <div className="h-full rounded-3xl border-2 border-cloud-200 p-6 transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-cloud-300">
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${feature.iconClass}`}>
-                                <HugeiconsIcon icon={feature.icon} size={24} />
-                            </div>
-                            <h3 className="mt-4 font-bold text-cloud-600">{feature.title}</h3>
-                            <p className="mt-1.5 text-sm leading-relaxed text-cloud-400">{feature.description}</p>
+                    <div
+                        key={feature.title}
+                        className="reveal flex gap-4 border-t border-cloud-300/60 py-7"
+                        style={{ transitionDelay: `${(i % 2) * 90}ms` }}
+                    >
+                        <HugeiconsIcon icon={feature.icon} size={22} className={`mt-0.5 shrink-0 ${feature.iconClass}`} />
+                        <div>
+                            <h3 className="font-semibold text-cloud-600">{feature.title}</h3>
+                            <p className="mt-1.5 text-[15px] leading-relaxed text-cloud-500/75">{feature.description}</p>
                         </div>
                     </div>
                 ))}

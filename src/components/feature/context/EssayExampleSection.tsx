@@ -30,6 +30,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@components/ui/DropdownMenu";
+import { LIMITS } from "@lib/validation/limits";
 
 interface EssayExample {
     id: string;
@@ -216,7 +217,7 @@ export const EssayExampleSection = ({ classroomId, canManage }: EssayExampleSect
                             id="example-title"
                             icon={Note01Icon}
                             placeholder="Ex: Redação nota 1000 — ENEM 2024"
-                            value={title}
+                            maxLength={LIMITS.ESSAY_TITLE} value={title}
                             onChange={setTitle}
                             autoFocus
                         />
@@ -230,7 +231,7 @@ export const EssayExampleSection = ({ classroomId, canManage }: EssayExampleSect
                         <InputText
                             id="example-description"
                             placeholder="O que destacar nesta redação? (estrutura, argumentação, repertório...)"
-                            value={description}
+                            maxLength={LIMITS.ESSAY_DESCRIPTION} value={description}
                             onChange={setDescription}
                             height="90px"
                         />

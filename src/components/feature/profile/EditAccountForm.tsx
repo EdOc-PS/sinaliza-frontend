@@ -22,6 +22,7 @@ import BackButton from "@components/ui/BackButton";
 import ProgressBar from "@components/layout/ProgressBar";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 import { isValidEmail } from "@lib/validation/email";
+import { LIMITS } from "@lib/validation/limits";
 
 interface EditAccountFormProps {
     onClose: () => void;
@@ -165,7 +166,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                 id="name"
                                 icon={LocationUser01Icon}
                                 placeholder="Digite seu nome"
-                                value={name}
+                                maxLength={LIMITS.NAME} value={name}
                                 noSpecialChars
                                 onChange={setName}
                             />
@@ -182,7 +183,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                 id="email"
                                 icon={MailOpenLoveIcon}
                                 placeholder="usuario@example.com"
-                                value={email}
+                                maxLength={LIMITS.EMAIL} value={email}
                                 onChange={setEmail}
                             />
                             {email.trim() !== "" && !emailValid && (
@@ -196,7 +197,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                 id="phone"
                                 icon={SmartPhone01Icon}
                                 placeholder="(31) 99999-9999"
-                                value={phone}
+                                maxLength={LIMITS.PHONE} value={phone}
                                 onChange={(value) => setPhone(maskPhone(value))}
                             />
                         </div>
@@ -241,7 +242,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                         icon={campo.icon}
                                         type={campo.type}
                                         placeholder={campo.placeholder}
-                                        value={dataProfile[campo.id] || ""}
+                                        maxLength={LIMITS.PROFILE_FIELD} value={dataProfile[campo.id] || ""}
                                         noSpecialChars={campo.noSpecialChars}
                                         onChange={(value) => handleDataProfileChange(campo.id, value)}
                                     />
@@ -269,7 +270,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                             id="bio"
                             icon={PenTool03Icon}
                             placeholder="Escreva uma breve descrição sobre você, seus interesses e o que faz na plataforma."
-                            value={bio}
+                            maxLength={LIMITS.BIO} value={bio}
                             onChange={setBio}
                         />
                     </div>

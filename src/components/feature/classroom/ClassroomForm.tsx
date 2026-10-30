@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 import type { CreateClassroomForm } from "@pages/classrooms";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { LIMITS } from "@lib/validation/limits";
 
 export const PRESET_COLORS = [
     { hex: "#BACA57", label: "Lime" },
@@ -129,7 +130,7 @@ export const ClassroomForm = ({ classroomId, onClose, onSuccess }: ClassroomForm
                     id="classroom-name"
                     icon={Book01Icon}
                     placeholder="Ex: Libras Básico"
-                    value={form.name}
+                    maxLength={LIMITS.CLASSROOM_NAME} value={form.name}
                     onChange={(v) => handleChange("name", v)}
                     noSpecialChars
                     autoFocus
@@ -151,7 +152,7 @@ export const ClassroomForm = ({ classroomId, onClose, onSuccess }: ClassroomForm
                     id="classroom-description"
                     icon={TextSelectIcon}
                     placeholder="Ex: Turma de Libras para iniciantes"
-                    value={form.description}
+                    maxLength={LIMITS.CLASSROOM_DESCRIPTION} value={form.description}
                     onChange={(v) => handleChange("description", v)}
                     height={96}
                 />

@@ -57,6 +57,9 @@ export function useScrollReveal() {
             observer.disconnect();
             mutationObserver.disconnect();
             revealAll();
+            // Sem o observer, conteúdo que chegar depois (ex: sinais da API com o
+            // servidor acordando) ficaria oculto para sempre — desliga o estado oculto
+            root.classList.remove("reveal-active");
         }, FALLBACK_DELAY);
 
         return () => {

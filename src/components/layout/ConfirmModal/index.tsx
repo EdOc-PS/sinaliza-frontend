@@ -16,6 +16,9 @@ interface ConfirmModalProps {
     icon?: IconSvgElement;
     confirmText?: string;
     loadingText?: string;
+    /** Conteúdo extra entre a descrição e as ações (ex: campo de motivo) */
+    children?: ReactNode;
+    confirmDisabled?: boolean;
 }
 
 const ConfirmModal = ({
@@ -28,6 +31,8 @@ const ConfirmModal = ({
     icon = Medal06Icon,
     confirmText = "Confirmar",
     loadingText = "Enviando",
+    children,
+    confirmDisabled = false,
 }: ConfirmModalProps) => {
     return (
         <Modal open={open} onClose={onClose} size="lg">
@@ -50,6 +55,8 @@ const ConfirmModal = ({
                     {description}
                 </p>
 
+                {children && <div className="w-full">{children}</div>}
+
                 {/* Ações */}
                 <div className="flex gap-3 pt-1 w-full">
                     <Button
@@ -66,6 +73,7 @@ const ConfirmModal = ({
                         variant="campfire"
                         className="flex-1"
                         onClick={onConfirm}
+                        disabled={confirmDisabled}
                         loading={loading}
                         loadingText={loadingText}
                     >

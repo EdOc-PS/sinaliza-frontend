@@ -13,6 +13,7 @@ import { AUTH } from '@routes/auth'
 import { isValidEmail } from '@lib/validation/email'
 import logoImg from '@/assets/images/logo/logo-simples.png'
 import securityImg from '@/assets/images/security.png'
+import { LIMITS } from "@lib/validation/limits";
 
 const ForgotPasswordPage = () => {
     const navigate = useNavigate()
@@ -86,7 +87,7 @@ const ForgotPasswordPage = () => {
                                             id="email"
                                             icon={MailOpenLoveIcon}
                                             placeholder="usuario@exemplo.com"
-                                            value={email}
+                                            maxLength={LIMITS.EMAIL} value={email}
                                             onChange={setEmail}
                                             autoFocus
                                         />

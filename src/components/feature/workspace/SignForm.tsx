@@ -34,6 +34,7 @@ import { GetRequest, PatchFormDataRequest, PostFormDataRequest } from "@requests
 import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import { isValidYouTubeUrl } from "@lib/youtube/youtube";
+import { LIMITS } from "@lib/validation/limits";
 
 interface SignOptions {
     categories: GenericOption[];
@@ -270,7 +271,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             id="sign-name"
                             icon={SignLanguageCIcon}
                             placeholder="Ex: Bom dia"
-                            value={name}
+                            maxLength={LIMITS.SIGN_NAME} value={name}
                             onChange={setName}
                             autoFocus
                         />
@@ -346,7 +347,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             id="example-pt"
                             icon={SpeechIcon}
                             placeholder='Ex: "Bom dia, tudo bem?"'
-                            value={examplePt}
+                            maxLength={LIMITS.SIGN_EXAMPLE} value={examplePt}
                             onChange={setExamplePt}
                         />
                     </div>
@@ -357,7 +358,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             id="example-libras"
                             icon={RotateRight01Icon}
                             placeholder="Ex: BOM-DIA TUDO BEM"
-                            value={exampleLibras}
+                            maxLength={LIMITS.SIGN_EXAMPLE} value={exampleLibras}
                             onChange={setExampleLibras}
                         />
                     </div>
@@ -368,7 +369,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             id="movement-desc"
                             icon={TextSelectIcon}
                             placeholder="Descreva o movimento das mãos..."
-                            value={movementDesc}
+                            maxLength={LIMITS.SIGN_MOVEMENT} value={movementDesc}
                             onChange={setMovementDesc}
                             height={96}
                         />
@@ -400,6 +401,8 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             placeholder="Adicionar tag e pressionar Enter..."
                             tags={tags}
                             onChange={setTags}
+                            maxTagLength={LIMITS.TAG}
+                            maxTags={LIMITS.TAGS_MAX}
                         />
                         <p className="text-xs text-cloud-400 pl-1">
                             Ex: saudação, cumprimento, cotidiano. Digite e pressione Enter para cada tag.
@@ -480,7 +483,7 @@ export const SignForm = ({ signId, onClose, onSuccess }: SignFormProps) => {
                             id="another-url"
                             icon={LinkSquare02Icon}
                             placeholder="https://youtube.com/watch?v=..."
-                            value={anotherUrl}
+                            maxLength={LIMITS.URL} value={anotherUrl}
                             onChange={setAnotherUrl}
                             disabled={urlDisabled}
                             wrapperClassName={urlDisabled ? "opacity-50" : ""}

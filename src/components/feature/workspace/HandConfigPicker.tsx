@@ -10,6 +10,7 @@ import { HAND_CONFIG } from "@routes/handConfigs";
 import Spinner from "@components/ui/Spinner";
 import { Tooltip } from "@components/ui/Tooltip";
 import { sortHandConfigs, HAND_CONFIG_SORT_OPTIONS, type HandConfigSort } from "./VisualKeyboard";
+import { LIMITS } from "@lib/validation/limits";
 
 export interface HandConfig {
     id: string;
@@ -115,7 +116,7 @@ const HandConfigPicker = ({
                         </span>
                         <input
                             type="text"
-                            value={search}
+                            maxLength={LIMITS.SEARCH} value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Buscar..."
                             className="w-full pl-8 pr-3 py-1.5 rounded-xl border-2 border-neutral-200 text-sm text-cloud-700 placeholder:text-neutral-400 hover:border-cloud-400 focus:border-cloud-400 focus:outline-none transition-all"
@@ -149,7 +150,7 @@ const HandConfigPicker = ({
                         </span>
                         <input
                             type="text"
-                            value={search}
+                            maxLength={LIMITS.SEARCH} value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Buscar configuração..."
                             className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-cloud-400/10 bg-cloud-100 text-sm text-cloud-700 placeholder:text-neutral-500 focus:border-cloud-500 focus:outline-none transition-all"

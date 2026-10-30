@@ -10,6 +10,7 @@ import Input from "@components/ui/Input";
 import InputText from "@components/ui/InputText";
 import Label from "@components/ui/Label";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { LIMITS } from "@lib/validation/limits";
 
 export interface EssayPrompt {
     id: string;
@@ -77,7 +78,7 @@ export const EssayPromptForm = ({ classroomId, prompt, onClose, onSuccess }: Ess
                     id="prompt-title"
                     icon={TaskDaily01Icon}
                     placeholder="Ex: Os desafios da inclusão de surdos na escola"
-                    value={title}
+                    maxLength={LIMITS.ESSAY_TITLE} value={title}
                     onChange={setTitle}
                     autoFocus
                 />
@@ -91,7 +92,7 @@ export const EssayPromptForm = ({ classroomId, prompt, onClose, onSuccess }: Ess
                 <InputText
                     id="prompt-description"
                     placeholder="Descreva a proposta, o tema e o que se espera da redação."
-                    value={description}
+                    maxLength={LIMITS.ESSAY_DESCRIPTION} value={description}
                     onChange={setDescription}
                     height="120px"
                 />

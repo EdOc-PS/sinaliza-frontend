@@ -11,6 +11,7 @@ import { Clapping02Icon } from "@hugeicons/core-free-icons";
 import { HAND_CONFIG } from "@routes/handConfigs";
 import { PostFormDataRequest, PatchFormDataRequest } from "@requests";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { LIMITS } from "@lib/validation/limits";
 
 interface HandConfigFormData {
     id?: string;
@@ -85,7 +86,7 @@ export const HandConfigForm = ({ handConfig, onClose, onSuccess }: HandConfigFor
                     id="hand-config-name"
                     icon={Clapping02Icon}
                     placeholder="Ex: Letra A"
-                    value={name}
+                    maxLength={LIMITS.HAND_CONFIG_NAME} value={name}
                     onChange={setName}
                 />
                 {name.trim() !== "" && !nameValid && (

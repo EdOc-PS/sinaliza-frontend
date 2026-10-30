@@ -8,6 +8,9 @@ import { SIGNS } from "@routes/signs";
 import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import ConfirmModal from "@components/layout/ConfirmModal";
+import Label from "@components/ui/Label";
+import InputText from "@components/ui/InputText";
+import { LIMITS } from "@lib/validation/limits";
 
 interface SignRef {
     id: string;
@@ -19,9 +22,11 @@ interface SignRef {
 export const useUnpromoteSign = (onDone?: () => void) => {
     const queryClient = useQueryClient();
     const [target, setTarget] = useState<SignRef | null>(null);
+    // Motivo vai por email para quem cadastrou o sinal
+    const [reason, setReason] = useState("");
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (sign: SignRef) => unwrap(PatchRequest(SIGNS.UNPROMOTE(sign.id), {})),
+        mutationFn: (sign: SignRef) => unwrap(PatchRequest(SIGNS.UNPROMOTE(sign.id), { reason: reason.trim() })),
         onSuccess: (_data, sign) => {
             toast.success(`"${sign.name}" saiu do glossário global`);
             setTarget(null);
@@ -38,7 +43,8 @@ export const useUnpromoteSign = (onDone?: () => void) => {
         <ConfirmModal
             open={!!target}
             onClose={() => setTarget(null)}
-            onConfirm={() => target && mutate(target)}
+            onConfirm={() => target && reason.trim() && mutate(target)}
+            confirmDisabled={!reason.trim()}
             loading={isPending}
             loadingText="Removendo"
             icon={Cancel02Icon}
@@ -46,14 +52,26 @@ export const useUnpromoteSign = (onDone?: () => void) => {
             description={
                 <>
                     O sinal <b>{target?.name}</b> deixa de ser público e volta a ficar só nas turmas.
-                    As disciplinas do glossário associadas a ele são desfeitas.
+                    As disciplinas do glossário associadas a ele são desfeitas. Quem cadastrou o sinal recebe o motivo por email.
                 </>
             }
             confirmText="Remover do glossário"
-        />
+        >
+            <div className="flex flex-col gap-2">
+                <Label htmlFor="unpromote-reason" isRequired>Motivo</Label>
+                <InputText
+                    id="unpromote-reason"
+                    value={reason}
+                    onChange={setReason}
+                    maxLength={LIMITS.REVIEW_REASON}
+                    height={96}
+                    placeholder="Ex: sinal duplicado no glossário."
+                />
+            </div>
+        </ConfirmModal>
     );
 
-    return { ask: (sign: SignRef) => setTarget(sign), modal };
+    return { ask: (sign: SignRef) => { setReason(""); setTarget(sign); }, modal };
 };
 
 export default useUnpromoteSign;

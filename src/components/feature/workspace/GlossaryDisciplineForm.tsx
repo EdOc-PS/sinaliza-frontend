@@ -12,6 +12,7 @@ import { PostRequest, PatchRequest } from "@requests";
 import { GLOSSARY_DISCIPLINES } from "@routes/glossaryDisciplines";
 import type { GlossaryDisciplineSlim } from "@lib/constants/glossaryDiscipline";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { LIMITS } from "@lib/validation/limits";
 
 interface GlossaryDisciplineFormProps {
     /** Quando informado, o formulário entra em modo de edição */
@@ -70,7 +71,7 @@ export const GlossaryDisciplineForm = ({ discipline, onClose, onSuccess }: Gloss
                     id="glossary-discipline-name"
                     icon={MortarboardIcon}
                     placeholder="Ex: Matemática"
-                    value={name}
+                    maxLength={LIMITS.GLOSSARY_DISCIPLINE_NAME} value={name}
                     onChange={setName}
                     autoFocus
                 />
@@ -84,7 +85,7 @@ export const GlossaryDisciplineForm = ({ discipline, onClose, onSuccess }: Gloss
                 <InputText
                     id="glossary-discipline-description"
                     placeholder="Uma breve descrição do que essa disciplina agrupa."
-                    value={description}
+                    maxLength={LIMITS.GLOSSARY_DISCIPLINE_DESCRIPTION} value={description}
                     onChange={setDescription}
                     height="80px"
                 />

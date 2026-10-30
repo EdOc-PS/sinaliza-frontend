@@ -33,6 +33,7 @@ import type { CreateEducatorPayload, EducatorType, Role, User } from "@api/reque
 import { isValidEmail } from "@lib/validation/email";
 import educatorImg from "@/assets/images/educator.png";
 import interpreterImg from "@/assets/images/interpreter.png";
+import { LIMITS } from "@lib/validation/limits";
 
 // Só os dois tipos de educador
 type EducatorKind = "educator" | "interpreter";
@@ -295,7 +296,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-name" isRequired>Nome:</Label>
-                            <Input id="edu-name" icon={LocationUser01Icon} placeholder="Nome completo" value={name} noSpecialChars onChange={setName} autoFocus />
+                            <Input id="edu-name" icon={LocationUser01Icon} placeholder="Nome completo" maxLength={LIMITS.NAME} value={name} noSpecialChars onChange={setName} autoFocus />
                             {name.trim() !== "" && !nameValid && (
                                 <p className="text-xs text-neutral-400 pl-1">O nome precisa ter pelo menos 3 caracteres.</p>
                             )}
@@ -303,7 +304,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-email" isRequired>E-mail:</Label>
-                            <Input id="edu-email" icon={MailOpenLoveIcon} placeholder="educador@email.com" value={email} onChange={setEmail} />
+                            <Input id="edu-email" icon={MailOpenLoveIcon} placeholder="educador@email.com" maxLength={LIMITS.EMAIL} value={email} onChange={setEmail} />
                             {email.trim() !== "" && !emailValid && (
                                 <p className="text-xs text-neutral-400 pl-1">Digite um e-mail válido.</p>
                             )}
@@ -311,7 +312,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-phone" isOptional>Telefone:</Label>
-                            <Input id="edu-phone" icon={SmartPhone01Icon} placeholder="(31) 99999-9999" value={phone} onChange={(v) => setPhone(maskPhone(v))} />
+                            <Input id="edu-phone" icon={SmartPhone01Icon} placeholder="(31) 99999-9999" maxLength={LIMITS.PHONE} value={phone} onChange={(v) => setPhone(maskPhone(v))} />
                         </div>
                     </div>
 
@@ -344,7 +345,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                                         icon={campo.icon}
                                         type={campo.type}
                                         placeholder={campo.placeholder}
-                                        value={dadosPerfil[campo.id] || ""}
+                                        maxLength={LIMITS.PROFILE_FIELD} value={dadosPerfil[campo.id] || ""}
                                         noSpecialChars={campo.noSpecialChars}
                                         onChange={(value) => handleProfileChange(campo.id, value)}
                                     />
@@ -373,7 +374,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                 <>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edu-bio" isOptional>Biografia:</Label>
-                        <InputText id="edu-bio" icon={PenTool03Icon} placeholder="Breve descrição do educador (opcional)." value={bio} onChange={setBio} />
+                        <InputText id="edu-bio" icon={PenTool03Icon} placeholder="Breve descrição do educador (opcional)." maxLength={LIMITS.BIO} value={bio} onChange={setBio} />
                     </div>
 
                     <div className="flex gap-3 pt-2">
@@ -389,7 +390,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-password" isRequired>Senha:</Label>
-                            <Input id="edu-password" icon={CirclePasswordIcon} type="password" placeholder="Mínimo 6 caracteres" value={password} onChange={setPassword} />
+                            <Input id="edu-password" icon={CirclePasswordIcon} type="password" placeholder="Mínimo 6 caracteres" maxLength={LIMITS.PASSWORD} value={password} onChange={setPassword} />
                             {password.trim() !== "" && !passwordValid && (
                                 <p className="text-xs text-neutral-400 pl-1">A senha precisa ter pelo menos 6 caracteres.</p>
                             )}
@@ -397,7 +398,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
 
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edu-confirm" isRequired>Confirmar senha:</Label>
-                            <Input id="edu-confirm" icon={CirclePasswordIcon} type="password" placeholder="Repita a senha" value={confirmPassword} onChange={setConfirmPassword} />
+                            <Input id="edu-confirm" icon={CirclePasswordIcon} type="password" placeholder="Repita a senha" maxLength={LIMITS.PASSWORD} value={confirmPassword} onChange={setConfirmPassword} />
                             {confirmPassword.trim() !== "" && !passwordsMatch && (
                                 <p className="text-xs text-neutral-400 pl-1">As senhas não coincidem.</p>
                             )}

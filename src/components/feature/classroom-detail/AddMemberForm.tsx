@@ -10,6 +10,7 @@ import { PostRequest } from "@requests";
 import { CLASSROOMS } from "@routes/classrooms";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
 import { isValidEmail } from "@lib/validation/email";
+import { LIMITS } from "@lib/validation/limits";
 
 interface AddMemberFormProps {
     classroomId: string;
@@ -59,7 +60,7 @@ export const AddMemberForm = ({ classroomId, onClose, onSuccess }: AddMemberForm
                     id="member-email"
                     icon={MailOpenLoveIcon}
                     placeholder="usuario@email.com"
-                    value={email}
+                    maxLength={LIMITS.EMAIL} value={email}
                     onChange={setEmail}
                     autoFocus
                 />

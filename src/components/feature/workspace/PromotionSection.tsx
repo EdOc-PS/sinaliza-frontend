@@ -11,10 +11,15 @@ import { getCategoryBadgeClass, type CategorySlim } from "@lib/constants/categor
 import { getYouTubeThumbnail } from "@lib/youtube/youtube";
 
 import Spinner from "@components/ui/Spinner";
+import Modal from "@components/ui/Modal";
+import Button from "@components/ui/Button";
+import Label from "@components/ui/Label";
+import InputText from "@components/ui/InputText";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
+import { LIMITS } from "@lib/validation/limits";
 
 interface PendingSign {
     id: string;
@@ -54,8 +59,8 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
     const [processing, setProcessing] = useState<Map<string, boolean>>(new Map());
 
     const { mutate: reviewMutate } = useMutation({
-        mutationFn: ({ sign, approve }: { sign: PendingSign; approve: boolean }) =>
-            unwrap(PatchRequest(SIGNS.REVIEW_PROMOTION(sign.id), { approve })),
+        mutationFn: ({ sign, approve, reason }: { sign: PendingSign; approve: boolean; reason?: string }) =>
+            unwrap(PatchRequest(SIGNS.REVIEW_PROMOTION(sign.id), { approve, reason })),
         onMutate: ({ sign, approve }) => {
             setProcessing((prev) => new Map(prev).set(sign.id, approve));
         },
@@ -74,7 +79,22 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
         },
     });
 
-    const review = (sign: PendingSign, approve: boolean) => reviewMutate({ sign, approve });
+    // Recusar abre o modal pedindo o motivo (vai por email para quem cadastrou o sinal)
+    const [rejecting, setRejecting] = useState<PendingSign | null>(null);
+    const [reason, setReason] = useState("");
+
+    const openReject = (sign: PendingSign) => {
+        setReason("");
+        setRejecting(sign);
+    };
+
+    const confirmReject = () => {
+        if (!rejecting || !reason.trim()) return;
+        reviewMutate({ sign: rejecting, approve: false, reason: reason.trim() });
+        setRejecting(null);
+    };
+
+    const approve = (sign: PendingSign) => reviewMutate({ sign, approve: true });
 
     if (!loading && signs.length === 0) return null;
 
@@ -145,7 +165,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                         <button
                                             type="button"
                                             disabled={busy}
-                                            onClick={() => review(sign, false)}
+                                            onClick={() => openReject(sign)}
                                             className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
                                         >
                                             {busyReject ? <Spinner size={18} color="#EEA2A2" /> : <HugeiconsIcon icon={Cancel02Icon} size={22} />}
@@ -154,7 +174,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                         <button
                                             type="button"
                                             disabled={busy}
-                                            onClick={() => review(sign, true)}
+                                            onClick={() => approve(sign)}
                                             className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
                                         >
                                             {busyApprove ? <Spinner size={18} color="#FFFFFF" /> : <HugeiconsIcon icon={Tick04Icon} size={22} />}
@@ -167,6 +187,31 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                     })}
                 </div>
             )}
+
+            <Modal open={!!rejecting} onClose={() => setRejecting(null)} size="md">
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <h3 className="font-baskerville text-lg font-bold text-cloud-600">Recusar promoção</h3>
+                        <p className="text-sm text-cloud-500">
+                            Explique o motivo da recusa de <strong>{rejecting?.name}</strong>. Quem cadastrou o sinal recebe esse texto por email.
+                        </p>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="rejection-reason" isRequired>Motivo</Label>
+                        <InputText
+                            id="rejection-reason"
+                            value={reason}
+                            onChange={setReason}
+                            maxLength={LIMITS.REVIEW_REASON}
+                            placeholder="Ex: o vídeo corta antes do fim do movimento."
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" className="flex-1" onClick={() => setRejecting(null)}>Cancelar</Button>
+                        <Button variant="salmon" className="flex-1" disabled={!reason.trim()} onClick={confirmReject}>Recusar</Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

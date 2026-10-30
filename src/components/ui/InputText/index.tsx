@@ -9,6 +9,9 @@ interface InputTextProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement
 
 const InputText = ({ onChange, icon, height = 128, ...props }: InputTextProps) => {
     const resolvedHeight = typeof height === "number" ? `${height}px` : height;
+    // Com `maxLength`, mostra quanto já foi usado do limite
+    const length = typeof props.value === "string" ? props.value.length : 0;
+    const showCounter = props.maxLength !== undefined;
 
     return (
         <div className="flex items-start gap-2 lg:gap-3 rounded-2xl lg:rounded-3xl border-2 border-cloud-400/10 bg-cloud-100 px-2 py-2 lg:px-2.5 lg:py-2.5 transition-colors focus-within:border-cloud-500 focus-within:text-cloud-500 focus-within:font-semibold">
@@ -22,12 +25,19 @@ const InputText = ({ onChange, icon, height = 128, ...props }: InputTextProps) =
                 </div>
             )}
 
-            <textarea
-                onChange={(event) => onChange?.(event.target.value, event)}
-                style={{ height: resolvedHeight }}
-                className="w-full resize-none bg-transparent text-sm lg:text-base text-neutral-900 outline-none placeholder:text-neutral-600 font-medium"
-                {...props}
-            />
+            <div className="flex w-full flex-col">
+                <textarea
+                    onChange={(event) => onChange?.(event.target.value, event)}
+                    style={{ height: resolvedHeight }}
+                    className="w-full resize-none bg-transparent text-sm lg:text-base text-neutral-900 outline-none placeholder:text-neutral-600 font-medium"
+                    {...props}
+                />
+                {showCounter && (
+                    <span className={`self-end pr-1 text-xs font-normal ${length >= props.maxLength! ? "text-salmon-600" : "text-cloud-400"}`}>
+                        {length}/{props.maxLength}
+                    </span>
+                )}
+            </div>
         </div>
     );
 };

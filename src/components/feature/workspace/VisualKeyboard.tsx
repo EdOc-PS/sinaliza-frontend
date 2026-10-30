@@ -21,6 +21,7 @@ import Spinner from "@components/ui/Spinner";
 import { Tooltip } from "@components/ui/Tooltip";
 import { useReportLoading } from "@lib/hooks/useLoadingGroup";
 import createHandImg from "@/assets/images/app/create-hand.png";
+import { LIMITS } from "@lib/validation/limits";
 
 export interface HandConfigTypeForm {
     id?: string;
@@ -162,7 +163,7 @@ export const VisualKeyboard = ({ onEdit, refreshTrigger, onSelectConfig, title, 
                             <input
                                 ref={searchRef}
                                 type="text"
-                                value={search}
+                                maxLength={LIMITS.SEARCH} value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Buscar..."
                                 className="w-full pl-8 pr-3 py-1.5 rounded-xl border-2 border-neutral-200 text-sm text-cloud-700 placeholder:text-neutral-400 hover:border-cloud-400 focus:border-cloud-400 focus:outline-none transition-all"

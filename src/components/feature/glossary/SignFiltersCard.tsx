@@ -10,6 +10,7 @@ import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
 import type { HandConfig } from "@components/feature/workspace/HandConfigPicker";
 import { SignFilterFields } from "./SignFilterFields";
+import { LIMITS } from "@lib/validation/limits";
 
 export interface SignFilters {
     query: string;
@@ -157,7 +158,7 @@ export const SignFiltersCard = ({
             <Input
                 icon={Search01Icon}
                 wrapperClassName={searchWrapperClassName}
-                value={draft.query}
+                maxLength={LIMITS.SEARCH} value={draft.query}
                 onChange={(query) => setDraft((d) => ({ ...d, query }))}
                 onFocus={() => setOpen(true)}
                 onKeyDown={(e) => { if (e.key === "Enter") apply(); }}

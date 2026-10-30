@@ -10,6 +10,7 @@ import { TagsIcon } from "@hugeicons/core-free-icons";
 import { PostRequest } from "@requests";
 import { CATEGORIES } from "@routes/categories";
 import ModalStickyHeader from "@components/ui/Modal/StickyHeader";
+import { LIMITS } from "@lib/validation/limits";
 
 interface CategoryFormProps {
     onClose: () => void;
@@ -58,7 +59,7 @@ export const CategoryForm = ({ onClose, onSuccess }: CategoryFormProps) => {
                     id="category-name"
                     icon={TagsIcon}
                     placeholder="Ex: Animal"
-                    value={name}
+                    maxLength={LIMITS.CATEGORY_NAME} value={name}
                     onChange={setName}
                     autoFocus
                 />

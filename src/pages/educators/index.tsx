@@ -19,6 +19,7 @@ import Pagination from "@components/ui/Pagination";
 import ConfirmDeleteModal from "@components/layout/ConfirmDeleteModal";
 import { EducatorForm } from "@components/feature/educators/EducatorForm";
 import { ListCardEducator, type EducatorListItem } from "@components/feature/educators/ListCardEducator";
+import { LIMITS } from "@lib/validation/limits";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -99,7 +100,7 @@ const EducatorsPage = () => {
                     {/* Busca */}
                     <Input
                         icon={Search01Icon}
-                        value={search}
+                        maxLength={LIMITS.SEARCH} value={search}
                         onChange={setSearch}
                         placeholder="Buscar por nome ou email..."
                     />

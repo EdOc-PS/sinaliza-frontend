@@ -13,6 +13,7 @@ import Input from "@components/ui/Input";
 import Spinner from "@components/ui/Spinner";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { SignCard, type SignCardData } from "@/components/feature/classroom-detail/SignCard";
+import { LIMITS } from "@lib/validation/limits";
 
 // Confete majoritariamente de corações
 const FAVORITE_ICONS = [FavouriteIcon, FavouriteIcon, FavouriteIcon, FavouriteIcon, FavouriteIcon, StarIcon];
@@ -96,7 +97,7 @@ const FavoritesPage = () => {
                         <div className="w-full sm:max-w-xs">
                             <Input
                                 icon={Search01Icon}
-                                value={query}
+                                maxLength={LIMITS.SEARCH} value={query}
                                 onChange={(value) => setQuery(value)}
                                 placeholder="Buscar nos favoritos..."
                             />

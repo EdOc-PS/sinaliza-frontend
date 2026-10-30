@@ -12,6 +12,7 @@ import { isPendingApproval } from '@lib/auth/approval'
 import { isValidEmail } from '@lib/validation/email'
 import logoImg from '@/assets/images/logo/logo-simples.png'
 import sunImg from '@/assets/images/sun.png'
+import { LIMITS } from "@lib/validation/limits";
 
 interface AuthProps {
     email: string
@@ -80,7 +81,7 @@ const LoginPage = () => {
                                     id="email"
                                     icon={MailOpenLoveIcon}
                                     placeholder="usuario@exemplo.com"
-                                    value={auth.email}
+                                    maxLength={LIMITS.EMAIL} value={auth.email}
                                     onChange={(value) => setAuth({ ...auth, email: value })}
                                 />
                                 {auth.email.trim() !== '' && !emailValido && (
@@ -97,7 +98,7 @@ const LoginPage = () => {
                                     type="password"
                                     icon={CirclePasswordIcon}
                                     placeholder="Sua melhor senha"
-                                    value={auth.password}
+                                    maxLength={LIMITS.PASSWORD} value={auth.password}
                                     onChange={(value) => setAuth({ ...auth, password: value })}
                                 />
                                 <button
