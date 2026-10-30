@@ -37,7 +37,7 @@ export const StatusDonut = ({ data }: { data: { status: GlobalStatus; total: num
                     </PieChart>
                 </ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="font-baskerville text-2xl font-bold tabular-nums text-cloud-600">{total}</span>
+                    <span className="font-baskerville text-2xl font-semibold tabular-nums text-cloud-600">{total}</span>
                     <span className="text-xs text-neutral-400">sinais</span>
                 </div>
             </div>

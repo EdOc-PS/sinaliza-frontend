@@ -38,7 +38,7 @@ export const GlossaryDisciplineCard = ({
         />
 
         <div className={`relative z-10 flex h-full flex-col justify-end ${compact ? "p-2" : "p-3"}`}>
-            <span className={`truncate font-bold text-white ${compact ? "text-xs" : "text-sm"}`}>{discipline.name}</span>
+            <span className={`truncate font-semibold text-white ${compact ? "text-xs" : "text-sm"}`}>{discipline.name}</span>
             {!compact && <span className="text-xs text-white/80">{discipline._count?.signs ?? 0} sinais</span>}
         </div>
 

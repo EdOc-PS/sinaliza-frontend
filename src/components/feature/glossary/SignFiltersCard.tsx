@@ -137,7 +137,7 @@ export const SignFiltersCard = ({
                 </button>
 
                 <div className="min-w-0 flex-1">
-                    <h2 className="font-baskerville text-lg font-bold text-cloud-600">{title}</h2>
+                    <h2 className="font-baskerville text-lg font-semibold text-cloud-600">{title}</h2>
                     <p className="truncate text-sm text-neutral-500">{subtitle}</p>
                 </div>
 

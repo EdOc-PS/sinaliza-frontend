@@ -48,7 +48,7 @@ const SearchResultsPage = () => {
             {/* Topo: termo buscado + voltar */}
             <div className="flex items-center justify-between gap-3 rounded-3xl bg-white p-6">
                 <div>
-                    <h1 className="font-baskerville text-2xl font-bold text-cloud-600">
+                    <h1 className="font-baskerville text-2xl font-semibold text-cloud-600">
                         {search ? <>Resultados para "<span className="text-campfire-500 italic">{search}</span>"</> : "Resultados da busca"}
                     </h1>
                     <p className="text-sm text-neutral-500">Sinais das turmas em que você participa</p>

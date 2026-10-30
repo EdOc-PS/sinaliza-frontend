@@ -113,7 +113,7 @@ const ClassroomsPage = () => {
         <>
             <section className="flex flex-col gap-10">
                 <div className="bg-white rounded-3xl p-6">
-                    <p className="text-xl sm:text-4xl font-bold text-cloud-500 font-baskerville">
+                    <p className="text-xl sm:text-4xl font-semibold text-cloud-500 font-baskerville">
                         Olá,
                         <span className="font-baskerville text-campfire-500 italic"> {user?.name ?? "professor"}</span>
                     </p>

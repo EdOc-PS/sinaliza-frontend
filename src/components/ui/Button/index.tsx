@@ -60,7 +60,7 @@ const Button = ({
             type={type}
             disabled={isDisabled}
             className={`
-                cursor-pointer flex items-center gap-2 font-bold
+                cursor-pointer flex items-center gap-2 font-semibold
                 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60
                 ${loading ? "justify-between" : "justify-center"}
                 ${sizeStyles[size]} ${variantStyles[variant]} ${className}

@@ -32,7 +32,7 @@ interface ListCardEducatorProps {
 export const ListCardEducator = ({ educator, onEdit, onDelete }: ListCardEducatorProps) => (
     <div className="flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24">
         {/* Avatar */}
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-campfire-100 font-baskerville font-bold text-campfire-600">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-campfire-100 font-baskerville font-semibold text-campfire-600">
             {getAvatarUrl(educator.avatar) ? (
                 <img src={getAvatarUrl(educator.avatar)} alt={educator.name} className="h-full w-full object-cover" />
             ) : (

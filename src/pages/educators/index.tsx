@@ -83,7 +83,7 @@ const EducatorsPage = () => {
                                 <HugeiconsIcon icon={UserMultiple02Icon} size={26} className="text-lime-700" />
                             </div>
                             <div>
-                                <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Educadores</h1>
+                                <h1 className="font-baskerville text-2xl font-semibold text-cloud-600">Educadores</h1>
                                 <p className="text-sm text-neutral-500">Cadastre e gerencie professores e intérpretes</p>
                             </div>
                         </div>

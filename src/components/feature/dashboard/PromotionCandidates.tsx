@@ -37,7 +37,7 @@ export const PromotionCandidates = ({ candidates, onPromote }: PromotionCandidat
                     onClick={() => navigate(`/signs/${sign.slug}`)}
                 >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <span className="w-5 shrink-0 text-center text-xs font-bold tabular-nums text-cloud-400">{index + 1}</span>
+                        <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-cloud-400">{index + 1}</span>
                         <SignThumb sign={sign} />
                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                             <div className="flex flex-wrap items-center gap-1.5">

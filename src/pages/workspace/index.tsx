@@ -40,7 +40,7 @@ const WorkspacePage = () => {
             <section className="flex flex-col gap-10">
                 <div className="bg-white rounded-3xl p-6 flex flex-col gap-6">
                     <div>
-                        <p className="text-xl sm:text-4xl font-bold text-cloud-500 font-baskerville">
+                        <p className="text-xl sm:text-4xl font-semibold text-cloud-500 font-baskerville">
                             Ambiente de
                             <span className="font-baskerville text-campfire-500 italic"> Trabalho</span>
                         </p>

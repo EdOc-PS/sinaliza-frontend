@@ -80,7 +80,7 @@ const MenuItem = ({ icon, label, shortLabel, onClick, isDesktop = false, isActiv
                     </span>
                 </span>
                 <span
-                    className={`text-[10px] font-bold leading-none whitespace-nowrap transition-all duration-300 overflow-hidden ${isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
+                    className={`text-[10px] font-semibold leading-none whitespace-nowrap transition-all duration-300 overflow-hidden ${isActive ? "max-h-4 opacity-100 text-lime-600" : "max-h-0 opacity-0 text-transparent"
                         }`}
                 >
                     {shortLabel ?? label}

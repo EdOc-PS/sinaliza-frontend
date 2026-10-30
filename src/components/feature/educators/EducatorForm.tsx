@@ -253,7 +253,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                             className={`flex items-center justify-between gap-2 rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-salmon-100 text-salmon-800 ${kind === "educator" ? "border-current/50" : "border-transparent opacity-90"}`}
                         >
                             <div>
-                                <p className="text-lg font-bold">Professor</p>
+                                <p className="text-lg font-semibold">Professor</p>
                                 <p className="mt-1 text-sm font-medium opacity-90">Gestão de turmas e sinais</p>
                             </div>
                             <img src={educatorImg} alt="" className="w-14 h-14 shrink-0" />
@@ -265,7 +265,7 @@ export const EducatorForm = ({ educatorId, onClose, onSuccess }: EducatorFormPro
                             className={`flex items-center justify-between gap-2 rounded-3xl px-5 py-5 text-left transition-all duration-300 hover:-translate-y-0.5 border-2 bg-campfire-100 text-campfire-800 ${kind === "interpreter" ? "border-current/50" : "border-transparent opacity-90"}`}
                         >
                             <div>
-                                <p className="text-lg font-bold">Intérprete</p>
+                                <p className="text-lg font-semibold">Intérprete</p>
                                 <p className="mt-1 text-sm font-medium opacity-90">Criação de sinais e apoio aos estudantes</p>
                             </div>
                             <img src={interpreterImg} alt="" className="w-14 h-14 shrink-0" />

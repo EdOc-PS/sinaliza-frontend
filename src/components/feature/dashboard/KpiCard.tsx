@@ -15,7 +15,7 @@ export const KpiCard = ({ icon, label, value, hint, tone }: KpiCardProps) => (
             <HugeiconsIcon icon={icon} size={20} />
         </span>
         <div>
-            <p className="font-baskerville text-3xl font-bold tabular-nums text-cloud-600">
+            <p className="font-baskerville text-3xl font-semibold tabular-nums text-cloud-600">
                 {value.toLocaleString("pt-BR")}
             </p>
             <p className="text-sm font-medium text-cloud-500">{label}</p>

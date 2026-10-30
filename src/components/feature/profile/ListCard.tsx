@@ -36,7 +36,7 @@ export const ListCard = ({ title, icon, iconClass, onSeeAll, loading, empty, emp
                     <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconClass}`}>
                         <HugeiconsIcon icon={icon} size={18} />
                     </div>
-                    <h2 className="font-baskerville text-lg font-bold text-cloud-600">{title}</h2>
+                    <h2 className="font-baskerville text-lg font-semibold text-cloud-600">{title}</h2>
                 </div>
 
                 {/* No mobile o botão desce para o fim da lista (ver abaixo) */}

@@ -260,7 +260,7 @@ const SignDetailPage = () => {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex flex-col gap-2">
                         <div className="flex flex-wrap items-center gap-3">
-                            <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
+                            <h1 className="font-baskerville text-2xl sm:text-3xl font-semibold text-cloud-600">
                                 {sign.name}
                             </h1>
                             {sign.category && (

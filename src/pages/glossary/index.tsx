@@ -94,7 +94,7 @@ const GlossaryPage = () => {
                     </div>
 
                     <div>
-                        <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-white">
+                        <h1 className="font-baskerville text-2xl sm:text-3xl font-semibold text-white">
                             Glossário Global
                         </h1>
                         <p className="mt-1.5 max-w-lg text-sm text-white/85">

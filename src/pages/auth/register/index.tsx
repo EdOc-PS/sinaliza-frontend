@@ -173,7 +173,7 @@ const RegisterPage = () => {
                 {/* Logo */}
                 <div className='flex items-center'>
                     <img src={logoImg} alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
-                    <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
+                    <h1 className='font-baskerville text-2xl sm:text-3xl font-semibold text-cloud-500'>Sinaliza</h1>
                 </div>
 
                 {/* Formulário de Registro */}
@@ -188,7 +188,7 @@ const RegisterPage = () => {
                                     <img src={helloImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                         Dados pessoais
                                     </p>
                                     <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -262,7 +262,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                         Perfil de uso
                                     </p>
                                     <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -283,7 +283,7 @@ const RegisterPage = () => {
                                                     }`}
                                             >
                                                 <div>
-                                                    <p className="text-lg font-bold">{perfil.titulo}</p>
+                                                    <p className="text-lg font-semibold">{perfil.titulo}</p>
                                                     <p className="break-normal mt-1 text-sm font-medium opacity-90">{perfil.descricao}</p>
                                                 </div>
 
@@ -316,7 +316,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                         {formularioSelecionado?.titulo}
                                     </p>
                                     <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -376,7 +376,7 @@ const RegisterPage = () => {
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                         Sua Bio
                                     </p>
                                     <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -411,7 +411,7 @@ const RegisterPage = () => {
                                     <img src={securityImg} alt="" className='w-16 h-16 sm:w-20 sm:h-20' />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                                    <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                         Criar Senha
                                     </p>
                                     <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -507,14 +507,14 @@ const RegisterPage = () => {
                 <div className="mt-1 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-bold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
                     >
                         <HugeiconsIcon icon={Home01Icon} size={20} />
                         Início
                     </button>
                     <button
                         onClick={() => navigate('/auth/login')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-campfire-500 px-5 py-3 font-bold text-cloud-100 transition-colors duration-300 hover:bg-campfire-500/90"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-campfire-500 px-5 py-3 font-semibold text-cloud-100 transition-colors duration-300 hover:bg-campfire-500/90"
                     >
                         <HugeiconsIcon icon={Login03Icon} size={20} />
                         Fazer login

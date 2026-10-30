@@ -131,7 +131,7 @@ const DashboardPage = () => {
                             <HugeiconsIcon icon={ChartIcon} size={26} className="text-campfire-600" />
                         </div>
                         <div>
-                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Métricas</h1>
+                            <h1 className="font-baskerville text-2xl font-semibold text-cloud-600">Métricas</h1>
                             <p className="text-sm text-neutral-500">Uso da plataforma e sinais que merecem ir para o glossário</p>
                         </div>
                     </div>

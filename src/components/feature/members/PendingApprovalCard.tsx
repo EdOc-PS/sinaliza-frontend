@@ -23,7 +23,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                     <HugeiconsIcon icon={UserTime03Icon} size={24} className="text-sunflower-700" />
                 </div>
                 <div>
-                    <h2 className="font-baskerville text-lg font-bold text-cloud-600">Aprovações pendentes</h2>
+                    <h2 className="font-baskerville text-lg font-semibold text-cloud-600">Aprovações pendentes</h2>
                     <p className="text-sm text-cloud-500">
                         {pending.length} conta{pending.length > 1 ? "s" : ""} aguardando sua aprovação
                     </p>
@@ -36,7 +36,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                     return (
                         <div key={member.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
                             <div className="flex min-w-0 flex-1 items-center gap-3">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-bold text-sky-600">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-semibold text-sky-600">
                                     {getAvatarUrl(member.avatar) ? (
                                         <img src={getAvatarUrl(member.avatar)} alt={member.name} className="h-full w-full object-cover" />
                                     ) : (

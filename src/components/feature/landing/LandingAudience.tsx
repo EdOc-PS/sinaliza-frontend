@@ -28,7 +28,7 @@ const audiences = [
 // "Para quem é" — três colunas separadas por linhas finas, sem cards
 export const LandingAudience = () => (
     <section id="para-quem" className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2 className="reveal max-w-2xl font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">
                 <WordReveal lines={[["Cada", "papel", "da", "sala"], ["tem", "seu", "lugar."]]} />
             </h2>

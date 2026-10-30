@@ -26,15 +26,12 @@ export const LandingHeader = ({ showAnchors = false, background = "bg-white" }: 
                 {/* Logo + descritor */}
                 <Link to="/" className="flex items-center gap-2 transition-opacity duration-300 ease-out hover:opacity-80">
                     <img src={logo} alt="" className="h-10 w-10" />
-                    <span className="flex flex-col leading-none">
-                        <span className="font-baskerville text-xl font-bold text-cloud-600">Sinaliza</span>
-                        <span className="mt-1 text-xs font-semibold text-cloud-400">repositório de Libras</span>
-                    </span>
+                    <span className="font-baskerville text-xl font-semibold text-cloud-600">Sinaliza</span>
                 </Link>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                     {/* Navegação em pílula */}
-                    <nav className="hidden items-center rounded-full bg-cloud-200/80 p-1.5 md:flex">
+                    <nav className="mr-2 hidden items-center rounded-full bg-cloud-200/80 p-1.5 md:flex">
                         {showRepositoryLink && (
                             <Link to="/public-glossary" className={pillLink}>Repositório</Link>
                         )}
@@ -45,8 +42,15 @@ export const LandingHeader = ({ showAnchors = false, background = "bg-white" }: 
                                 <a href="#sobre" className={pillLink}>Sobre</a>
                             </>
                         )}
-                        <Link to="/auth/login" className={pillLink}>Entrar</Link>
                     </nav>
+
+                    {/* Ações de conta lado a lado */}
+                    <Link
+                        to="/auth/login"
+                        className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-cloud-600 transition-colors duration-300 ease-out hover:bg-cloud-200 sm:px-5 sm:py-3"
+                    >
+                        Entrar
+                    </Link>
 
                     <button
                         onClick={() => navigate("/auth/register")}

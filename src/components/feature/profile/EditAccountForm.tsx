@@ -138,7 +138,7 @@ export const EditAccountForm = ({ onClose, onSuccess }: EditAccountFormProps) =>
                                     onClick={() => setAvatar("")}
                                     aria-pressed={avatar === ""}
                                     title="Sem avatar (iniciais)"
-                                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 bg-campfire-100 font-baskerville text-sm font-bold text-campfire-600 transition-colors ${
+                                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 bg-campfire-100 font-baskerville text-sm font-semibold text-campfire-600 transition-colors ${
                                         avatar === "" ? "border-cloud-500" : "border-transparent hover:border-cloud-300"
                                     }`}
                                 >

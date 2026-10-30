@@ -99,7 +99,7 @@ const ProfilePage = () => {
                     <div className="relative px-6 py-6 sm:px-8 sm:py-8">
                         {/* Avatar */}
                         <div className="absolute right-6 top-0 h-24 w-24 -translate-y-1/2 shrink-0 sm:right-8 sm:h-28 sm:w-28">
-                            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-campfire-100 font-baskerville text-3xl font-bold text-campfire-600 shadow-sm">
+                            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-campfire-100 font-baskerville text-3xl font-semibold text-campfire-600 shadow-sm">
                                 {getAvatarUrl(user.avatar) ? (
                                     <img src={getAvatarUrl(user.avatar)} alt={user.name} className="h-full w-full object-cover" />
                                 ) : (
@@ -112,7 +112,7 @@ const ProfilePage = () => {
                             {/* Identidade */}
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                                 <div className="flex flex-col gap-1 pt-14 sm:pr-32 sm:pt-0">
-                                    <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-600">
+                                    <h1 className="font-baskerville text-2xl sm:text-3xl font-semibold text-cloud-600">
                                         {user.name}
                                     </h1>
                                     {user.institution?.name && (

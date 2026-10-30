@@ -111,7 +111,7 @@ export const LandingHowItWorks = () => {
             className="relative bg-white lg:h-[340vh]"
         >
             <div className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:items-center">
-                <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:px-8 lg:py-0">
+                <div className="mx-auto grid w-full max-w-7xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:px-8 lg:py-0">
                     {/* Passos */}
                     <div className="flex flex-col justify-center">
                         <h2 className="reveal font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">

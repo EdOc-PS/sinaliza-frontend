@@ -10,7 +10,7 @@ export const LandingAbout = () => {
 
     return (
         <section id="sobre" className="bg-white py-24 sm:py-32">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Citação */}
                 <figure className="reveal max-w-4xl">
                     <blockquote className="relative font-baskerville text-2xl font-normal leading-snug tracking-tight text-cloud-600 sm:text-4xl">
@@ -24,12 +24,12 @@ export const LandingAbout = () => {
                 </figure>
 
                 {/* Contexto do projeto */}
-                <div className="mt-24 grid gap-10 border-t border-cloud-200 pt-12 md:grid-cols-[1fr_2fr_auto] md:gap-12">
-                    <h3 className="reveal font-baskerville text-2xl text-cloud-600">
+                <div className="mt-24 grid gap-10 border-t border-cloud-200 pt-12 md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:gap-y-6">
+                    <h3 className="reveal font-baskerville md:col-span-2 text-2xl text-cloud-600">
                         Por que <em className="font-baskerville text-lime-500">Sinaliza</em>?
                     </h3>
 
-                    <div className="reveal flex flex-col gap-4 text-[15px] leading-relaxed text-cloud-500/75" style={{ transitionDelay: "90ms" }}>
+                    <div className="reveal flex max-w-3xl flex-col gap-4 text-[15px] leading-relaxed text-cloud-500/75" style={{ transitionDelay: "90ms" }}>
                         <p>
                             O Sinaliza nasceu como Trabalho de Conclusão de Curso no{" "}
                             <strong className="font-semibold text-cloud-600">IFMG — Campus Ouro Branco</strong>.

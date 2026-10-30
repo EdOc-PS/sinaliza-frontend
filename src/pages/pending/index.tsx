@@ -27,7 +27,7 @@ const PendingPage = () => {
                 {rejected ? (
                     <>
                         <div className="flex flex-col gap-2">
-                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600 sm:text-3xl">
+                            <h1 className="font-baskerville text-2xl font-semibold text-cloud-600 sm:text-3xl">
                                 Solicitação <span className="italic text-salmon-500 font-baskerville">recusada</span>
                             </h1>
                             <p className="text-sm leading-relaxed text-cloud-500 sm:text-base">
@@ -44,7 +44,7 @@ const PendingPage = () => {
                 ) : (
                     <>
                         <div className="flex flex-col gap-2">
-                            <h1 className="font-baskerville text-2xl font-bold text-cloud-600 sm:text-3xl">
+                            <h1 className="font-baskerville text-2xl font-semibold text-cloud-600 sm:text-3xl">
                                 Solicitação <span className="italic text-campfire-500 font-baskerville">em análise</span>
                             </h1>
                             <p className="text-sm leading-relaxed text-cloud-500 sm:text-base">

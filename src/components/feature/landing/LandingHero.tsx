@@ -1,38 +1,13 @@
-import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon, ArrowRight01Icon, SignLanguageCIcon } from "@hugeicons/core-free-icons";
 
 import AuthBackground from "@components/layout/AuthBackground";
 import WordReveal from "./WordReveal";
-import type { SignCardData } from "@components/feature/classroom-detail/SignCard";
-
-interface LandingHeroProps {
-    signs: SignCardData[];
-}
-
-const ROTATE_MS = 3200;
 
 // Hero da landing: céu (sol + nuvens) sobre as ondas do AuthBackground.
-// O card flutuante vai alternando entre os sinais públicos mais recentes.
-export const LandingHero = ({ signs }: LandingHeroProps) => {
+export const LandingHero = () => {
     const navigate = useNavigate();
-    const [current, setCurrent] = useState(0);
-    const recent = signs.slice(0, 6);
-
-    function nextSign() {
-        setCurrent((i) => (i + 1) % Math.max(recent.length, 1));
-    }
-
-    function startRotation() {
-        if (recent.length < 2) return;
-        const id = window.setInterval(nextSign, ROTATE_MS);
-        return () => window.clearInterval(id);
-    }
-
-    useEffect(() => startRotation(), [recent.length]);
-
-    const sign = recent[current];
 
     return (
         <section className="relative flex min-h-[92vh] items-center overflow-hidden pb-28 pt-20 sm:pb-32 sm:pt-24">
@@ -75,26 +50,6 @@ export const LandingHero = ({ signs }: LandingHeroProps) => {
                         <HugeiconsIcon icon={ArrowRight01Icon} size={18} className="transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
                     </Link>
                 </div>
-
-                {/* Card flutuante com o sinal da vez */}
-                {sign && (
-                    <div className="fade-up mt-14 flex justify-center" style={{ animationDelay: "0.9s" }}>
-                        <button
-                            key={sign.id}
-                            onClick={() => navigate("/public-glossary")}
-                            className="pop-in flex items-center gap-3 rounded-2xl bg-cloud-600/95 py-2.5 pl-2.5 pr-5 text-left shadow-lg shadow-cloud-600/20"
-                        >
-                            <span className="relative flex h-2 w-2 shrink-0">
-                                <span className="live-ping absolute inset-0 rounded-full bg-campfire-500" />
-                                <span className="relative h-2 w-2 rounded-full bg-campfire-500" />
-                            </span>
-                            <span className="text-sm text-cloud-200">
-                                Novo no repositório: <strong className="font-semibold text-white">{sign.name}</strong>
-                                {sign.category && <span className="text-cloud-300"> · {sign.category.name}</span>}
-                            </span>
-                        </button>
-                    </div>
-                )}
             </div>
 
             {/* Indicador de scroll — canto inferior direito */}

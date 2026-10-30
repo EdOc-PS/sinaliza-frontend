@@ -49,7 +49,7 @@ const ResetPasswordPage = () => {
             <div className="flex flex-col items-center w-full">
                 <div className="flex items-center">
                     <img src={logoImg} alt="Logo do Sinaliza" className="w-20 h-20" />
-                    <h1 className="font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500">Sinaliza</h1>
+                    <h1 className="font-baskerville text-2xl sm:text-3xl font-semibold text-cloud-500">Sinaliza</h1>
                 </div>
 
                 <div className="w-full max-w-lg bg-white rounded-4xl p-6 sm:p-8 border-2 border-neutral-300">
@@ -59,7 +59,7 @@ const ResetPasswordPage = () => {
                         </div>
 
                         <div className="text-center">
-                            <p className="text-2xl sm:text-3xl font-bold text-cloud-500 font-baskerville">
+                            <p className="text-2xl sm:text-3xl font-semibold text-cloud-500 font-baskerville">
                                 Crie uma <span className="text-campfire-500">nova senha</span>
                             </p>
                             <p className="text-sm sm:text-base text-neutral-500 mt-2 font-baskerville">

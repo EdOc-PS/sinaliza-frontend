@@ -102,7 +102,7 @@ const PublicGlossaryPage = () => {
                             </div>
 
                             <div>
-                                <h1 className="font-baskerville text-2xl font-bold text-white sm:text-3xl">
+                                <h1 className="font-baskerville text-2xl font-semibold text-white sm:text-3xl">
                                     Repositório Público
                                 </h1>
                                 <p className="mt-1.5 max-w-lg text-sm text-white/85">

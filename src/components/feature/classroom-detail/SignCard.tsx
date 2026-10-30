@@ -258,7 +258,7 @@ export const SignCard = ({
                         className="flex flex-col gap-1 cursor-pointer flex-1 min-w-0"
                         onClick={handleCardClick}
                     >
-                        <h3 className="font-baskerville text-base font-bold text-cloud-600 leading-snug truncate">
+                        <h3 className="font-baskerville text-base font-semibold text-cloud-600 leading-snug truncate">
                             {sign.name}
                         </h3>
                         {sign.category && (

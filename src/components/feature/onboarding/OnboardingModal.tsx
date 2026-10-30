@@ -138,7 +138,7 @@ const buildSteps = (user: User): OnboardingStep[] => {
                             <HugeiconsIcon icon={roleMeta.icon} size={18} />
                         </span>
                         Você está entrando como: 
-                        <span className="ml-1 font-bold capitalize"> {roleLabel}</span>
+                        <span className="ml-1 font-semibold capitalize"> {roleLabel}</span>
                     </p>
                 </div>
             ),

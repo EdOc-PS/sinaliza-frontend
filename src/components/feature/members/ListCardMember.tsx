@@ -47,7 +47,7 @@ export const ListCardMember = ({ member, onToggleStatus, onApprove, updatingStat
     return (
         <div className={`flex items-center gap-3 rounded-3xl bg-white p-5 min-h-24 ${!member.status ? "opacity-60" : ""}`}>
             {/* Avatar */}
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-sky-100 font-baskerville font-bold text-sky-600">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-sky-100 font-baskerville font-semibold text-sky-600">
                 {getAvatarUrl(member.avatar) ? (
                     <img src={getAvatarUrl(member.avatar)} alt={member.name} className="h-full w-full object-cover" />
                 ) : (

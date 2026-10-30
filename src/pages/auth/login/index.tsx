@@ -55,7 +55,7 @@ const LoginPage = () => {
                 {/* Logo */}
                 <div className='flex items-center'>
                     <img src={logoImg} alt="Logo do Sinaliza" className='w-20 h-20 sm:w-20 sm:h-20' />
-                    <h1 className='font-baskerville text-2xl sm:text-3xl font-bold text-cloud-500'>Sinaliza</h1>
+                    <h1 className='font-baskerville text-2xl sm:text-3xl font-semibold text-cloud-500'>Sinaliza</h1>
                 </div>
 
                 {/* Formulário de Login */}
@@ -66,7 +66,7 @@ const LoginPage = () => {
                         </div>
 
                         <div className="text-center">
-                            <p className="text-2xl sm:text-4xl font-bold text-cloud-500 font-baskerville">
+                            <p className="text-2xl sm:text-4xl font-semibold text-cloud-500 font-baskerville">
                                 Olá, <span className="text-campfire-500 font-baskerville">Bem vindo!</span>
                             </p>
                             <p className="text-sm sm:text-lg text-neutral-500 mt-2 font-baskerville">
@@ -126,14 +126,14 @@ const LoginPage = () => {
                 <div className="mt-4 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-bold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
                     >
                         <HugeiconsIcon icon={Home01Icon} size={20} />
                         Início
                     </button>
                     <button
                         onClick={() => navigate('/auth/register')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-lime-500 px-5 py-3 font-bold text-cloud-100 transition-colors duration-300 hover:bg-lime-500/90"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-lime-500 px-5 py-3 font-semibold text-cloud-100 transition-colors duration-300 hover:bg-lime-500/90"
                     >
                         <HugeiconsIcon icon={UserAdd01Icon} size={20} />
                         Solicitar entrada

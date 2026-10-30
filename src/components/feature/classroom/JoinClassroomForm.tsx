@@ -64,7 +64,7 @@ export const JoinClassroomForm = ({ onClose, onSuccess }: JoinClassroomFormProps
 
                     {/* Título */}
                     <div className="flex flex-col gap-1 text-center">
-                        <h2 className="text-2xl font-bold text-cloud-700 font-baskerville">
+                        <h2 className="text-2xl font-semibold text-cloud-700 font-baskerville">
                             Participar de uma turma
                         </h2>
                         <p className="text-sm text-cloud-400">

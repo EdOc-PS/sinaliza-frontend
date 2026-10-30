@@ -107,7 +107,7 @@ export const ClassroomCard = ({
                         <p className="text-xs text-neutral-500">
                             Prof. {classroom.teacherName}
                         </p>
-                        <h3 className="text-lg font-bold text-cloud-500">
+                        <h3 className="text-lg font-semibold text-cloud-500">
                             {classroom.name}
                         </h3>
                     </div>
@@ -125,7 +125,7 @@ export const ClassroomCard = ({
                             {!!classroom.newSignsCount && (
                                 <span
                                     title={`${classroom.newSignsCount} sinal(is) novo(s) desde sua última visita`}
-                                    className="rounded-full bg-salmon-500 px-2 py-0.5 text-xs font-bold text-white"
+                                    className="rounded-full bg-salmon-500 px-2 py-0.5 text-xs font-semibold text-white"
                                 >
                                     {classroom.newSignsCount > 99 ? "99+" : classroom.newSignsCount}{" "}
                                     {classroom.newSignsCount === 1 ? "novo" : "novos"}

@@ -105,7 +105,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                     <HugeiconsIcon icon={Medal06Icon} size={24} className="text-sunflower-700" />
                 </div>
                 <div>
-                    <h2 className="font-baskerville text-lg font-bold text-cloud-600">Promoções pendentes</h2>
+                    <h2 className="font-baskerville text-lg font-semibold text-cloud-600">Promoções pendentes</h2>
                     <p className="text-sm text-cloud-500">
                         {signs.length} sina{signs.length > 1 ? "is" : "l"} aguardando aprovação para o glossário global
                         {!canReview && " · apenas gestores podem aprovar"}
@@ -191,7 +191,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
             <Modal open={!!rejecting} onClose={() => setRejecting(null)} size="md">
                 <div className="flex flex-col gap-4">
                     <div>
-                        <h3 className="font-baskerville text-lg font-bold text-cloud-600">Recusar promoção</h3>
+                        <h3 className="font-baskerville text-lg font-semibold text-cloud-600">Recusar promoção</h3>
                         <p className="text-sm text-cloud-500">
                             Explique o motivo da recusa de <strong>{rejecting?.name}</strong>. Quem cadastrou o sinal recebe esse texto por email.
                         </p>

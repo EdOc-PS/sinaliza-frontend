@@ -88,7 +88,7 @@ export const SignUsageSection = ({ signs, loading = false, title = "Mais usados"
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime-200 text-lime-700">
                     <HugeiconsIcon icon={ArrowUp01Icon} size={16} />
                 </span>
-                <h3 className="font-baskerville text-sm font-bold text-cloud-600">{title}</h3>
+                <h3 className="font-baskerville text-sm font-semibold text-cloud-600">{title}</h3>
             </div>
 
             {signs.length === 0 ? (

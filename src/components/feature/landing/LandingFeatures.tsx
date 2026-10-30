@@ -59,7 +59,7 @@ const features: Feature[] = [
 // "Recursos" — título fixo à esquerda e lista em duas colunas com linhas finas
 export const LandingFeatures = () => (
     <section id="recursos" className="bg-cloud-100 py-24 sm:py-32">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[4fr_8fr] lg:gap-16 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[4fr_8fr] lg:gap-16 lg:px-8">
             <div>
                 <h2 className="reveal font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl lg:sticky lg:top-28">
                     <WordReveal lines={[["O", "que", "vem"], ["junto."]]} />

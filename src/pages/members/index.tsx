@@ -102,7 +102,7 @@ const MembersPage = () => {
                         <HugeiconsIcon icon={StudentsIcon} size={26} className="text-sky-600" />
                     </div>
                     <div>
-                        <h1 className="font-baskerville text-2xl font-bold text-cloud-600">Alunos</h1>
+                        <h1 className="font-baskerville text-2xl font-semibold text-cloud-600">Alunos</h1>
                         <p className="text-sm text-neutral-500">Acompanhe e aprove as contas da instituição</p>
                     </div>
                 </div>

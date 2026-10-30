@@ -19,7 +19,7 @@ export const LandingRepositoryPreview = ({ signs, total }: LandingRepositoryPrev
 
     return (
         <section id="repositorio" className="bg-cloud-100 py-24 sm:py-32">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
                     <h2 className="reveal max-w-xl font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">
                         <WordReveal lines={[["Abra", "o", "repositório"], ["sem", "criar", "conta."]]} />

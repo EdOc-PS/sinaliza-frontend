@@ -17,7 +17,7 @@ const NotFoundPage = () => {
                 <img src={notFoundImg} alt="" className="h-40 w-40 object-contain sm:h-48 sm:w-48" />
 
                 <div className="flex flex-col gap-2">
-                    <h1 className="font-baskerville text-2xl font-bold text-cloud-600 sm:text-3xl">
+                    <h1 className="font-baskerville text-2xl font-semibold text-cloud-600 sm:text-3xl">
                         Página não <span className="italic text-campfire-500 font-baskerville">encontrada</span>
                     </h1>
                     <p className="text-sm leading-relaxed text-cloud-500 sm:text-base">

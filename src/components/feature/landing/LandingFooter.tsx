@@ -51,13 +51,13 @@ function FooterAnchor({ label, to, external }: FooterLink) {
 // Rodapé público — colunas de links, wordmark gigante sumindo e linha de base
 export const LandingFooter = () => (
     <footer className="overflow-hidden bg-cloud-100">
-        <div className="mx-auto max-w-6xl px-4 pt-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-[2fr_1fr_1fr_1fr]">
                 {/* Marca */}
                 <div className="col-span-2 flex flex-col gap-4 md:col-span-1">
                     <div className="flex items-center gap-1.5">
                         <img src={logo} alt="" className="h-8 w-8" />
-                        <span className="font-baskerville text-lg font-bold text-cloud-600">Sinaliza</span>
+                        <span className="font-baskerville text-lg font-semibold text-cloud-600">Sinaliza</span>
                     </div>
                     <p className="max-w-xs text-sm leading-relaxed text-cloud-500/75">
                         Repositório de sinais em Libras para intérpretes, alunos e professores do IFMG.
@@ -88,7 +88,7 @@ export const LandingFooter = () => (
             </p>
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-3 border-t border-cloud-300/70 py-6 text-xs text-cloud-400 sm:flex-row sm:items-center sm:justify-between">
                 <p>© {new Date().getFullYear()} Sinaliza · Feito por Eduardo Octavio no IFMG</p>
                 <div className="flex gap-5">

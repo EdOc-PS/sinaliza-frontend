@@ -33,7 +33,7 @@ function Home() {
             <LandingHeader showAnchors background="bg-cloud-100" />
 
             <main>
-                <LandingHero signs={signs} />
+                <LandingHero />
                 <LandingAudience />
                 <LandingRepositoryPreview signs={signs} total={signs.length} />
                 <LandingHowItWorks />
