@@ -19,9 +19,11 @@ interface ModalProps {
     open: boolean;
     onClose: (value: boolean) => void;
     size?: ModalSize;
+    /** Esconde o X para passos obrigatórios */
+    hideClose?: boolean;
 }
 
-const Modal = ({ children, open, onClose, size = "2xl" }: ModalProps) => {
+const Modal = ({ children, open, onClose, size = "2xl", hideClose = false }: ModalProps) => {
 
     // Trava o scroll do fundo enquanto o modal está aberto. O padding compensa a
     // largura da barra que some, evitando o conteúdo "pular" para a direita.
@@ -57,12 +59,14 @@ const Modal = ({ children, open, onClose, size = "2xl" }: ModalProps) => {
             <div className={`relative flex w-full ${sizeStyles[size]} max-h-[90vh] flex-col overflow-hidden rounded-4xl animate-fade-in bg-white border-2 border-neutral-300 shadow-xl`}>
 
                 {/* right-5 afasta o botão da barra de rolagem do conteúdo (~15px) */}
-                <button
-                    className="absolute right-5 top-4 z-20 p-2 cursor-pointer rounded-full duration-300 bg-cloud-100 text-cloud-500 hover:bg-cloud-300/50"
-                    onClick={() => onClose(false)}
-                >
-                    <HugeiconsIcon icon={Cancel01Icon} />
-                </button>
+                {!hideClose && (
+                    <button
+                        className="absolute right-5 top-4 z-20 p-2 cursor-pointer rounded-full duration-300 bg-cloud-100 text-cloud-500 hover:bg-cloud-300/50"
+                        onClick={() => onClose(false)}
+                    >
+                        <HugeiconsIcon icon={Cancel01Icon} />
+                    </button>
+                )}
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 sm:p-10">
                     {children}

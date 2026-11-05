@@ -49,6 +49,7 @@ export type User = {
   institution?: { name: string } | null;
   dataProfile?: DataProfile | null;
   onboardingSeenAt?: string | null;
+  mustChangePassword?: boolean;
   createdAt: string;
   updatedAt: string;
 };

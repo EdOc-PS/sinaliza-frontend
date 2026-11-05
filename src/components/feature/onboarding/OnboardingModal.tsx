@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     ChartIcon,
@@ -20,6 +21,11 @@ import Button from "@components/ui/Button";
 import BackButton from "@components/ui/BackButton";
 import ProgressBar from "@/components/layout/ProgressBar";
 import { getRoleMeta } from "@components/ui/RoleBadge";
+import {
+    ChangePasswordFields,
+    EMPTY_PASSWORD_VALUES,
+    isChangePasswordValid,
+} from "@components/feature/profile/ChangePasswordFields";
 
 import { useAuth } from "@context/AuthContext";
 import { PatchRequest } from "@requests";
@@ -77,14 +83,17 @@ const NavRow = ({ entry }: { entry: NavEntry }) => (
     </li>
 );
 
-const buildSteps = (user: User): OnboardingStep[] => {
+// Depois das boas-vindas, para quem entrou com a senha temporária do gestor
+const PASSWORD_STEP_INDEX = 1;
+
+const buildSteps = (user: User, passwordBody: ReactNode | null): OnboardingStep[] => {
     const roleMeta = getPrimaryRoleMeta(user);
     const roleLabel = roleMeta.label.toLowerCase();
     const visible = NAV_ENTRIES.filter((e) => !e.roles || e.roles.some((r) => user.roles.includes(r)));
     const general = visible.filter((e) => !e.admin);
     const admin = visible.filter((e) => e.admin);
 
-    return [
+    const steps: OnboardingStep[] = [
         {
             title: `Olá, ${user.name.split(" ")[0]}`,
             subtitle: "Que bom ter você por aqui",
@@ -166,6 +175,16 @@ const buildSteps = (user: User): OnboardingStep[] => {
             ),
         },
     ];
+
+    if (passwordBody) {
+        steps.splice(PASSWORD_STEP_INDEX, 0, {
+            title: "Crie sua senha",
+            subtitle: "Sua senha atual é temporária. Este passo é obrigatório",
+            body: passwordBody,
+        });
+    }
+
+    return steps;
 };
 
 interface OnboardingModalProps {
@@ -176,22 +195,39 @@ interface OnboardingModalProps {
 // Tour inicial. Abre sozinho no primeiro login e pode ser reaberto pelo botão de ajuda.
 // Fechar por qualquer caminho (concluir, pular ou o X) marca o tour como visto.
 export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
-    const { user, getUser } = useAuth();
+    const { user, getUser, changePassword, logout } = useAuth();
     const [view, setView] = useState(0);
     const [saving, setSaving] = useState(false);
+    const [passwords, setPasswords] = useState(EMPTY_PASSWORD_VALUES);
+    // Guardado à parte: ao concluir, o usuário perde o flag e a lista de passos não pode mudar no meio do tour
+    const [hasPasswordStep, setHasPasswordStep] = useState(false);
 
     // Sempre começa do primeiro passo ao abrir
     useEffect(() => {
-        if (open) setView(0);
+        if (open) {
+            setView(0);
+            setPasswords(EMPTY_PASSWORD_VALUES);
+            setHasPasswordStep(!!user?.mustChangePassword);
+        }
     }, [open]);
 
     if (!user) return null;
 
-    const steps = buildSteps(user);
+    const mustChange = !!user.mustChangePassword;
+    const passwordBody = !hasPasswordStep ? null : mustChange ? (
+        <ChangePasswordFields values={passwords} onChange={setPasswords} currentLabel="Senha temporária:" />
+    ) : (
+        <p className="text-sm leading-relaxed text-cloud-600">Senha criada com sucesso. Agora é só continuar.</p>
+    );
+
+    const steps = buildSteps(user, passwordBody);
     const step = steps[view];
     const isLast = view === steps.length - 1;
+    const onPasswordStep = hasPasswordStep && view === PASSWORD_STEP_INDEX;
 
     const finish = async () => {
+        // Com a troca pendente, nenhum caminho fecha o tour
+        if (mustChange) return;
         if (user.onboardingSeenAt) {
             onClose();
             return;
@@ -206,10 +242,36 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
         }
     };
 
+    const submitPassword = async () => {
+        setSaving(true);
+        try {
+            await changePassword(passwords.current, passwords.next);
+            setPasswords(EMPTY_PASSWORD_VALUES);
+            toast.success("Senha criada com sucesso!");
+            setView((v) => v + 1);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Não foi possível alterar a senha");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Com a troca pendente, a barra de passos não deixa pular a senha
+    const goToStep = (target: number) => {
+        if (mustChange && target > PASSWORD_STEP_INDEX) return;
+        setView(target);
+    };
+
+    const handleNext = () => {
+        if (onPasswordStep && mustChange) return submitPassword();
+        if (isLast) return finish();
+        setView((v) => v + 1);
+    };
+
     return (
-        <Modal open={open} onClose={finish} size="2xl">
+        <Modal open={open} onClose={finish} size="2xl" hideClose={mustChange}>
             <div className="flex flex-col gap-6">
-                <ProgressBar currentStep={view} totalSteps={steps.length} onStepClick={setView} />
+                <ProgressBar currentStep={view} totalSteps={steps.length} onStepClick={goToStep} />
 
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-medium text-cloud-700 font-baskerville">{step.title}</h2>
@@ -231,8 +293,8 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
                 <div className="flex gap-3 pt-2">
                     {view === 0 ? (
                         <>
-                            <Button type="button" variant="outline" className="flex-1" onClick={finish} disabled={saving}>
-                                Pular
+                            <Button type="button" variant="outline" className="flex-1" onClick={mustChange ? logout : finish} disabled={saving}>
+                                {mustChange ? "Sair" : "Pular"}
                             </Button>
                             <Button type="button" variant="cloud" className="flex-1" onClick={() => setView((v) => v + 1)}>
                                 Próximo
@@ -245,7 +307,8 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
                                 type="button"
                                 variant="cloud"
                                 className="flex-1"
-                                onClick={isLast ? finish : () => setView((v) => v + 1)}
+                                onClick={handleNext}
+                                disabled={onPasswordStep && mustChange && !isChangePasswordValid(passwords)}
                                 loading={saving}
                                 loadingText="Salvando"
                             >

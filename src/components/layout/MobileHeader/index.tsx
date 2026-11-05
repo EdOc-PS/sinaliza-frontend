@@ -3,12 +3,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
 import { getAvatarUrl } from "@lib/constants/avatars";
+import { NotificationBell } from "@components/feature/notifications/NotificationBell";
 
 interface MobileHeaderProps {
     onOpenHelp?: () => void;
+    onOpenNotifications: () => void;
 }
 
-const MobileHeader = ({ onOpenHelp }: MobileHeaderProps) => {
+const MobileHeader = ({ onOpenHelp, onOpenNotifications }: MobileHeaderProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -30,6 +32,10 @@ const MobileHeader = ({ onOpenHelp }: MobileHeaderProps) => {
                     <button onClick={onOpenHelp} aria-label="Ajuda: como usar a plataforma" className="flex items-center justify-center w-10 h-10 rounded-xl text-cloud-500 transition-colors hover:bg-cloud-200">
                         <HugeiconsIcon icon={HelpCircleIcon} size={20} />
                     </button>
+                    <NotificationBell
+                        onOpen={onOpenNotifications}
+                        className="flex items-center justify-center w-10 h-10 rounded-xl text-cloud-500 transition-colors hover:bg-cloud-200"
+                    />
                     <button onClick={() => navigate("/favorites")} className={iconClass("/favorites")}>
                         <HugeiconsIcon icon={FavouriteIcon} size={20} />
                     </button>

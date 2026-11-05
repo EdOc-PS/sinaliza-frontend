@@ -6,6 +6,7 @@ import {
     Edit02Icon,
     FavouriteIcon,
     Logout01Icon,
+    CirclePasswordIcon,
     Mail01Icon,
     Rotate01Icon,
     SchoolIcon,
@@ -25,6 +26,7 @@ import Spinner from "@components/ui/Spinner";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { EditAccountForm } from "@components/feature/profile/EditAccountForm";
+import { ChangePasswordForm } from "@components/feature/profile/ChangePasswordForm";
 import { ListCard } from "@components/feature/profile/ListCard";
 import { SignListItem, type SignListData } from "@components/feature/profile/SignListItem";
 import { getInitials } from "@lib/format/initials";
@@ -45,6 +47,7 @@ const ProfilePage = () => {
     };
 
     const [editModal, setEditModal] = useState(false);
+    const [passwordModal, setPasswordModal] = useState(false);
     const [logoutModal, setLogoutModal] = useState(false);
 
     // Mesmas chaves de /history e /favorites: se o usuário já visitou aquelas
@@ -195,6 +198,14 @@ const ProfilePage = () => {
                     </ListCard>
                 </div>
 
+                <button
+                    onClick={() => setPasswordModal(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-200"
+                >
+                    <HugeiconsIcon icon={CirclePasswordIcon} size={18} />
+                    Trocar senha
+                </button>
+
                 {/* Sair — no desktop essa ação vive na sidebar, que não existe no mobile */}
                 <button
                     onClick={() => setLogoutModal(true)}
@@ -214,6 +225,10 @@ const ProfilePage = () => {
                 description="Você precisará entrar de novo para acessar a plataforma."
                 confirmText="Sair"
             />
+
+            <Modal open={passwordModal} onClose={() => setPasswordModal(false)} size="lg">
+                <ChangePasswordForm onClose={() => setPasswordModal(false)} />
+            </Modal>
 
             {/* Modal de editar conta */}
             <Modal open={editModal} onClose={() => setEditModal(false)}>

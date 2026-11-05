@@ -10,6 +10,10 @@
  * com `["classrooms"]`.
  */
 export const queryKeys = {
+    notifications: {
+        all: ["notifications"] as const,
+        list: () => ["notifications", "list"] as const,
+    },
     classrooms: {
         all: ["classrooms"] as const,
         mine: () => ["classrooms", "mine"] as const,
