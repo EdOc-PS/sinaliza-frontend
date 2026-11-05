@@ -12,7 +12,7 @@ import {
     Logout01Icon,
     CirclePasswordIcon,
     Mail01Icon,
-    Rotate01Icon,
+    Time01Icon,
     SchoolIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -180,7 +180,7 @@ const ProfilePage = () => {
                     {/* Últimos acessados */}
                     <ListCard
                         title="Últimos acessados"
-                        icon={Rotate01Icon}
+                        icon={Time01Icon}
                         iconClass="bg-sky-100 text-sky-600"
                         onSeeAll={() => navigate("/history")}
                         loading={loading}

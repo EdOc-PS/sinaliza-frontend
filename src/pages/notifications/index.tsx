@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Delete02Icon, Notification01Icon } from "@hugeicons/core-free-icons";
+import { BellDotIcon, Delete02Icon, Notification01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { toast } from "sonner";
 
 import { DeleteRequest, PatchRequest } from "@requests";
@@ -11,7 +11,11 @@ import { queryKeys } from "@/config/query/queryKeys";
 import { unwrap } from "@/config/query/unwrap";
 import Button from "@components/ui/Button";
 import Spinner from "@components/ui/Spinner";
+import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { useNotifications, type NotificationItem } from "@components/feature/notifications/useNotifications";
+
+// Confete de sinos
+const NOTIFICATION_ICONS = [Notification01Icon, Notification01Icon, Notification01Icon, BellDotIcon, BellDotIcon, StarIcon];
 
 const TONE_DOT: Record<NotificationItem["tone"], string> = {
     success: "bg-lime-500",
@@ -74,18 +78,36 @@ const NotificationsPage = () => {
 
     return (
         <section className="flex flex-col gap-6">
-            <div className="flex items-center justify-between gap-3 rounded-3xl bg-white p-6 sm:p-8">
-                <h1 className="font-baskerville text-2xl font-semibold text-cloud-600 sm:text-3xl">Notificações</h1>
-                {notifications.length > 0 && (
-                    <button
-                        type="button"
-                        onClick={() => removeAll()}
-                        disabled={removingAll}
-                        className="cursor-pointer text-sm font-semibold text-cloud-500/80 hover:text-cloud-500 disabled:opacity-50"
-                    >
-                        Apagar todas
-                    </button>
-                )}
+            {/* Banner */}
+            <div className="relative overflow-hidden rounded-3xl">
+                <CardMemphisBackground seed="notifications" color="#E6AB6E" rounded="rounded-3xl" icons={NOTIFICATION_ICONS} />
+                <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
+                    <div className="flex items-start justify-between gap-3">
+                        {/* Ícone */}
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
+                            <HugeiconsIcon icon={Notification01Icon} size={28} className="text-white" />
+                        </div>
+                        {notifications.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => removeAll()}
+                                disabled={removingAll}
+                                className="flex cursor-pointer items-center gap-2 rounded-2xl bg-white/15 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/25 disabled:opacity-50"
+                            >
+                                <HugeiconsIcon icon={Delete02Icon} size={18} />
+                                Apagar todas
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Título + descrição */}
+                    <div>
+                        <h1 className="font-baskerville text-2xl font-semibold text-white sm:text-3xl">Notificações</h1>
+                        <p className="mt-1.5 max-w-lg text-sm text-white/85">
+                            Avisos sobre suas turmas, seus sinais e sua conta, tudo em um só lugar.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {isPending ? (

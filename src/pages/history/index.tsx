@@ -10,6 +10,7 @@ import {
     Delete02Icon,
     Rotate01Icon,
     SignLanguageCIcon,
+    Time01Icon,
     ViewIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -119,7 +120,7 @@ const HistoryPage = () => {
                 <div className="relative z-10 flex flex-col gap-5 p-6 sm:p-8" style={{ minHeight: 200 }}>
                     {/* Ícone */}
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 ">
-                        <HugeiconsIcon icon={Rotate01Icon} size={28} className="text-white" />
+                        <HugeiconsIcon icon={Time01Icon} size={28} className="text-white" />
                     </div>
 
                     {/* Título + descrição */}
