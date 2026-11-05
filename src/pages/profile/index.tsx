@@ -89,13 +89,22 @@ const ProfilePage = () => {
                     {/* Banner */}
                     <div className="relative h-40 sm:h-48">
                         <CardMemphisBackground seed={user.id} color="#213547" rounded="rounded-none" />
-                        <button
-                            onClick={() => setEditModal(true)}
-                            className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"
-                        >
-                            <HugeiconsIcon icon={Edit02Icon} size={18} />
-                            Editar conta
-                        </button>
+                        <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+                            <button
+                                onClick={() => setPasswordModal(true)}
+                                className="flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"
+                            >
+                                <HugeiconsIcon icon={CirclePasswordIcon} size={18} />
+                                Trocar senha
+                            </button>
+                            <button
+                                onClick={() => setEditModal(true)}
+                                className="flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"
+                            >
+                                <HugeiconsIcon icon={Edit02Icon} size={18} />
+                                Editar conta
+                            </button>
+                        </div>
                     </div>
 
                     {/* Cabeçalho */}
@@ -197,14 +206,6 @@ const ProfilePage = () => {
                         ))}
                     </ListCard>
                 </div>
-
-                <button
-                    onClick={() => setPasswordModal(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-200"
-                >
-                    <HugeiconsIcon icon={CirclePasswordIcon} size={18} />
-                    Trocar senha
-                </button>
 
                 {/* Sair — no desktop essa ação vive na sidebar, que não existe no mobile */}
                 <button
