@@ -99,6 +99,7 @@ export const PERFIL_FORMULARIOS: Record<
                 placeholder: "Informação sobre certificação",
                 icon: DiplomaIcon,
                 noSpecialChars: true,
+                optional: true,
             },
             {
                 id: "areaAtuacao",
@@ -106,6 +107,7 @@ export const PERFIL_FORMULARIOS: Record<
                 placeholder: "Ex: reforço escolar, interpretação",
                 icon: TeacherIcon,
                 noSpecialChars: true,
+                optional: true,
             },
         ],
     },
