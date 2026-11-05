@@ -14,6 +14,7 @@ import {
     Key02Icon,
     Video01Icon,
     Search01Icon,
+    SignLanguageCIcon,
 } from "@hugeicons/core-free-icons";
 
 import Modal from "@components/ui/Modal";
@@ -86,7 +87,7 @@ const NavRow = ({ entry }: { entry: NavEntry }) => (
 // Depois das boas-vindas, para quem entrou com a senha temporária do gestor
 const PASSWORD_STEP_INDEX = 1;
 
-const buildSteps = (user: User, passwordBody: ReactNode | null): OnboardingStep[] => {
+const buildSteps = (user: User, passwordBody: ReactNode | null, helpOnly: boolean): OnboardingStep[] => {
     const roleMeta = getPrimaryRoleMeta(user);
     const roleLabel = roleMeta.label.toLowerCase();
     const visible = NAV_ENTRIES.filter((e) => !e.roles || e.roles.some((r) => user.roles.includes(r)));
@@ -99,6 +100,9 @@ const buildSteps = (user: User, passwordBody: ReactNode | null): OnboardingStep[
             subtitle: "Que bom ter você por aqui",
             body: (
                 <div className="flex flex-col gap-4 text-sm leading-relaxed text-cloud-600">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-campfire-100 text-campfire-600">
+                        <HugeiconsIcon icon={SignLanguageCIcon} size={30} />
+                    </span>
                     <p>
                         Antes de começar, preparamos um tour rápido para você conhecer o Sinaliza
                         e entender como aproveitar melhor a plataforma.
@@ -108,7 +112,7 @@ const buildSteps = (user: User, passwordBody: ReactNode | null): OnboardingStep[
             ),
         },
         {
-            title: "Bem-vindo ao Sinaliza",
+            title: "Como funciona o Sinaliza",
             subtitle: "Um repositório colaborativo de sinais em Libras",
             body: (
                 <div className="flex flex-col gap-4 text-sm leading-relaxed text-cloud-600">
@@ -179,35 +183,41 @@ const buildSteps = (user: User, passwordBody: ReactNode | null): OnboardingStep[
     if (passwordBody) {
         steps.splice(PASSWORD_STEP_INDEX, 0, {
             title: "Crie sua senha",
-            subtitle: "Sua senha atual é temporária. Este passo é obrigatório",
+            subtitle: "Defina sua nova senha. Este passo é obrigatório",
             body: passwordBody,
         });
     }
 
-    return steps;
+    // Pelo botão de ajuda, só a explicação da plataforma
+    return helpOnly ? steps.slice(1) : steps;
 };
 
 interface OnboardingModalProps {
     open: boolean;
     onClose: () => void;
+    /** Aberto pelo botão de ajuda: sem boas-vindas e sem senha */
+    helpOnly?: boolean;
 }
 
 // Tour inicial. Abre sozinho no primeiro login e pode ser reaberto pelo botão de ajuda.
-// Fechar por qualquer caminho (concluir, pular ou o X) marca o tour como visto.
-export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
-    const { user, getUser, changePassword, logout } = useAuth();
+// X e Pular só existem pelo botão de ajuda; no primeiro acesso, o tour termina no "Começar", que o marca como visto.
+export const OnboardingModal = ({ open, onClose, helpOnly = false }: OnboardingModalProps) => {
+    const { user, getUser, changePassword } = useAuth();
     const [view, setView] = useState(0);
     const [saving, setSaving] = useState(false);
     const [passwords, setPasswords] = useState(EMPTY_PASSWORD_VALUES);
     // Guardado à parte: ao concluir, o usuário perde o flag e a lista de passos não pode mudar no meio do tour
     const [hasPasswordStep, setHasPasswordStep] = useState(false);
+    // Troca aprovada pelo gestor: quem já fez o tour vê só o passo da senha
+    const [passwordOnly, setPasswordOnly] = useState(false);
 
     // Sempre começa do primeiro passo ao abrir
     useEffect(() => {
         if (open) {
             setView(0);
             setPasswords(EMPTY_PASSWORD_VALUES);
-            setHasPasswordStep(!!user?.mustChangePassword);
+            setHasPasswordStep(!helpOnly && !!user?.mustChangePassword);
+            setPasswordOnly(!helpOnly && !!user?.mustChangePassword && !!user?.onboardingSeenAt);
         }
     }, [open]);
 
@@ -215,15 +225,16 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
 
     const mustChange = !!user.mustChangePassword;
     const passwordBody = !hasPasswordStep ? null : mustChange ? (
-        <ChangePasswordFields values={passwords} onChange={setPasswords} currentLabel="Senha temporária:" />
+        <ChangePasswordFields values={passwords} onChange={setPasswords} />
     ) : (
         <p className="text-sm leading-relaxed text-cloud-600">Senha criada com sucesso. Agora é só continuar.</p>
     );
 
-    const steps = buildSteps(user, passwordBody);
+    const allSteps = buildSteps(user, passwordBody, helpOnly);
+    const steps = passwordOnly ? [allSteps[PASSWORD_STEP_INDEX]] : allSteps;
     const step = steps[view];
     const isLast = view === steps.length - 1;
-    const onPasswordStep = hasPasswordStep && view === PASSWORD_STEP_INDEX;
+    const onPasswordStep = hasPasswordStep && (passwordOnly || view === PASSWORD_STEP_INDEX);
 
     const finish = async () => {
         // Com a troca pendente, nenhum caminho fecha o tour
@@ -245,10 +256,11 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
     const submitPassword = async () => {
         setSaving(true);
         try {
-            await changePassword(passwords.current, passwords.next);
+            await changePassword(passwords.next);
             setPasswords(EMPTY_PASSWORD_VALUES);
             toast.success("Senha criada com sucesso!");
-            setView((v) => v + 1);
+            if (passwordOnly) onClose();
+            else setView((v) => v + 1);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Não foi possível alterar a senha");
         } finally {
@@ -269,7 +281,7 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
     };
 
     return (
-        <Modal open={open} onClose={finish} size="2xl" hideClose={mustChange}>
+        <Modal open={open} onClose={finish} size="2xl" hideClose={!helpOnly}>
             <div className="flex flex-col gap-6">
                 <ProgressBar currentStep={view} totalSteps={steps.length} onStepClick={goToStep} />
 
@@ -288,34 +300,24 @@ export const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
                     )}
                 </div>
 
-                {/* Mesmo padrão de navegação do modal de criar educador: primeiro passo tem
-                    Pular + Próximo lado a lado; a partir do segundo, BackButton fixo + ação principal */}
-                <div className="flex gap-3 pt-2">
-                    {view === 0 ? (
-                        <>
-                            <Button type="button" variant="outline" className="flex-1" onClick={mustChange ? logout : finish} disabled={saving}>
-                                {mustChange ? "Sair" : "Pular"}
-                            </Button>
-                            <Button type="button" variant="cloud" className="flex-1" onClick={() => setView((v) => v + 1)}>
-                                Próximo
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <BackButton onClick={() => setView((v) => v - 1)} />
-                            <Button
-                                type="button"
-                                variant="cloud"
-                                className="flex-1"
-                                onClick={handleNext}
-                                disabled={onPasswordStep && mustChange && !isChangePasswordValid(passwords)}
-                                loading={saving}
-                                loadingText="Salvando"
-                            >
-                                {isLast ? "Começar" : "Próximo"}
-                            </Button>
-                        </>
+                                <div className="flex gap-3 pt-2">
+                    {view > 0 && <BackButton onClick={() => setView((v) => v - 1)} />}
+                    {helpOnly && !isLast && (
+                        <Button type="button" variant="outline" className="flex-1" onClick={finish}>
+                            Pular
+                        </Button>
                     )}
+                    <Button
+                        type="button"
+                        variant="cloud"
+                        className="flex-1"
+                        onClick={handleNext}
+                        disabled={onPasswordStep && mustChange && !isChangePasswordValid(passwords)}
+                        loading={saving}
+                        loadingText="Salvando"
+                    >
+                        {isLast ? "Começar" : "Próximo"}
+                    </Button>
                 </div>
             </div>
         </Modal>

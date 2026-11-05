@@ -1,3 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { PostRequest } from "@requests";
+import { NOTIFICATIONS } from "@routes/notifications";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -26,7 +30,6 @@ import Spinner from "@components/ui/Spinner";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 import { CardMemphisBackground } from "@components/feature/classroom/CardMemphisBackground";
 import { EditAccountForm } from "@components/feature/profile/EditAccountForm";
-import { ChangePasswordForm } from "@components/feature/profile/ChangePasswordForm";
 import { ListCard } from "@components/feature/profile/ListCard";
 import { SignListItem, type SignListData } from "@components/feature/profile/SignListItem";
 import { getInitials } from "@lib/format/initials";
@@ -47,7 +50,13 @@ const ProfilePage = () => {
     };
 
     const [editModal, setEditModal] = useState(false);
-    const [passwordModal, setPasswordModal] = useState(false);
+
+    const { mutate: requestPasswordChange, isPending: requestingPassword } = useMutation({
+        mutationFn: () => unwrap(PostRequest(NOTIFICATIONS.PASSWORD_REQUESTS(), {})),
+        onSuccess: () => toast.success("Pedido enviado ao gestor. Você será avisado nas notificações."),
+        onError: (err: Error) => toast.error(err.message),
+    });
+
     const [logoutModal, setLogoutModal] = useState(false);
 
     // Mesmas chaves de /history e /favorites: se o usuário já visitou aquelas
@@ -91,11 +100,12 @@ const ProfilePage = () => {
                         <CardMemphisBackground seed={user.id} color="#213547" rounded="rounded-none" />
                         <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
                             <button
-                                onClick={() => setPasswordModal(true)}
+                                onClick={() => requestPasswordChange()}
+                                disabled={requestingPassword}
                                 className="flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 transition-colors px-3 py-1.5 text-sm font-medium text-white"
                             >
                                 <HugeiconsIcon icon={CirclePasswordIcon} size={18} />
-                                Trocar senha
+                                Solicitar nova senha
                             </button>
                             <button
                                 onClick={() => setEditModal(true)}
@@ -226,10 +236,6 @@ const ProfilePage = () => {
                 description="Você precisará entrar de novo para acessar a plataforma."
                 confirmText="Sair"
             />
-
-            <Modal open={passwordModal} onClose={() => setPasswordModal(false)} size="lg">
-                <ChangePasswordForm onClose={() => setPasswordModal(false)} />
-            </Modal>
 
             {/* Modal de editar conta */}
             <Modal open={editModal} onClose={() => setEditModal(false)}>

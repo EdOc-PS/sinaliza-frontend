@@ -10,7 +10,6 @@ import { FAB } from "@components/layout/FAB"
 import { OnboardingModal } from "@components/feature/onboarding/OnboardingModal"
 
 import { NotificationBell } from "@components/feature/notifications/NotificationBell"
-import { NotificationsModal } from "@components/feature/notifications/NotificationsModal"
 
 import { FABProvider } from "@context/FABContext"
 import { useAuth } from "@context/AuthContext"
@@ -18,12 +17,20 @@ import { useAuth } from "@context/AuthContext"
 const MainLayout = () => {
     const { user } = useAuth()
     const [onboardingOpen, setOnboardingOpen] = useState(false)
-    const [notificationsOpen, setNotificationsOpen] = useState(false)
+    const [helpOnly, setHelpOnly] = useState(false)
 
     // Primeiro login: abre o tour sozinho. Depois só pelo botão de ajuda.
     useEffect(() => {
-        if (user && (!user.onboardingSeenAt || user.mustChangePassword)) setOnboardingOpen(true)
+        if (user && (!user.onboardingSeenAt || user.mustChangePassword)) {
+            setHelpOnly(false)
+            setOnboardingOpen(true)
+        }
     }, [user])
+
+    function openHelp() {
+        setHelpOnly(true)
+        setOnboardingOpen(true)
+    }
 
     // Senha temporária: a API recusa o resto, então só o tour é carregado até a troca.
     // O modal fica na mesma posição da árvore para não reiniciar o tour depois da troca.
@@ -33,21 +40,22 @@ const MainLayout = () => {
         <FABProvider>
             {!locked && (
                 <>
-            <MobileHeader onOpenHelp={() => setOnboardingOpen(true)} onOpenNotifications={() => setNotificationsOpen(true)} />
+            <MobileHeader onOpenHelp={openHelp} />
             <MenuNavigation />
 
             <main className="relative md:ml-16 xl:ml-20 min-h-screen pb-28 md:pb-10">
                 {/* Botão de ajuda flutua no canto — não ocupa uma faixa própria,
                     então o conteúdo começa logo no topo da página */}
                 <div className="hidden md:flex items-center gap-2 absolute right-10 top-5 z-20">
-                    <NotificationBell
-                        onOpen={() => setNotificationsOpen(true)}
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
-                    />
+                    <Tooltip label="Notificações" position="bottom">
+                        <NotificationBell
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
+                        />
+                    </Tooltip>
                     <Tooltip label="Como usar a plataforma" position="right">
                         <button
                             type="button"
-                            onClick={() => setOnboardingOpen(true)}
+                            onClick={openHelp}
                             aria-label="Ajuda: como usar a plataforma"
                             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-cloud-500 shadow-lg shadow-cloud-500/20 ring-2 ring-cloud-400/10 transition-colors hover:bg-cloud-100 hover:text-cloud-700"
                         >
@@ -64,8 +72,7 @@ const MainLayout = () => {
             <FAB />
                 </>
             )}
-            <NotificationsModal open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
-            <OnboardingModal open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
+            <OnboardingModal open={onboardingOpen} helpOnly={helpOnly} onClose={() => setOnboardingOpen(false)} />
         </FABProvider>
     )
 }

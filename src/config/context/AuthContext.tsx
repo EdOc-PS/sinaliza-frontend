@@ -26,7 +26,7 @@ type AuthContextValue = {
     login: (credentials: LoginPayload) => Promise<User>
     register: (data: RegisterPayload) => Promise<void>
     updateUser: (data: UpdateUserPayload) => Promise<void>
-    changePassword: (currentPassword: string, newPassword: string) => Promise<void>
+    changePassword: (newPassword: string) => Promise<void>
     logout: () => void
     getUser: () => Promise<void>
 }
@@ -119,8 +119,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Troca a senha e guarda o token novo: o antigo deixa de valer no backend
-    async function changePassword(currentPassword: string, newPassword: string) {
-        const response = await PatchRequest<LoginResponse>(AUTH.CHANGE_PASSWORD(), { currentPassword, newPassword })
+    async function changePassword(newPassword: string) {
+        const response = await PatchRequest<LoginResponse>(AUTH.CHANGE_PASSWORD(), { newPassword })
 
         if (!response.success || !response.object) {
             throw new Error(response.message || 'Não foi possível alterar a senha.')

@@ -13,6 +13,7 @@ export interface NotificationItem {
     reason: string | null;
     link: string | null;
     readAt: string | null;
+    passwordRequest: { id: string; status: "PENDING" | "APPROVED" | "REJECTED" } | null;
     createdAt: string;
 }
 

@@ -11,6 +11,7 @@ import PageLoader from '@components/layout/PageLoader'
 
 // Publico
 const Home = lazy(() => import('@pages/home'))
+const NotificationsPage = lazy(() => import('@pages/notifications'))
 const PublicGlossaryPage = lazy(() => import('@pages/public-glossary'))
 
 // Auth
@@ -125,6 +126,10 @@ const routes: RouteObject[] = [
                     {
                         path: 'favorites',
                         element: suspended(FavoritesPage),
+                    },
+                    {
+                        path: 'notifications',
+                        element: suspended(NotificationsPage),
                     },
                     {
                         path: 'history',

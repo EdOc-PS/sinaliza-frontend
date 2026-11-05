@@ -6,6 +6,9 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from '@context/AuthContext.tsx'
 import { queryClient } from '@/config/query/queryClient'
+import { reloadOnStaleChunk } from '@lib/reloadOnStaleChunk'
+
+reloadOnStaleChunk()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -7,10 +7,9 @@ import { NotificationBell } from "@components/feature/notifications/Notification
 
 interface MobileHeaderProps {
     onOpenHelp?: () => void;
-    onOpenNotifications: () => void;
 }
 
-const MobileHeader = ({ onOpenHelp, onOpenNotifications }: MobileHeaderProps) => {
+const MobileHeader = ({ onOpenHelp }: MobileHeaderProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -33,7 +32,6 @@ const MobileHeader = ({ onOpenHelp, onOpenNotifications }: MobileHeaderProps) =>
                         <HugeiconsIcon icon={HelpCircleIcon} size={20} />
                     </button>
                     <NotificationBell
-                        onOpen={onOpenNotifications}
                         className="flex items-center justify-center w-10 h-10 rounded-xl text-cloud-500 transition-colors hover:bg-cloud-200"
                     />
                     <button onClick={() => navigate("/favorites")} className={iconClass("/favorites")}>
