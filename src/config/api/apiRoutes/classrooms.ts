@@ -9,6 +9,7 @@ export const CLASSROOMS = {
     MEMBERS:         (id: string) => `classrooms/${id}/members`,
     ADD_MEMBER:      (id: string) => `classrooms/${id}/members`,
     REMOVE_MEMBER:   (id: string, userId: string) => `classrooms/${id}/members/${userId}`,
+    MEMBER_ADMIN:    (id: string, userId: string) => `classrooms/${id}/members/${userId}/admin`,
     UPDATE:   (id: string) => `classrooms/${id}`,
     DELETE:   (id: string) => `classrooms/${id}`,
     LEAVE:    (id: string) => `classrooms/${id}/leave`,

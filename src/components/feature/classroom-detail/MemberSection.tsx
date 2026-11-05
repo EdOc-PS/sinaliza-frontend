@@ -1,11 +1,12 @@
 import { Tooltip } from "@components/ui/Tooltip";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Delete02Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, StarAward01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { RoleBadge } from "@/components/ui/RoleBadge";
 import { getAvatarUrl } from "@lib/constants/avatars";
 
 export interface Member {
     roleInClass: string;
+    isAdmin?: boolean;
     createdAt: string;
     user: { id: string; name: string; avatar?: string; role: string; educatorType?: "TEACHER" | "INTERPRETER" | null };
 }
@@ -17,9 +18,13 @@ interface MemberSectionProps {
     onRemove?: (member: Member) => void;
     /** IDs de usuários que não podem ser removidos (ex: professor da turma) */
     lockedUserIds?: string[];
+    /** Dono da turma: recebe a tag "Dono" */
+    ownerId?: string;
+    /** Quando definido, educadores ganham o botão de promover/rebaixar */
+    onToggleAdmin?: (member: Member) => void;
 }
 
-export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: MemberSectionProps) => (
+export const MemberSection = ({ title, members, onRemove, lockedUserIds = [], ownerId, onToggleAdmin }: MemberSectionProps) => (
     <div className="flex flex-col gap-3">
         <div className="px-1">
             <h3 className="font-baskerville text-lg text-cloud-600">{title}</h3>
@@ -50,8 +55,29 @@ export const MemberSection = ({ title, members, onRemove, lockedUserIds = [] }: 
                             {/* Nome */}
                             <span className="flex-1 text-sm font-medium text-cloud-600">{m.user.name}</span>
 
+                            {/* Papel dentro da turma */}
+                            {(m.user.id === ownerId || m.isAdmin) && (
+                                <span className="rounded-lg bg-sunflower-100 px-2 py-0.5 text-xs font-semibold text-sunflower-700">
+                                    {m.user.id === ownerId ? "Dono" : "Admin"}
+                                </span>
+                            )}
+
                             {/* Role badge */}
                             <RoleBadge role={m.roleInClass} educatorType={m.user.educatorType} />
+
+                            {/* Promover/rebaixar (apenas educadores matriculados) */}
+                            {onToggleAdmin && m.roleInClass === "EDUCATOR" && !lockedUserIds.includes(m.user.id) && (
+                                <Tooltip label={m.isAdmin ? "Remover administrador" : "Tornar administrador"} position="top">
+                                    <button
+                                        type="button"
+                                        onClick={() => onToggleAdmin(m)}
+                                        aria-label={m.isAdmin ? "Remover administrador" : "Tornar administrador"}
+                                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${m.isAdmin ? "bg-sunflower-100 text-sunflower-700" : "text-cloud-400 hover:bg-sunflower-100 hover:text-sunflower-700"}`}
+                                    >
+                                        <HugeiconsIcon icon={StarAward01Icon} size={18} />
+                                    </button>
+                                </Tooltip>
+                            )}
 
                             {/* Remover (apenas educador, exceto usuários bloqueados) */}
                             {onRemove && !lockedUserIds.includes(m.user.id) && (

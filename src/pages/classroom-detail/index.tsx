@@ -115,14 +115,17 @@ const ClassroomDetailPage = () => {
     const { data: members = [], isPending: loadingMembers } = useQuery({
         queryKey: queryKeys.classrooms.members(id ?? ""),
         queryFn: () => unwrap(GetRequest<Member[]>(CLASSROOMS.MEMBERS(id!))),
-        enabled: !!id && detailView === "settings",
+        // Sempre carregado: é daqui que sai se o usuário é administrador da turma
+        enabled: !!id,
     });
+    const isOwner = classroom?.teacher.id === user?.id;
+    const isClassAdmin = members.some((m) => m.user.id === user?.id && m.isAdmin);
     // Quem herda a turma se o dono sair: educador matriculado há mais tempo
     // (a API devolve os membros em ordem de entrada — mesma regra do backend)
     const heir = members.find((m) => m.roleInClass === "EDUCATOR" && m.user.id !== classroom?.teacher.id);
 
     // Visualização compacta de uso — só o professor da turma vê
-    const canManageEarly = !!user?.roles?.includes("EDUCATOR") && classroom?.teacher.id === user?.id;
+    const canManageEarly = !!user?.roles?.includes("EDUCATOR") && (isOwner || isClassAdmin);
     const { data: usageStats, isPending: loadingUsage } = useQuery({
         queryKey: queryKeys.classrooms.usageStats(id ?? ""),
         queryFn: () => unwrap(GetRequest<{ mostUsed: SignUsage[] }>(CLASSROOMS.USAGE_STATS(id!), { limit: 10 })),
@@ -180,6 +183,16 @@ const ClassroomDetailPage = () => {
         promoteSign(ids);
     };
 
+    const { mutate: toggleAdmin } = useMutation({
+        mutationFn: (member: Member) =>
+            unwrap(PatchRequest(CLASSROOMS.MEMBER_ADMIN(id!, member.user.id), { isAdmin: !member.isAdmin })),
+        onSuccess: (_data, member) => {
+            toast.success(member.isAdmin ? `${member.user.name} não é mais administrador` : `${member.user.name} agora é administrador`);
+            queryClient.invalidateQueries({ queryKey: queryKeys.classrooms.members(id ?? "") });
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
     const { mutate: removeMember, isPending: removingMember } = useMutation({
         mutationFn: (memberUserId: string) =>
             unwrap(DeleteRequest(CLASSROOMS.REMOVE_MEMBER(id!, memberUserId))),
@@ -217,7 +230,7 @@ const ClassroomDetailPage = () => {
         );
     }
 
-    const canManage = !!user?.roles?.includes("EDUCATOR") && classroom.teacher.id === user?.id;
+    const canManage = canManageEarly;
     const color = classroom.colorBackground || "#213547";
 
     return (
@@ -262,10 +275,20 @@ const ClassroomDetailPage = () => {
                                 <span><b className="text-white">{classroom.userCount}</b> membros</span>
                             </div>
                             {classroom.classCode && (
-                                <span className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white">
-                                    <HugeiconsIcon icon={SquareLock02Icon} size={14} className="text-white/70" />
-                                    Código: <span className="font-mono tracking-wider">{classroom.classCode}</span>
-                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white">
+                                        <HugeiconsIcon icon={SquareLock02Icon} size={14} className="text-white/70" />
+                                        Código: <span className="font-mono tracking-wider">{classroom.classCode}</span>
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={handleCopyCode}
+                                        aria-label="Copiar código da turma"
+                                        className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-white/15 text-white transition-colors hover:bg-white/25"
+                                    >
+                                        <HugeiconsIcon icon={CopyIcon} size={14} />
+                                    </button>
+                                </div>
                             )}
                             <span className="flex items-center gap-1.5 text-white/60 text-xs">
                                 {getAvatarUrl(classroom.teacher.avatar) && (
@@ -428,7 +451,7 @@ const ClassroomDetailPage = () => {
                                     )}
                                     {/* Dono só sai se houver outro educador para herdar a turma —
                                         sendo o único, o botão nem aparece */}
-                                    {(!canManage || heir) && (
+                                    {(!isOwner || heir) && (
                                         <Button size="sm" variant="salmon" icon={Logout03Icon} iconSize={18} onClick={() => setLeaveModal(true)}>
                                             Sair da turma
                                         </Button>
@@ -446,6 +469,8 @@ const ClassroomDetailPage = () => {
                                     ]}
                                     onRemove={canManage ? (m) => setRemoveMemberModal({ open: true, member: m }) : undefined}
                                     lockedUserIds={[classroom.teacher.id]}
+                                    ownerId={classroom.teacher.id}
+                                    onToggleAdmin={canManage ? (m) => toggleAdmin(m) : undefined}
                                 />
                             </>
                         )}
@@ -536,7 +561,7 @@ const ClassroomDetailPage = () => {
                     <>
                         Você deixará de ter acesso aos sinais e materiais de{" "}
                         <span className="font-semibold text-salmon-600 italic">{classroom.name}</span>.
-                        {canManage && heir && (
+                        {isOwner && heir && (
                             <> A turma passará a ser gerenciada por <b>{heir.user.name}</b>.</>
                         )}
                         {" "}Para voltar, será necessário um novo convite.
