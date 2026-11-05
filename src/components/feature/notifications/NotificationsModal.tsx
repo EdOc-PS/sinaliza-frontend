@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Delete02Icon, Notification03Icon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, Notification01Icon } from "@hugeicons/core-free-icons";
 import { toast } from "sonner";
 
 import { DeleteRequest, PatchRequest } from "@requests";
@@ -88,7 +88,7 @@ export const NotificationsModal = ({ open, onClose }: NotificationsModalProps) =
                     <div className="flex justify-center py-10"><Spinner /></div>
                 ) : notifications.length === 0 ? (
                     <div className="flex flex-col items-center gap-3 py-10 text-center text-cloud-500/70">
-                        <HugeiconsIcon icon={Notification03Icon} size={32} />
+                        <HugeiconsIcon icon={Notification01Icon} size={32} />
                         <p className="text-sm">Você não tem notificações.</p>
                     </div>
                 ) : (

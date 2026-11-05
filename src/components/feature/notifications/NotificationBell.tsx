@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BellDotIcon, Notification03Icon } from "@hugeicons/core-free-icons";
+import { BellDotIcon, Notification01Icon } from "@hugeicons/core-free-icons";
 
 import { useNotifications } from "./useNotifications";
 
@@ -20,7 +20,7 @@ export const NotificationBell = ({ onOpen, className }: NotificationBellProps) =
             aria-label={unread > 0 ? `Notificações: ${unread} não lidas` : "Notificações"}
             className={`relative ${className}`}
         >
-            <HugeiconsIcon icon={unread > 0 ? BellDotIcon : Notification03Icon} size={22} />
+            <HugeiconsIcon icon={unread > 0 ? BellDotIcon : Notification01Icon} size={22} />
         </button>
     );
 };
