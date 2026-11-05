@@ -61,7 +61,7 @@ export const LandingFeatures = () => (
     <section id="recursos" className="bg-cloud-100 py-24 sm:py-32">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[4fr_8fr] lg:gap-16 lg:px-8">
             <div>
-                <h2 className="reveal font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl lg:sticky lg:top-28">
+                <h2 className="reveal font-baskerville text-3xl font-semibold leading-tight tracking-tight text-cloud-600 sm:text-5xl lg:sticky lg:top-28">
                     <WordReveal lines={[["O", "que", "vem"], ["junto."]]} />
                 </h2>
             </div>
@@ -76,7 +76,7 @@ export const LandingFeatures = () => (
                         <HugeiconsIcon icon={feature.icon} size={22} className={`mt-0.5 shrink-0 ${feature.iconClass}`} />
                         <div>
                             <h3 className="font-semibold text-cloud-600">{feature.title}</h3>
-                            <p className="mt-1.5 text-[15px] leading-relaxed text-cloud-500/75">{feature.description}</p>
+                            <p className="mt-1.5 text-sm sm:text-base leading-relaxed text-cloud-500/75">{feature.description}</p>
                         </div>
                     </div>
                 ))}

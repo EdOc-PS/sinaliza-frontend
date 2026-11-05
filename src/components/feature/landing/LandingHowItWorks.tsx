@@ -114,7 +114,7 @@ export const LandingHowItWorks = () => {
                 <div className="mx-auto grid w-full max-w-7xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:px-8 lg:py-0">
                     {/* Passos */}
                     <div className="flex flex-col justify-center">
-                        <h2 className="reveal font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">
+                        <h2 className="reveal font-baskerville text-3xl font-semibold leading-tight tracking-tight text-cloud-600 sm:text-5xl">
                             <WordReveal lines={[["Do", "pedido"], ["à", "sala", "de", "aula."]]} />
                         </h2>
 
@@ -134,7 +134,7 @@ export const LandingHowItWorks = () => {
                                         </div>
 
                                         <div className="flex items-baseline gap-4">
-                                            <span className="font-baskerville text-sm text-cloud-400">
+                                            <span className="font-baskerville font-semibold text-sm text-cloud-400">
                                                 {String(i + 1).padStart(2, "0")}
                                             </span>
                                             <div>
@@ -144,7 +144,7 @@ export const LandingHowItWorks = () => {
                                                     {step.title}
                                                 </h3>
                                                 <p
-                                                    className={`overflow-hidden text-[15px] leading-relaxed text-cloud-500/75 transition-all duration-500 ease-out ${isActive ? "mt-2 lg:max-h-32 lg:opacity-100" : "mt-2 lg:mt-0 lg:max-h-0 lg:opacity-0"}`}
+                                                    className={`overflow-hidden text-sm sm:text-base leading-relaxed text-cloud-500/75 transition-all duration-500 ease-out ${isActive ? "mt-2 lg:max-h-32 lg:opacity-100" : "mt-2 lg:mt-0 lg:max-h-0 lg:opacity-0"}`}
                                                 >
                                                     {step.description}
                                                 </p>
@@ -166,12 +166,12 @@ export const LandingHowItWorks = () => {
                                     <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${current.iconClass}`}>
                                         <HugeiconsIcon icon={current.icon} size={22} />
                                     </div>
-                                    <span className="font-baskerville text-sm text-cloud-400">
+                                    <span className="font-baskerville font-semibold text-sm text-cloud-400">
                                         {active + 1}/{steps.length}
                                     </span>
                                 </div>
 
-                                <p className="mt-5 font-baskerville text-xl text-cloud-600">{current.title}</p>
+                                <p className="mt-5 font-baskerville font-semibold text-xl text-cloud-600">{current.title}</p>
 
                                 <dl className="mt-5 flex flex-col">
                                     {current.mock.map((row) => (

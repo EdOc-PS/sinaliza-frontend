@@ -4,7 +4,7 @@ import AuthBackground from '@/components/layout/AuthBackground'
 import Input from '@components/ui/Input'
 import Label from '@components/ui/Label'
 import Button from '@components/ui/Button'
-import { CirclePasswordIcon, Home01Icon, MailOpenLoveIcon, UserAdd01Icon } from '@hugeicons/core-free-icons'
+import { CirclePasswordIcon, Home01Icon, MailOpenLoveIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/config/context/AuthContext'
@@ -119,25 +119,28 @@ const LoginPage = () => {
                                 Entrar na minha conta
                             </Button>
                         </form>
-                    </div>
-                </div>
 
-                {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-4 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
-                    >
-                        <HugeiconsIcon icon={Home01Icon} size={20} />
-                        Início
-                    </button>
-                    <button
-                        onClick={() => navigate('/auth/register')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-lime-500 px-5 py-3 font-semibold text-cloud-100 transition-colors duration-300 hover:bg-lime-500/90"
-                    >
-                        <HugeiconsIcon icon={UserAdd01Icon} size={20} />
-                        Solicitar entrada
-                    </button>
+                        <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t-2 border-neutral-200 pt-5 text-sm sm:flex-row">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/')}
+                                className="flex cursor-pointer items-center gap-1.5 font-semibold text-cloud-500/80 hover:text-cloud-500"
+                            >
+                                <HugeiconsIcon icon={Home01Icon} size={18} />
+                                Início
+                            </button>
+                            <p className="text-neutral-500">
+                                Não tem uma conta?{' '}
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/auth/register')}
+                                    className="cursor-pointer font-semibold text-campfire-600 hover:text-campfire-500"
+                                >
+                                    Solicitar entrada
+                                </button>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

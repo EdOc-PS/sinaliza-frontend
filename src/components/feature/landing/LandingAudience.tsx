@@ -29,7 +29,7 @@ const audiences = [
 export const LandingAudience = () => (
     <section id="para-quem" className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="reveal max-w-2xl font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">
+            <h2 className="reveal max-w-2xl font-baskerville text-3xl font-semibold leading-tight tracking-tight text-cloud-600 sm:text-5xl">
                 <WordReveal lines={[["Cada", "papel", "da", "sala"], ["tem", "seu", "lugar."]]} />
             </h2>
 
@@ -41,11 +41,11 @@ export const LandingAudience = () => (
                         style={{ transitionDelay: `${i * 90}ms` }}
                     >
                         <img src={item.image} alt="" className="h-16 w-16 object-contain" />
-                        <h3 className="flex items-center gap-2.5 font-baskerville text-2xl text-cloud-600">
+                        <h3 className="flex items-center gap-2.5 font-baskerville font-semibold text-2xl text-cloud-600">
                             <span className={`h-2 w-2 rounded-full ${item.dot}`} />
                             {item.title}
                         </h3>
-                        <p className="max-w-xs text-[15px] leading-relaxed text-cloud-500/75">{item.description}</p>
+                        <p className="max-w-xs text-sm sm:text-base leading-relaxed text-cloud-500/75">{item.description}</p>
                     </div>
                 ))}
             </div>

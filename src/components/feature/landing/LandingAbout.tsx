@@ -13,7 +13,7 @@ export const LandingAbout = () => {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Citação */}
                 <figure className="reveal max-w-4xl">
-                    <blockquote className="relative font-baskerville text-2xl font-normal leading-snug tracking-tight text-cloud-600 sm:text-4xl">
+                    <blockquote className="relative font-baskerville text-2xl font-semibold leading-snug tracking-tight text-cloud-600 sm:text-4xl">
                         <span className="font-baskerville absolute -left-5 -top-1 text-campfire-500 sm:-left-7">“</span>
                         A educação em Libras deve ser acessível, organizada e inspiradora para todo
                         mundo que está na sala de aula.
@@ -25,11 +25,11 @@ export const LandingAbout = () => {
 
                 {/* Contexto do projeto */}
                 <div className="mt-24 grid gap-10 border-t border-cloud-200 pt-12 md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:gap-y-6">
-                    <h3 className="reveal font-baskerville md:col-span-2 text-2xl text-cloud-600">
+                    <h3 className="reveal font-baskerville font-semibold md:col-span-2 text-2xl text-cloud-600">
                         Por que <em className="font-baskerville text-lime-500">Sinaliza</em>?
                     </h3>
 
-                    <div className="reveal flex max-w-3xl flex-col gap-4 text-[15px] leading-relaxed text-cloud-500/75" style={{ transitionDelay: "90ms" }}>
+                    <div className="reveal flex max-w-3xl flex-col gap-4 text-sm sm:text-base leading-relaxed text-cloud-500/75" style={{ transitionDelay: "90ms" }}>
                         <p>
                             O Sinaliza nasceu como Trabalho de Conclusão de Curso no{" "}
                             <strong className="font-semibold text-cloud-600">IFMG — Campus Ouro Branco</strong>.
@@ -53,10 +53,10 @@ export const LandingAbout = () => {
                     <CardMemphisBackground seed="landing-cta" color="#213547" rounded="rounded-[2rem]" />
 
                     <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center">
-                        <h2 className="font-baskerville text-3xl font-normal leading-tight tracking-tight text-white sm:text-5xl">
+                        <h2 className="font-baskerville text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
                             <WordReveal lines={[["Comece", "pelo"], ["primeiro", "sinal."]]} />
                         </h2>
-                        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/70">
+                        <p className="mt-5 max-w-md text-sm sm:text-base leading-relaxed text-white/70">
                             Solicite sua entrada ou explore o repositório público agora mesmo.
                         </p>
 

@@ -13,7 +13,6 @@ import {
     CirclePasswordIcon,
     Home01Icon,
     LocationUser01Icon,
-    Login03Icon,
     MailOpenLoveIcon,
     PenTool03Icon,
     SmartPhone01Icon,
@@ -501,25 +500,27 @@ const RegisterPage = () => {
                             </>
                         )}
                     </div>
+                    <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t-2 border-neutral-200 pt-5 text-sm sm:flex-row">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/')}
+                                className="flex cursor-pointer items-center gap-1.5 font-semibold text-cloud-500/80 hover:text-cloud-500"
+                            >
+                                <HugeiconsIcon icon={Home01Icon} size={18} />
+                                Início
+                            </button>
+                            <p className="text-neutral-500">
+                                Já tem uma conta?{' '}
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/auth/login')}
+                                    className="cursor-pointer font-semibold text-campfire-600 hover:text-campfire-500"
+                                >
+                                    Fazer login
+                                </button>
+                            </p>
+                        </div>
                 </form>
-
-                {/* Mobile: abaixo do form | md+: canto superior direito */}
-                <div className="mt-1 flex items-center gap-2 rounded-3xl border-2 border-neutral-300 bg-white p-2 md:absolute md:right-4 md:top-4 md:mt-0">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 font-semibold text-cloud-500 transition-colors duration-300 hover:bg-cloud-100"
-                    >
-                        <HugeiconsIcon icon={Home01Icon} size={20} />
-                        Início
-                    </button>
-                    <button
-                        onClick={() => navigate('/auth/login')}
-                        className="flex cursor-pointer items-center gap-2 rounded-2xl bg-campfire-500 px-5 py-3 font-semibold text-cloud-100 transition-colors duration-300 hover:bg-campfire-500/90"
-                    >
-                        <HugeiconsIcon icon={Login03Icon} size={20} />
-                        Fazer login
-                    </button>
-                </div>
             </div>
         </div>
     )

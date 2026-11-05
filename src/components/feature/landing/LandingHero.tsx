@@ -14,7 +14,7 @@ export const LandingHero = () => {
             <AuthBackground variant="contained" sun />
 
             <div className="relative z-10 mx-auto w-full max-w-4xl px-4 text-center sm:px-6">
-                <h1 className="font-baskerville text-[2.6rem] font-normal leading-[1.1] tracking-tight text-cloud-600 sm:text-6xl lg:text-7xl">
+                <h1 className="font-baskerville text-[2.6rem] font-semibold leading-[1.1] tracking-tight text-cloud-600 sm:text-6xl lg:text-7xl">
                     <WordReveal
                         lines={[
                             [<em key="l" className="text-campfire-500">Libras</em>, "ao", "alcance"],

@@ -21,14 +21,14 @@ export const LandingRepositoryPreview = ({ signs, total }: LandingRepositoryPrev
         <section id="repositorio" className="bg-cloud-100 py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-                    <h2 className="reveal max-w-xl font-baskerville text-3xl font-normal leading-tight tracking-tight text-cloud-600 sm:text-5xl">
+                    <h2 className="reveal max-w-xl font-baskerville text-3xl font-semibold leading-tight tracking-tight text-cloud-600 sm:text-5xl">
                         <WordReveal lines={[["Abra", "o", "repositório"], ["sem", "criar", "conta."]]} />
                     </h2>
 
                     <div className="reveal flex max-w-sm flex-col gap-5" style={{ transitionDelay: "120ms" }}>
-                        <p className="text-[15px] leading-relaxed text-cloud-500/75">
+                        <p className="text-sm sm:text-base leading-relaxed text-cloud-500/75">
                             {total > 0 && (
-                                <strong className="font-baskerville text-2xl font-normal text-cloud-600">{total} sinais </strong>
+                                <strong className="font-baskerville text-2xl font-semibold text-cloud-600">{total} sinais </strong>
                             )}
                             validados pelos gestores, com busca por palavra, categoria ou configuração de mão.
                         </p>
@@ -69,7 +69,7 @@ export const LandingRepositoryPreview = ({ signs, total }: LandingRepositoryPrev
                                         </div>
 
                                         <div className="flex items-center justify-between gap-2 px-1 pt-3">
-                                            <h3 className="truncate font-baskerville text-lg text-cloud-600">{sign.name}</h3>
+                                            <h3 className="truncate font-baskerville font-semibold text-lg text-cloud-600">{sign.name}</h3>
                                             {sign.category && (
                                                 <span className={`shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-semibold ${getCategoryBadgeClass(sign.category.value)}`}>
                                                     {sign.category.name}
