@@ -118,7 +118,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                     <Spinner size={28} color="#6B7280" />
                 </div>
             ) : (
-                <div className="stagger-children flex flex-col gap-2">
+                <div className="@container stagger-children flex flex-col gap-2">
                     {signs.map((sign) => {
                         const busyApprove = processing.get(sign.id) === true;
                         const busyReject = processing.get(sign.id) === false;
@@ -127,7 +127,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                             ?? (sign.anotherUrl ? getYouTubeThumbnail(sign.anotherUrl) : null);
 
                         return (
-                            <div key={sign.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
+                            <div key={sign.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 @lg:flex-row @lg:items-center">
                                 <div
                                     className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
                                     onClick={() => navigate(`/signs/${sign.slug}`)}
@@ -161,12 +161,12 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                 </div>
 
                                 {canReview && (
-                                    <div className="flex shrink-0 items-center gap-2">
+                                    <div className="flex shrink-0 items-center gap-2 @lg:w-auto w-full">
                                         <button
                                             type="button"
                                             disabled={busy}
                                             onClick={() => openReject(sign)}
-                                            className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
+                                            className="flex flex-1 items-center justify-center gap-1.5 min-h-11 whitespace-nowrap rounded-2xl bg-salmon-100 px-4 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 @lg:flex-none"
                                         >
                                             {busyReject ? <Spinner size={18} color="#EEA2A2" /> : <HugeiconsIcon icon={Cancel02Icon} size={22} />}
                                             Recusar
@@ -175,7 +175,7 @@ export const PromotionSection = ({ canReview }: PromotionSectionProps) => {
                                             type="button"
                                             disabled={busy}
                                             onClick={() => approve(sign)}
-                                            className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
+                                            className="flex flex-1 items-center justify-center gap-1.5 min-h-11 whitespace-nowrap rounded-2xl bg-lime-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 @lg:flex-none"
                                         >
                                             {busyApprove ? <Spinner size={18} color="#FFFFFF" /> : <HugeiconsIcon icon={Tick04Icon} size={22} />}
                                             Aprovar

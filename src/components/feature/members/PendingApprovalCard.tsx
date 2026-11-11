@@ -30,11 +30,11 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="@container flex flex-col gap-2">
                 {pending.map((member) => {
                     const busy = processingId === member.id;
                     return (
-                        <div key={member.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 sm:flex-row sm:items-center">
+                        <div key={member.id} className="flex flex-col gap-3 rounded-2xl bg-white p-3 @lg:flex-row @lg:items-center">
                             <div className="flex min-w-0 flex-1 items-center gap-3">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sky-100 font-baskerville text-sm font-semibold text-sky-600">
                                     {getAvatarUrl(member.avatar) ? (
@@ -58,12 +58,12 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                 </div>
                             </div>
 
-                            <div className="flex shrink-0 items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2 @lg:w-auto w-full">
                                 <button
                                     type="button"
                                     disabled={busy}
                                     onClick={() => onReject(member)}
-                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-salmon-100 px-3 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 sm:flex-none"
+                                    className="flex flex-1 items-center justify-center gap-1.5 min-h-11 whitespace-nowrap rounded-2xl bg-salmon-100 px-4 py-2 text-sm font-medium text-salmon-600 transition-colors hover:bg-salmon-200 disabled:opacity-50 @lg:flex-none"
                                 >
                                     <HugeiconsIcon icon={Cancel02Icon} size={22} />
                                     Recusar
@@ -72,7 +72,7 @@ export const PendingApprovalCard = ({ pending, processingId, onApprove, onReject
                                     type="button"
                                     disabled={busy}
                                     onClick={() => onApprove(member)}
-                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-lime-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 sm:flex-none"
+                                    className="flex flex-1 items-center justify-center gap-1.5 min-h-11 whitespace-nowrap rounded-2xl bg-lime-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lime-600 disabled:opacity-50 @lg:flex-none"
                                 >
                                     <HugeiconsIcon icon={Tick04Icon} size={22}/>
                                     Aprovar
