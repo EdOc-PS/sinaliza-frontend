@@ -45,7 +45,7 @@ const FABAction = ({ icon, label, onClick, delay = "0ms", visible }: FABActionPr
             text-sm font-semibold text-cloud-700 whitespace-nowrap
             hover:shadow-xl hover:border-cloud-400 transition-all duration-200
             ${visible
-                ? "opacity-100 translate-y-0 scale-100"
+                ? "pointer-events-auto opacity-100 translate-y-0 scale-100"
                 : "opacity-0 translate-y-3 scale-95 pointer-events-none"
             }
         `}
@@ -106,7 +106,7 @@ export const FAB = () => {
 
     return (
         <>
-            <div className="fixed bottom-30 md:bottom-10 right-5 md:right-8 xl:right-10 z-40 flex flex-col items-end gap-3">
+            <div className="pointer-events-none fixed bottom-30 md:bottom-10 right-5 md:right-8 xl:right-10 z-40 flex flex-col items-end gap-3">
                 {isEducator && (
                     <div className="flex flex-col items-end gap-2.5">
                         {/* Ações do gestor (cadastros administrativos) ficam no topo */}
@@ -162,7 +162,7 @@ export const FAB = () => {
                 <div className="flex items-center gap-2.5">
                     <button
                         onClick={handleFABClick}
-                        className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-cloud-500 shadow-lg shadow-cloud-500/40 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none"
+                        className="pointer-events-auto w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-cloud-500 shadow-lg shadow-cloud-500/40 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none"
                     >
                         <HugeiconsIcon
                             icon={AddIcon}

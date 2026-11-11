@@ -27,3 +27,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testes: prints, vídeos e relatórios gerados a cada execução
+src/teste/resultados
+src/teste/relatorio

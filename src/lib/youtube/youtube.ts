@@ -1,6 +1,6 @@
 // Extrai o id de um link do YouTube (watch?v=, youtu.be/, embed/)
 export function getYouTubeId(url: string): string | null {
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
     return match ? match[1] : null;
 }
 

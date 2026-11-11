@@ -57,6 +57,10 @@ export const InputCode = ({ digits, onChange, length = 6 }: InputCodeProps) => {
                     value={digits[index] || ""}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
+                    onPaste={(e) => {
+                        e.preventDefault();
+                        handleChange(index, e.clipboardData.getData("text"));
+                    }}
                     className={`caret-transparent flex-1 min-w-0 max-w-14 h-12 sm:h-14 text-center text-base sm:text-lg font-semibold rounded-2xl border-2 transition-all focus:outline-none ${
                         digits[index]
                             ? "border-lime-400 bg-lime-50"

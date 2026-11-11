@@ -252,8 +252,8 @@ const ClassroomDetailPage = () => {
                 </div>
 
                 <div className="relative z-10 flex flex-col justify-between h-full p-6 sm:p-8" style={{ minHeight: 220 }}>
-                        {/* Nome + descrição (topo esquerdo) */}
-                        <div>
+                        {/* Nome + descrição (topo esquerdo) — abaixo do Voltar no celular */}
+                        <div className="pt-10 sm:pt-0 sm:pr-28">
                             <h1 className="font-baskerville text-2xl sm:text-3xl font-semibold leading-tight drop-shadow">
                                 {classroom.name}
                             </h1>

@@ -133,7 +133,7 @@ function handleError<T>(error: unknown): APIResponse<T> {
         }
         return { success: false, message: data.message ?? 'Acesso não autorizado.' };
       case 403:
-        return { success: false, message: 'Acesso negado.' };
+        return { success: false, message: data.message ?? 'Acesso negado.' };
       case 404:
         return { success: false, message: data.message ?? 'Recurso não encontrado.' };
       case 409:
